@@ -31,7 +31,7 @@ class EventModel {
     }
 
     /**
-     * Retrieve all events for admin management, sorted by event_date.
+     * Retrieve all events sorted by event_date.
      *
      * @return array
      */
@@ -58,7 +58,7 @@ class EventModel {
     }
 
     /**
-     * Create a new campus event (admin action).
+     * Create a new campus event (authorized action).
      *
      * @param string $title
      * @param string|null $description
@@ -83,7 +83,7 @@ class EventModel {
     }
 
     /**
-     * Update an existing event (admin action).
+     * Update an existing event (authorized action).
      *
      * @param int $id
      * @param string $title
@@ -113,7 +113,7 @@ class EventModel {
     }
 
     /**
-     * Delete an event by ID (admin action).
+     * Delete an event by ID (authorized action).
      *
      * @param int $id
      * @return bool

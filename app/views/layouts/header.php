@@ -150,9 +150,6 @@ if ($isLoggedIn) {
                                     <div class="d-flex flex-column min-w-0 flex-grow-1">
                                         <div class="d-flex align-items-center justify-content-between gap-1">
                                             <span class="fb-user-fullname text-truncate"><?= htmlspecialchars($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'User'); ?></span>
-                                            <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                                                <span class="badge bg-warning text-dark micro-text flex-shrink-0">Admin</span>
-                                            <?php endif; ?>
                                         </div>
                                         <span class="fb-user-subtext text-truncate">@<?= htmlspecialchars($_SESSION['username'] ?? 'user'); ?></span>
                                     </div>

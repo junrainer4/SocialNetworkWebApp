@@ -144,7 +144,6 @@ class AuthController {
                     $_SESSION['user_id']       = $user['id'];
                     $_SESSION['username']      = $user['username'];
                     $_SESSION['full_name']     = $user['full_name'];
-                    $_SESSION['role']          = $user['role'] ?? 'user';
                     $_SESSION['profile_image'] = $user['profile_image'] ?? null;
 
                     $_SESSION['success_message'] = 'Welcome back, ' . htmlspecialchars($user['full_name']) . '!';

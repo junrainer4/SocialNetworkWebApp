@@ -408,12 +408,11 @@ class ProfileController {
         }
 
         // Privacy Check:
-        // If profile is private and current user is NOT the owner and NOT an admin:
+        // If profile is private and current user is NOT the owner:
         $isOwner = ($currentUserId === $targetUserId);
-        $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
         $isPrivate = (($targetUser['privacy_followers'] ?? 'public') === 'private');
 
-        if ($isPrivate && !$isOwner && !$isAdmin) {
+        if ($isPrivate && !$isOwner) {
             echo json_encode([
                 'success' => false,
                 'is_private' => true,

@@ -4,12 +4,10 @@
 
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
-require_once __DIR__ . '/../models/ReportModel.php';
 
 class InsightsController {
     private $userModel;
     private $postModel;
-    private $reportModel;
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) {
@@ -17,7 +15,6 @@ class InsightsController {
         }
         $this->userModel = new UserModel();
         $this->postModel = new PostModel();
-        $this->reportModel = new ReportModel();
     }
 
     /**
@@ -123,52 +120,6 @@ class InsightsController {
             } catch (Exception $e) {
                 error_log("Search execution error: " . $e->getMessage());
                 $errorMessage = "Search Error: An error occurred while retrieving search results. Please try again.";
-            }
-        }
-
-        // 5. Execute Community Reports Queries ONLY if user is an Admin and requested report
-        $isAdmin = (isset($_SESSION['role']) && $_SESSION['role'] === 'admin');
-        $isReportRequested = $isAdmin && (!empty($_GET['generate_report']) || ($_GET['action'] ?? '') === 'reports');
-        $reportGenerated = false;
-
-        $summaryMetrics = [
-            'total_users'    => 0,
-            'total_posts'    => 0,
-            'total_comments' => 0,
-            'total_likes'    => 0
-        ];
-        $postsGroupedByAuthor = [];
-        $mostActiveMembers = [];
-        $postActivityTimeline = [];
-        $detailedReportRows = [];
-
-        // If non-admin attempts to access action=reports directly, inform them and redirect to insights
-        if (($_GET['action'] ?? '') === 'reports' && !$isAdmin) {
-            $_SESSION['error_message'] = 'Community Reports generation is restricted to administrators.';
-            header('Location: ' . BASE_URL . '/index.php?action=insights');
-            exit;
-        }
-
-        if ($isReportRequested && empty($errorMessage)) {
-            $filterParams = [
-                'search'        => $effectiveSearch,
-                'author_id'     => $authorId,
-                'start_date'    => $startDate,
-                'end_date'      => $endDate,
-                'content_type'  => $contentType,
-                'report_sort'   => $reportSort
-            ];
-
-            try {
-                $summaryMetrics = $this->reportModel->getFilteredSummaryMetrics($filterParams);
-                $postsGroupedByAuthor = $this->reportModel->getPostsGroupedByAuthor($filterParams);
-                $mostActiveMembers = $this->reportModel->getMostActiveMembers($filterParams, 5);
-                $postActivityTimeline = $this->reportModel->getPostActivityTimeline($filterParams);
-                $detailedReportRows = $this->reportModel->getDetailedReportTable($filterParams);
-                $reportGenerated = true;
-            } catch (Exception $e) {
-                error_log("Reports query error: " . $e->getMessage());
-                $errorMessage = "Report Generation Error: We could not generate the community report at this time. Please try again.";
             }
         }
 

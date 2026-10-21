@@ -119,7 +119,7 @@ class UserModel {
      * @return array|false
      */
     public function findById($id) {
-        $sql = "SELECT id, username, full_name, bio, profile_image, cover_photo, role, privacy_followers, created_at FROM users WHERE id = :id LIMIT 1";
+        $sql = "SELECT id, username, full_name, bio, profile_image, cover_photo, privacy_followers, created_at FROM users WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $id]);
         return $stmt->fetch();

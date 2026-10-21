@@ -37,14 +37,13 @@ $currentUserId = $_SESSION['user_id'] ?? null;
         <div class="search-reports-card mb-4">
             <!-- Card Heading -->
             <div class="mb-4">
-                <h3 class="fw-bold insights-title mb-1" style="letter-spacing: -0.5px;">Search & Reports</h3>
-                <p class="text-secondary mb-0 small">Find users, filter community posts, and inspect interaction statistics.</p>
+                <h3 class="fw-bold insights-title mb-1" style="letter-spacing: -0.5px;">Community Search</h3>
+                <p class="text-secondary mb-0 small">Find users and filter community posts by topic, author, and date.</p>
             </div>
 
             <!-- Search Form -->
             <form action="<?= BASE_URL ?>/index.php" method="GET" id="insightsSearchForm">
                 <input type="hidden" name="action" value="insights">
-                <input type="hidden" name="report_sort" value="<?= htmlspecialchars($reportSort); ?>">
 
                 <!-- Full-Width Search Input -->
                 <div class="position-relative mb-3">
@@ -126,16 +125,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 </div>
 
                 <!-- Action Row -->
-                <div class="pt-3 border-top insights-border d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-3">
-                    <?php if (isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                        <button type="submit" name="generate_report" value="1" class="btn btn-report-generate rounded-pill px-3 py-2 fw-medium btn-sm d-inline-flex align-items-center gap-2">
-                            <i class="bi bi-bar-chart-line search-accent-icon"></i>
-                            <span>Generate Full Community Report</span>
-                        </button>
-                    <?php else: ?>
-                        <div></div>
-                    <?php endif; ?>
-
+                <div class="pt-3 border-top insights-border d-flex justify-content-end gap-3">
                     <button type="submit" class="btn btn-black rounded-pill px-4 py-2 fw-semibold btn-sm shadow-sm d-inline-flex align-items-center gap-2">
                         <i class="bi bi-search"></i>
                         <span>Search & Filter</span>
@@ -150,18 +140,17 @@ $currentUserId = $_SESSION['user_id'] ?? null;
             <div class="text-center mb-4">
                 <!-- Top Center Icon -->
                 <div class="insights-header-icon-box mx-auto mb-3">
-                    <i class="bi <?= (!empty($reportGenerated) && empty($query)) ? 'bi-bar-chart-line-fill' : 'bi-search' ?> fs-5"></i>
+                    <i class="bi bi-search fs-5"></i>
                 </div>
 
-                <h4 class="fw-bold insights-title mb-2">Explore Community<?= (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? ' & Generate Reports' : ''; ?></h4>
+                <h4 class="fw-bold insights-title mb-2">Explore Community</h4>
                 <p class="text-secondary small mb-0 mx-auto" style="max-width: 560px; line-height: 1.6;">
-                    Discover community members, search posts, and analyze user interactions<?= (isset($_SESSION['role']) && $_SESSION['role'] === 'admin') ? ', and inspect database reports' : ''; ?>.
+                    Discover community members, search posts, and explore user interactions.
                 </p>
             </div>
 
             <!-- RESULTS DISPLAY -->
             <?php if (($type === 'all' && empty($users) && empty($posts)) || ($type === 'users' && empty($users)) || ($type === 'posts' && empty($posts))): ?>
-                <?php if (empty($reportGenerated) || !empty($query)): ?>
                 <!-- Clean Empty State -->
                 <div class="p-4 text-center rounded-3 mb-4 border bg-body">
                     <div class="text-muted mb-2 fs-3"><i class="bi bi-search"></i></div>
@@ -169,7 +158,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                     <p class="text-muted small mb-3">No community members or posts matched your search parameters. Try adjusting keywords or clearing filters.</p>
                     <a href="<?= BASE_URL ?>/index.php?action=insights" class="btn btn-outline-secondary btn-sm rounded-pill px-4">Clear Search & Filters</a>
                 </div>
-                <?php endif; ?>
             <?php else: ?>
 
                 <!-- USER MATCHES -->
@@ -376,107 +364,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 
             <?php endif; ?>
 
-            <!-- COMMUNITY REPORTS DISPLAY (WHEN GENERATED FOR ADMIN) -->
-            <?php if (!empty($reportGenerated) && isset($_SESSION['role']) && $_SESSION['role'] === 'admin'): ?>
-                <div class="pt-4 border-top insights-border mt-4" id="communityReportsDetails">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <h5 class="fw-bold insights-title mb-0">
-                            <i class="bi bi-bar-chart-line-fill me-2 text-primary"></i> Generated Community Reports
-                        </h5>
-                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1 fw-semibold">
-                            Live SQL Analytics
-                        </span>
-                    </div>
-
-                    <!-- SUMMARY CARDS -->
-                    <div class="row g-3 mb-4">
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-3 border bg-body text-center">
-                                <span class="text-muted micro-text fw-bold text-uppercase d-block mb-1">Total Users</span>
-                                <h4 class="fw-bold insights-title mb-0"><?= (int)($summaryMetrics['total_users'] ?? 0); ?></h4>
-                            </div>
-                        </div>
-
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-3 border bg-body text-center">
-                                <span class="text-muted micro-text fw-bold text-uppercase d-block mb-1">Total Posts</span>
-                                <h4 class="fw-bold insights-title mb-0"><?= (int)($summaryMetrics['total_posts'] ?? 0); ?></h4>
-                            </div>
-                        </div>
-
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-3 border bg-body text-center">
-                                <span class="text-muted micro-text fw-bold text-uppercase d-block mb-1">Total Comments</span>
-                                <h4 class="fw-bold insights-title mb-0"><?= (int)($summaryMetrics['total_comments'] ?? 0); ?></h4>
-                            </div>
-                        </div>
-
-                        <div class="col-6 col-md-3">
-                            <div class="p-3 rounded-3 border bg-body text-center">
-                                <span class="text-muted micro-text fw-bold text-uppercase d-block mb-1">Total Likes</span>
-                                <h4 class="fw-bold insights-title mb-0"><?= (int)($summaryMetrics['total_likes'] ?? 0); ?></h4>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- DETAILED AUTHOR REPORT TABLE -->
-                    <div class="p-3 rounded-3 border bg-body mb-2">
-                        <div class="d-flex flex-column flex-sm-row align-items-sm-center justify-content-between gap-2 mb-2 pb-2 border-bottom insights-border">
-                            <span class="fw-bold insights-title micro-text text-uppercase">
-                                Author Activity Report
-                            </span>
-                            <div class="d-flex align-items-center gap-2">
-                                <span class="text-muted micro-text">Sort:</span>
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="<?= BASE_URL ?>/index.php?action=insights&generate_report=1&report_sort=posts_desc#communityReportsDetails" class="btn <?= ($reportSort === 'posts_desc') ? 'btn-dark' : 'btn-outline-secondary' ?> py-1 px-2 micro-text">Posts ↓</a>
-                                    <a href="<?= BASE_URL ?>/index.php?action=insights&generate_report=1&report_sort=likes_desc#communityReportsDetails" class="btn <?= ($reportSort === 'likes_desc') ? 'btn-dark' : 'btn-outline-secondary' ?> py-1 px-2 micro-text">Likes ↓</a>
-                                    <a href="<?= BASE_URL ?>/index.php?action=insights&generate_report=1&report_sort=comments_desc#communityReportsDetails" class="btn <?= ($reportSort === 'comments_desc') ? 'btn-dark' : 'btn-outline-secondary' ?> py-1 px-2 micro-text">Comments ↓</a>
-                                    <a href="<?= BASE_URL ?>/index.php?action=insights&generate_report=1&report_sort=username_asc#communityReportsDetails" class="btn <?= ($reportSort === 'username_asc') ? 'btn-dark' : 'btn-outline-secondary' ?> py-1 px-2 micro-text">Name A-Z</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <?php if (!empty($detailedReportRows)): ?>
-                            <div class="table-responsive">
-                                <table class="table table-hover align-middle mb-0 insights-table">
-                                    <thead class="table-light micro-text text-uppercase insights-table-head">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Author</th>
-                                            <th>Username</th>
-                                            <th class="text-center">Posts</th>
-                                            <th class="text-center">Likes</th>
-                                            <th class="text-center">Comments</th>
-                                            <th class="text-end">Latest Post</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <?php foreach ($detailedReportRows as $idx => $r): ?>
-                                            <tr>
-                                                <td class="text-muted micro-text"><?= $idx + 1; ?></td>
-                                                <td>
-                                                    <a href="<?= BASE_URL ?>/index.php?action=profile&id=<?= $r['user_id']; ?>" class="fw-bold insights-title text-decoration-none small">
-                                                        <?= htmlspecialchars($r['full_name']); ?>
-                                                    </a>
-                                                </td>
-                                                <td class="text-muted small">@<?= htmlspecialchars($r['username']); ?></td>
-                                                <td class="text-center"><span class="badge bg-dark rounded-pill px-2"><?= (int)$r['post_count']; ?></span></td>
-                                                <td class="text-center"><span class="badge bg-light text-secondary border rounded-pill px-2 insights-badge-subtle"><?= (int)$r['total_likes']; ?></span></td>
-                                                <td class="text-center"><span class="badge bg-light text-secondary border rounded-pill px-2 insights-badge-subtle"><?= (int)$r['total_comments']; ?></span></td>
-                                                <td class="text-end micro-text text-muted">
-                                                    <?= !empty($r['latest_post_date']) ? date('M j, Y', strtotime($r['latest_post_date'])) : 'No activity'; ?>
-                                                </td>
-                                            </tr>
-                                        <?php endforeach; ?>
-                                    </tbody>
-                                </table>
-                            </div>
-                        <?php else: ?>
-                            <div class="text-center py-3 text-muted small">No detailed report data found for current filters.</div>
-                        <?php endif; ?>
-                    </div>
-                </div>
-            <?php endif; ?>
         </div>
 
     </div>
