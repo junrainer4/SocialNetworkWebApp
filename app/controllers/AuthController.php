@@ -15,6 +15,20 @@ class AuthController {
     }
 
     /**
+     * Show welcome landing screen for unauthenticated visitors.
+     */
+    public function welcome() {
+        // If already logged in, redirect to home
+        if (isset($_SESSION['user_id'])) {
+            header('Location: ' . BASE_URL . '/index.php');
+            exit;
+        }
+
+        $pageTitle = 'Welcome to SMCC Connect';
+        require __DIR__ . '/../views/auth/welcome.php';
+    }
+
+    /**
      * Show registration form or process registration submission.
      */
     public function register() {
@@ -172,7 +186,7 @@ class AuthController {
 
         // Set flash message on new session state
         $_SESSION['success_message'] = 'You have been logged out successfully.';
-        header('Location: ' . BASE_URL . '/index.php?action=login');
+        header('Location: ' . BASE_URL . '/index.php?action=welcome');
         exit;
     }
 

@@ -138,18 +138,26 @@ require_once __DIR__ . '/../layouts/header.php';
                 <div id="confirmFeedback" class="mt-1" style="font-size: 0.8rem; min-height: 20px;" aria-live="polite"></div>
             </div>
 
-            <!-- Submit Button -->
+            <!-- Functional Create Account Submit Button -->
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-navy py-2-5 fw-semibold shadow-sm" id="submitBtn">
-                    <i class="bi bi-person-check-fill me-1"></i> Register Account
+                    <i class="bi bi-person-check-fill me-1"></i> Create Account
                 </button>
             </div>
 
+            <!-- Form Navigation Links -->
             <div class="text-center pt-3 border-top">
-                <span class="text-muted small">Already have an account?</span>
-                <a href="<?= BASE_URL ?>/index.php?action=login" class="text-navy small fw-bold text-decoration-none ms-1">
-                    Sign In
-                </a>
+                <div class="mb-2">
+                    <span class="text-muted small">Already have an account?</span>
+                    <a href="<?= BASE_URL ?>/index.php?action=login" class="text-navy small fw-bold text-decoration-none ms-1">
+                        Log In
+                    </a>
+                </div>
+                <div>
+                    <a href="<?= BASE_URL ?>/index.php?action=welcome" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i> Back to Welcome
+                    </a>
+                </div>
             </div>
         </form>
     </div>

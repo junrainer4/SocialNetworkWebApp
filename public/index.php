@@ -25,6 +25,12 @@ if (!defined('BASE_URL')) {
 $action = $_GET['action'] ?? $_POST['action'] ?? 'home';
 
 switch ($action) {
+    case 'welcome':
+        require_once __DIR__ . '/../app/controllers/AuthController.php';
+        $authController = new AuthController();
+        $authController->welcome();
+        break;
+
     case 'register':
         require_once __DIR__ . '/../app/controllers/AuthController.php';
         $authController = new AuthController();
@@ -151,14 +157,17 @@ switch ($action) {
         $postController->delete();
         break;
 
-    // Community Insights (Search, Filtering, and Reports)
+    // Community Insights (Search and Filtering)
     case 'insights':
     case 'search':
-    case 'reports':
         require_once __DIR__ . '/../app/controllers/InsightsController.php';
         $insightsController = new InsightsController();
         $insightsController->index();
         break;
+
+    case 'reports':
+        header('Location: ' . BASE_URL . '/index.php?action=insights');
+        exit;
 
     // Follow and Unfollow Actions
     case 'follow_user':
@@ -208,8 +217,10 @@ switch ($action) {
     case 'home':
     case '':
         if (!isset($_SESSION['user_id'])) {
-            header('Location: ' . BASE_URL . '/index.php?action=login');
-            exit;
+            require_once __DIR__ . '/../app/controllers/AuthController.php';
+            $authController = new AuthController();
+            $authController->welcome();
+            break;
         }
         $pageTitle = 'Home';
         require_once __DIR__ . '/../app/models/PostModel.php';
