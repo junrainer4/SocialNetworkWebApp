@@ -1,20 +1,23 @@
 <?php
 // app/controllers/FollowController.php
-// Handles following and unfollowing users via AJAX and standard POST requests
+// Handles following, unfollowing, and the Friends/Followers management page for Nexus
 
 require_once __DIR__ . '/../models/FollowModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../models/NotificationModel.php';
 
 class FollowController {
     private $followModel;
     private $userModel;
+    private $notificationModel;
 
     public function __construct() {
         if (session_status() === PHP_SESSION_NONE) {
             session_start();
         }
-        $this->followModel = new FollowModel();
-        $this->userModel   = new UserModel();
+        $this->followModel       = new FollowModel();
+        $this->userModel         = new UserModel();
+        $this->notificationModel = new NotificationModel();
     }
 
     private function requireAuth() {
@@ -22,13 +25,47 @@ class FollowController {
             if (!empty($_POST['ajax']) || (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
                 header('Content-Type: application/json');
                 http_response_code(401);
-                echo json_encode(['success' => false, 'error' => 'You must be logged in to follow users.']);
+                echo json_encode(['success' => false, 'error' => 'You must be logged in to access connections.']);
                 exit;
             }
-            $_SESSION['error_message'] = 'You must be logged in to follow users.';
+            $_SESSION['error_message'] = 'You must be logged in to view friends and connections.';
             header('Location: ' . BASE_URL . '/index.php?action=login');
             exit;
         }
+    }
+
+    /**
+     * Dedicated Friends (Followers & Following) page.
+     */
+    public function friends() {
+        $this->requireAuth();
+        $userId = (int)$_SESSION['user_id'];
+
+        $activeTab = ($_GET['tab'] ?? 'followers') === 'following' ? 'following' : 'followers';
+
+        $rawFollowers = $this->followModel->getFollowers($userId);
+        $rawFollowing = $this->followModel->getFollowing($userId);
+
+        $followersCount = count($rawFollowers);
+        $followingCount = count($rawFollowing);
+
+        // Pre-compute whether current user follows each follower (for Follow / Following buttons)
+        $followers = [];
+        foreach ($rawFollowers as $f) {
+            $f['is_following'] = $this->followModel->isFollowing($userId, (int)$f['id']);
+            $followers[] = $f;
+        }
+
+        $following = [];
+        foreach ($rawFollowing as $f) {
+            $f['is_following'] = true;
+            $following[] = $f;
+        }
+
+        $pageTitle = 'Friends';
+        require_once __DIR__ . '/../views/layouts/header.php';
+        require_once __DIR__ . '/../views/friends/index.php';
+        require_once __DIR__ . '/../views/layouts/footer.php';
     }
 
     /**
@@ -54,7 +91,7 @@ class FollowController {
             if ($isAjax) {
                 header('Content-Type: application/json');
                 http_response_code(403);
-                echo json_encode(['success' => false, 'error' => 'Invalid or expired CSRF token.']);
+                echo json_encode(['success' => false, 'error' => 'Security error: Invalid CSRF token.']);
                 exit;
             }
             $_SESSION['error_message'] = 'Security error: Invalid CSRF token.';
@@ -97,22 +134,40 @@ class FollowController {
         } else {
             $this->followModel->follow($followerId, $followingId);
             $newStatus = true;
+
+            // Send notification to target user
+            $this->notificationModel->create(
+                $followingId,
+                $followerId,
+                'follow',
+                'started following you.'
+            );
         }
 
         $followersCount = $this->followModel->getFollowersCount($followingId);
         $followingCount = $this->followModel->getFollowingCount($followingId);
         $isFollowedBy   = $this->followModel->isFollowing($followingId, $followerId);
 
+        // Also get acting user's following count
+        $myFollowingCount = $this->followModel->getFollowingCount($followerId);
+
         if ($isAjax) {
             header('Content-Type: application/json');
             echo json_encode([
-                'success'         => true,
-                'is_following'    => $newStatus,
-                'is_followed_by'  => $isFollowedBy,
-                'followers_count' => $followersCount,
-                'following_count' => $followingCount,
-                'user_id'         => $followingId
+                'success'            => true,
+                'is_following'       => $newStatus,
+                'is_followed_by'     => $isFollowedBy,
+                'followers_count'    => $followersCount,
+                'following_count'    => $followingCount,
+                'my_following_count' => $myFollowingCount,
+                'user_id'            => $followingId
             ]);
+            exit;
+        }
+
+        $redirect = $_POST['redirect'] ?? '';
+        if ($redirect === 'friends') {
+            header('Location: ' . BASE_URL . '/index.php?action=friends');
             exit;
         }
 

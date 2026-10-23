@@ -389,7 +389,12 @@ class PostModel {
      * @param int|null $authorId Optional user ID to filter posts by author
      * @return array
      */
-    public function searchPosts($query = '', $filter = 'newest', $currentUserId = null, $authorId = null) {
+    public function searchPosts($query = '', $filter = 'newest', $currentUserId = null, $authorId = null, $limit = 50, $mediaOnly = false) {
+        $trimmedQuery = trim($query);
+        if ($trimmedQuery === '' && empty($authorId)) {
+            return [];
+        }
+
         $whereConditions = [];
         $params = [];
 
@@ -399,14 +404,18 @@ class PostModel {
             $params[':current_user_id'] = 0;
         }
 
-        if (trim($query) !== '') {
+        if ($trimmedQuery !== '') {
             $whereConditions[] = "p.content LIKE :search_term";
-            $params[':search_term'] = '%' . trim($query) . '%';
+            $params[':search_term'] = '%' . $trimmedQuery . '%';
         }
 
         if (!empty($authorId)) {
             $whereConditions[] = "p.user_id = :author_id";
             $params[':author_id'] = (int)$authorId;
+        }
+
+        if ($mediaOnly) {
+            $whereConditions[] = "(p.image IS NOT NULL AND p.image != '')";
         }
 
         $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
@@ -428,12 +437,15 @@ class PostModel {
                 break;
         }
 
+        $limitVal = max(1, min(100, (int)$limit));
+
         // SQL Query demonstrating:
         // 1. JOIN (JOIN users u ON p.user_id = u.id, LEFT JOIN likes l, LEFT JOIN comments c)
         // 2. Aggregate functions (COUNT(DISTINCT l.id), COUNT(DISTINCT c.id))
         // 3. Subquery for user like status (SELECT COUNT(*) FROM likes ...)
         // 4. GROUP BY (GROUP BY p.id)
         // 5. ORDER BY ($orderBy)
+        // 6. LIMIT ($limitVal)
         $sql = "SELECT p.*, 
                        u.username, 
                        u.full_name, 
@@ -447,7 +459,8 @@ class PostModel {
                 LEFT JOIN comments c ON p.id = c.post_id
                 {$whereClause}
                 GROUP BY p.id, p.user_id, p.content, p.image, p.created_at, u.username, u.full_name, u.profile_image
-                ORDER BY {$orderBy}";
+                ORDER BY {$orderBy}
+                LIMIT {$limitVal}";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
@@ -460,6 +473,31 @@ class PostModel {
         }
 
         return $posts;
+    }
+
+    /**
+     * Count matching posts for keyword search.
+     * Demonstrates: SQL Aggregate Function COUNT().
+     *
+     * @param string $query
+     * @param bool $mediaOnly
+     * @return int
+     */
+    public function countSearchPosts($query = '', $mediaOnly = false) {
+        $trimmed = trim($query);
+        if ($trimmed === '') {
+            return 0;
+        }
+        if ($mediaOnly) {
+            $sql = "SELECT COUNT(*) FROM posts p WHERE p.content LIKE ? AND (p.image IS NOT NULL AND p.image != '')";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['%' . $trimmed . '%']);
+        } else {
+            $sql = "SELECT COUNT(*) FROM posts p WHERE p.content LIKE ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['%' . $trimmed . '%']);
+        }
+        return (int)$stmt->fetchColumn();
     }
 
     /**

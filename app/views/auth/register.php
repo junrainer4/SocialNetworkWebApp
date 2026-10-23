@@ -1,6 +1,6 @@
 <?php
 // app/views/auth/register.php
-// User Registration View - Modernized Design matching SMCC Connect branding
+// User Registration View - Modernized Design matching Nexus branding
 
 require_once __DIR__ . '/../layouts/header.php';
 ?>
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../layouts/header.php';
                 <i class="bi bi-person-plus-fill"></i>
             </div>
             <h3 class="fw-bold text-navy mb-1">Create an Account</h3>
-            <p class="text-muted small">Join SMCC Connect and connect with the campus community.</p>
+            <p class="text-muted small">Join Nexus and connect with the SMCC campus community.</p>
         </div>
 
         <?php if (!empty($errors)): ?>

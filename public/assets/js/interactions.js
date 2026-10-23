@@ -1,5 +1,5 @@
 /**
- * SMCC Connect - AJAX Interactions (Post creation, Commenting, Liking)
+ * Nexus - AJAX Interactions (Post creation, Commenting, Liking)
  * Prevents full page reloads for seamless user experience.
  */
 

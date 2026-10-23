@@ -1,6 +1,6 @@
 <?php
 // app/views/auth/login.php
-// User Login View - Modernized Design matching SMCC Connect branding
+// User Login View - Modernized Design matching Nexus branding
 
 require_once __DIR__ . '/../layouts/header.php';
 ?>
@@ -12,7 +12,7 @@ require_once __DIR__ . '/../layouts/header.php';
                 <i class="bi bi-shield-lock-fill"></i>
             </div>
             <h3 class="fw-bold text-navy mb-1">Welcome Back</h3>
-            <p class="text-muted small">Enter your credentials to access your SMCC Connect account.</p>
+            <p class="text-muted small">Enter your credentials to access your Nexus account.</p>
         </div>
 
         <!-- Flash Success Message -->

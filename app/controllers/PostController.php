@@ -623,6 +623,21 @@ class PostController {
         try {
             $isLiked = $this->postModel->toggleLike($postId, $userId);
             $likesCount = $this->postModel->getLikesCount($postId);
+
+            if ($isLiked) {
+                $postAuthorId = (int)$post['user_id'];
+                if ($postAuthorId !== $userId) {
+                    require_once __DIR__ . '/../models/NotificationModel.php';
+                    $notifModel = new NotificationModel();
+                    $notifModel->create(
+                        $postAuthorId,
+                        $userId,
+                        'like',
+                        'liked your post.',
+                        $postId
+                    );
+                }
+            }
         } catch (Throwable $e) {
             error_log("Error toggling like on post {$postId}: " . $e->getMessage());
             $errMsg = 'Could not update like status at this time. Please try again.';

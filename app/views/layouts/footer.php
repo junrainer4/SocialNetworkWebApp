@@ -7,7 +7,7 @@
 
         <!-- Modern Footer -->
         <footer class="bg-white border-top py-3 px-4 text-muted small text-start">
-            &copy; <?= date('Y'); ?> <strong>SMCC Connect</strong>. All rights reserved.
+            &copy; <?= date('Y'); ?> <strong>Nexus</strong>. All rights reserved.
         </footer>
 
     <!-- Closing Main Content Area Wrapper -->
@@ -228,5 +228,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+<script>
+// ===== Notification Badge Updater =====
+window.updateHeaderNotificationBadge = function(count) {
+    var badge = document.getElementById('headerNotifBadge');
+    var btn   = document.getElementById('headerNotifBtn');
+    if (!btn) return;
+    if (count > 0) {
+        var label = count > 99 ? '99+' : String(count);
+        if (badge) {
+            badge.textContent = label;
+        } else {
+            var newBadge = document.createElement('span');
+            newBadge.className = 'notif-badge-count';
+            newBadge.id = 'headerNotifBadge';
+            newBadge.textContent = label;
+            btn.appendChild(newBadge);
+        }
+    } else {
+        if (badge) badge.remove();
+    }
+};
+</script>
 </body>
 </html>

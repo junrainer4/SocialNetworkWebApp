@@ -40,9 +40,9 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
-                    <h2 class="fw-bold text-dark mb-2">Welcome to SMCC Connect</h2>
+                    <h2 class="fw-bold text-dark mb-2">Welcome to Nexus</h2>
                     <p class="text-muted fs-6 mb-4 col-md-10 mx-auto">
-                        The campus social networking platform for SMCC. Sign in or create an account to view campus posts, connect with fellow students, comment, and engage with the community.
+                        The SMCC Community Hub. Sign in or create an account to view campus posts, connect with fellow students, comment, and engage with the community.
                     </p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap">
                         <a href="<?= BASE_URL ?>/index.php?action=login" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-medium">
@@ -397,7 +397,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 <div class="card-modern p-5 text-center text-muted">
                     <i class="bi bi-chat-square-text fs-1 mb-3 text-secondary"></i>
                     <h5>No posts yet</h5>
-                    <p class="small mb-0">Be the first to share an update on SMCC Connect!</p>
+                    <p class="small mb-0">Be the first to share an update on Nexus!</p>
                 </div>
             <?php endif; ?>
             <?php endif; // End if (!$currentUserId) ?>
@@ -544,7 +544,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                         </div>
                                         <div class="modal-footer border-top bg-light py-3 px-4 d-flex justify-content-between align-items-center">
                                             <div class="micro-text text-muted">
-                                                <i class="bi bi-shield-check text-success me-1"></i>Official SMCC Connect Announcement
+                                                <i class="bi bi-shield-check text-success me-1"></i>Official Nexus Announcement
                                             </div>
                                             <div class="d-flex gap-2">
                                                 <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Close</button>

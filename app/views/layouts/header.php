@@ -62,7 +62,7 @@ if ($isLoggedIn) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
-    <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' - SMCC Connect' : 'SMCC Connect'; ?></title>
+    <title><?= isset($pageTitle) ? (strpos($pageTitle, 'Nexus') !== false ? htmlspecialchars($pageTitle) : htmlspecialchars($pageTitle) . ' - Nexus') : 'Nexus - The SMCC Community Hub'; ?></title>
 
     <!-- Bootstrap 5.3 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -91,13 +91,13 @@ if ($isLoggedIn) {
         <header class="app-header">
             <div class="header-container">
                 <?php if ($isLoggedIn): ?>
-                    <!-- Header Left: SMCC Connect Brand Logo and Name -->
+                    <!-- Header Left: Nexus Brand Logo and Name -->
                     <div class="header-brand-group d-flex align-items-center me-3">
-                        <a href="<?= BASE_URL ?>/" class="brand-link align-items-center gap-2" id="headerLogoBtn" title="SMCC Connect Home">
+                        <a href="<?= BASE_URL ?>/" class="brand-link align-items-center gap-2" id="headerLogoBtn" title="Nexus Home">
                             <div class="brand-icon-box flex-shrink-0">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <span class="fs-5 brand-title fw-bold d-none d-sm-inline">SMCC Connect</span>
+                            <span class="fs-5 brand-title fw-bold d-none d-sm-inline">Nexus</span>
                         </a>
                     </div>
 
@@ -111,6 +111,22 @@ if ($isLoggedIn) {
 
                     <!-- Right Header Actions -->
                     <div class="header-actions">
+                        <!-- Notifications Bell -->
+                        <?php if ($isLoggedIn): ?>
+                        <div class="position-relative">
+                            <a href="<?= BASE_URL ?>/index.php?action=notifications" class="header-icon-btn notif-bell-btn" title="Notifications" aria-label="Notifications" id="headerNotifBtn">
+                                <i class="bi bi-bell-fill"></i>
+                                <?php
+                                require_once __DIR__ . '/../../models/NotificationModel.php';
+                                $headerNotifModel = new NotificationModel();
+                                $headerUnreadCount = $headerNotifModel->getUnreadCount((int)$_SESSION['user_id']);
+                                if ($headerUnreadCount > 0): ?>
+                                    <span class="notif-badge-count" id="headerNotifBadge"><?= $headerUnreadCount > 99 ? '99+' : $headerUnreadCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </div>
+                        <?php endif; ?>
+
                         <!-- Dark Mode / Light Mode Toggle -->
                         <button class="header-icon-btn theme-toggle-btn" type="button" onclick="toggleTheme()" title="Switch to Dark Mode" aria-label="Switch to Dark Mode">
                             <i class="theme-toggle-icon bi bi-moon-fill"></i>
@@ -168,6 +184,17 @@ if ($isLoggedIn) {
                                     <i class="bi bi-chevron-right fb-arrow-right"></i>
                                 </a>
 
+                                <!-- Option: Friends -->
+                                <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=friends">
+                                    <div class="fb-menu-item-left">
+                                        <div class="fb-icon-circle">
+                                            <i class="bi bi-people-fill"></i>
+                                        </div>
+                                        <span class="fb-item-label">Friends</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right fb-arrow-right"></i>
+                                </a>
+
                                 <!-- Option 2: Account Settings -->
                                 <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=settings" title="Account Settings">
                                     <div class="fb-menu-item-left">
@@ -197,11 +224,11 @@ if ($isLoggedIn) {
                 <?php else: ?>
                     <!-- Public / Unauthenticated Header -->
                     <div class="d-flex align-items-center">
-                        <a href="<?= BASE_URL ?>/" class="brand-link text-dark" title="SMCC Connect">
+                        <a href="<?= BASE_URL ?>/" class="brand-link text-dark" title="Nexus">
                             <div class="brand-icon-box">
                                 <i class="bi bi-people-fill"></i>
                             </div>
-                            <span class="fs-5 font-navy ms-2">SMCC Connect</span>
+                            <span class="fs-5 font-navy ms-2">Nexus</span>
                         </a>
                     </div>
 

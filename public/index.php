@@ -169,6 +169,44 @@ switch ($action) {
         header('Location: ' . BASE_URL . '/index.php?action=insights');
         exit;
 
+    // Friends and Connections
+    case 'friends':
+        require_once __DIR__ . '/../app/controllers/FollowController.php';
+        $followController = new FollowController();
+        $followController->friends();
+        break;
+
+    // Notifications System
+    case 'notifications':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $notifController = new NotificationController();
+        $notifController->index();
+        break;
+
+    case 'open_notification':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $notifController = new NotificationController();
+        $notifController->open();
+        break;
+
+    case 'notifications_dropdown':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $notifController = new NotificationController();
+        $notifController->getDropdown();
+        break;
+
+    case 'mark_notification_read':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $notifController = new NotificationController();
+        $notifController->markRead();
+        break;
+
+    case 'mark_all_notifications_read':
+        require_once __DIR__ . '/../app/controllers/NotificationController.php';
+        $notifController = new NotificationController();
+        $notifController->markAllRead();
+        break;
+
     // Follow and Unfollow Actions
     case 'follow_user':
         require_once __DIR__ . '/../app/controllers/FollowController.php';
@@ -243,6 +281,6 @@ switch ($action) {
 
     default:
         // Return friendly 404 Not Found for unrecognized action routes
-        ErrorHandler::renderErrorPage(404, 'Page Not Found', 'The page or action you requested ("' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '") does not exist on SMCC Connect.');
+        ErrorHandler::renderErrorPage(404, 'Page Not Found', 'The page or action you requested ("' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '") does not exist on Nexus.');
         break;
 }
