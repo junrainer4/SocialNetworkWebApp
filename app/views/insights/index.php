@@ -1,6 +1,4 @@
 <?php
-// app/views/insights/index.php
-// Redesigned Community Search View for Nexus — The SMCC Community Hub
 
 $currentUserId = (int)($_SESSION['user_id'] ?? 0);
 $type = $type ?? 'users';
@@ -13,7 +11,6 @@ $totalCount = (int)($totalCount ?? 0);
 <div class="insights-container py-4">
     <div class="search-reports-container mx-auto" style="max-width: 780px;">
 
-        <!-- Back to Newsfeed Link -->
         <div class="mb-3">
             <a href="<?= BASE_URL ?>/" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1-5 fw-medium shadow-sm d-inline-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i>
@@ -21,7 +18,6 @@ $totalCount = (int)($totalCount ?? 0);
             </a>
         </div>
 
-        <!-- Flash Notifications / Error Alerts -->
         <?php if (!empty($errorMessage)): ?>
             <div class="alert alert-danger fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -38,20 +34,18 @@ $totalCount = (int)($totalCount ?? 0);
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
 
-        <!-- BACK TO NEWSFEED BUTTON -->
         <div class="mb-3">
             <a href="<?= BASE_URL ?>/" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-2 fw-medium shadow-sm d-inline-flex align-items-center gap-2">
                 <i class="bi bi-arrow-left"></i> Back to Newsfeed
             </a>
         </div>
 
-        <!-- MAIN SEARCH & REPORTS CARD -->
         <div class="search-reports-card mb-4">
-            <!-- Card Heading -->
+
 =======
-        <!-- MAIN SEARCH CARD -->
+
         <div class="search-reports-card mb-4 border-0 shadow-sm">
-            <!-- Header -->
+
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
             <div class="mb-4">
                 <div class="d-flex align-items-center gap-3 mb-2">
@@ -65,25 +59,23 @@ $totalCount = (int)($totalCount ?? 0);
                 </div>
             </div>
 
-            <!-- Search Form -->
             <form action="<?= BASE_URL ?>/index.php" method="GET" id="communitySearchForm">
                 <input type="hidden" name="action" value="search">
                 <input type="hidden" name="type" id="searchTypeInput" value="<?= htmlspecialchars($type); ?>">
                 <input type="hidden" name="filter" id="searchFilterInput" value="<?= htmlspecialchars($filter); ?>">
 
-                <!-- Segmented Users / Posts Selector -->
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
                     <div class="insights-segmented-wrap" role="tablist" aria-label="Search mode">
-                        <button type="button" 
-                                class="insights-segmented-btn <?= $type === 'users' ? 'active' : ''; ?>" 
+                        <button type="button"
+                                class="insights-segmented-btn <?= $type === 'users' ? 'active' : ''; ?>"
                                 data-type="users"
                                 id="btnModeUsers"
                                 role="tab"
                                 aria-selected="<?= $type === 'users' ? 'true' : 'false'; ?>">
                             <i class="bi bi-people-fill me-1"></i> Users
                         </button>
-                        <button type="button" 
-                                class="insights-segmented-btn <?= $type === 'posts' ? 'active' : ''; ?>" 
+                        <button type="button"
+                                class="insights-segmented-btn <?= $type === 'posts' ? 'active' : ''; ?>"
                                 data-type="posts"
                                 id="btnModePosts"
                                 role="tab"
@@ -99,18 +91,17 @@ $totalCount = (int)($totalCount ?? 0);
                     <?php endif; ?>
                 </div>
 
-                <!-- Prominent Search Input + Button Group -->
                 <div class="input-group search-input-group shadow-sm rounded-4 overflow-hidden border">
                     <span class="input-group-text bg-transparent border-0 ps-3 pe-2">
                         <i class="bi bi-search text-muted fs-6"></i>
                     </span>
-                    <input 
-                        type="text" 
-                        name="q" 
+                    <input
+                        type="text"
+                        name="q"
                         id="communitySearchInput"
-                        class="form-control border-0 py-2-5 ps-1" 
+                        class="form-control border-0 py-2-5 ps-1"
                         style="height: 50px; font-size: 0.95rem; box-shadow: none;"
-                        placeholder="<?= $type === 'users' ? 'Search by name or username...' : 'Search posts by keywords...'; ?>" 
+                        placeholder="<?= $type === 'users' ? 'Search by name or username...' : 'Search posts by keywords...'; ?>"
                         value="<?= htmlspecialchars($query); ?>"
                         autocomplete="off"
                         required
@@ -126,13 +117,11 @@ $totalCount = (int)($totalCount ?? 0);
                     </button>
                 </div>
 
-                <!-- Modern Quick Filter Pills -->
                 <div class="d-flex align-items-center flex-wrap gap-2 mt-3 pt-3 border-top insights-border" id="filterPillsRow">
                     <span class="micro-text fw-bold text-uppercase text-muted me-1">
                         <i class="bi bi-funnel me-1"></i> Filter:
                     </span>
 
-                    <!-- Filters for Users mode -->
                     <div class="filter-group-users <?= $type === 'users' ? 'd-inline-flex' : 'd-none'; ?> align-items-center flex-wrap gap-2">
                         <button type="button" class="btn btn-sm filter-pill <?= ($filter === 'all' || empty($filter)) ? 'active' : ''; ?>" data-filter="all">
                             <i class="bi bi-people me-1"></i> All Members
@@ -142,7 +131,6 @@ $totalCount = (int)($totalCount ?? 0);
                         </button>
                     </div>
 
-                    <!-- Filters for Posts mode -->
                     <div class="filter-group-posts <?= $type === 'posts' ? 'd-inline-flex' : 'd-none'; ?> align-items-center flex-wrap gap-2">
                         <button type="button" class="btn btn-sm filter-pill <?= ($filter === 'newest' || empty($filter)) ? 'active' : ''; ?>" data-filter="newest">
                             <i class="bi bi-clock-history me-1"></i> Latest
@@ -158,11 +146,10 @@ $totalCount = (int)($totalCount ?? 0);
             </form>
         </div>
 
-        <!-- SEARCH RESULTS SECTION -->
         <div id="searchResultsSection">
 
             <?php if (!$hasSearched): ?>
-                <!-- 1. Initial State: Explore SMCC Community -->
+
                 <div class="search-reports-card text-center py-5 border-0 shadow-sm">
                     <div class="insights-header-icon-box mx-auto mb-3" style="width: 56px; height: 56px;">
                         <i class="bi bi-compass fs-4"></i>
@@ -185,7 +172,7 @@ $totalCount = (int)($totalCount ?? 0);
                 </div>
 
             <?php elseif ($totalCount === 0): ?>
-                <!-- 2. Empty State: No matches found -->
+
                 <div class="search-reports-card text-center py-5 border-0 shadow-sm">
                     <div class="notif-empty-icon mx-auto mb-3">
                         <i class="bi bi-search"></i>
@@ -209,7 +196,7 @@ $totalCount = (int)($totalCount ?? 0);
                 </div>
 
             <?php else: ?>
-                <!-- 3. Results Header & Count -->
+
                 <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3 px-1">
                     <div class="d-flex align-items-center gap-2">
                         <span class="micro-text fw-bold text-uppercase text-secondary">
@@ -249,15 +236,15 @@ $totalCount = (int)($totalCount ?? 0);
                                         <div class="d-flex align-items-center gap-2 min-w-0">
                                             <a href="<?= BASE_URL ?>/index.php?action=profile&id=<?= $u['id']; ?>" class="text-decoration-none flex-shrink-0">
                                                 <?php if (!empty($u['profile_image'])): ?>
-                                                    <img 
-                                                        src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($u['profile_image'])) ?>" 
-                                                        alt="<?= htmlspecialchars($u['full_name']); ?>" 
+                                                    <img
+                                                        src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($u['profile_image'])) ?>"
+                                                        alt="<?= htmlspecialchars($u['full_name']); ?>"
                                                         class="rounded-circle border"
                                                         style="width: 38px; height: 38px; object-fit: cover;"
                                                         onerror="this.onerror=null; this.outerHTML='<div class=\'user-avatar-sm\' style=\'width: 38px; height: 38px; font-size: 0.9rem;\'><?= htmlspecialchars($uInitials) ?></div>';"
                                                     >
 =======
-                <!-- 4. User Results Grid -->
+
                 <?php if ($type === 'users' && !empty($users)): ?>
                     <div class="row g-3">
                         <?php foreach ($users as $u): ?>
@@ -288,7 +275,7 @@ $totalCount = (int)($totalCount ?? 0);
                                 <div class="card-modern p-3 h-100 border-0 shadow-sm d-flex flex-column justify-content-between">
                                     <div>
                                         <div class="d-flex align-items-center gap-3 mb-2">
-                                            <!-- Avatar Link -->
+
                                             <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none flex-shrink-0">
                                                 <?php if (!empty($uAvatarPath)): ?>
                                                     <img src="<?= $uAvatarPath ?>" alt="<?= htmlspecialchars($uFullName); ?>" class="friend-card-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\'friend-card-avatar-initials\'><?= htmlspecialchars($uInitials); ?></div>';">
@@ -300,7 +287,6 @@ $totalCount = (int)($totalCount ?? 0);
                                                 <?php endif; ?>
                                             </a>
 
-                                            <!-- User Details -->
                                             <div class="min-w-0 flex-grow-1">
                                                 <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none">
                                                     <h6 class="fw-bold insights-title mb-0 text-truncate"><?= htmlspecialchars($uFullName); ?></h6>
@@ -315,7 +301,6 @@ $totalCount = (int)($totalCount ?? 0);
                                             </p>
                                         <?php endif; ?>
 
-                                        <!-- Aggregate Stats (Posts & Followers) -->
                                         <div class="d-flex align-items-center gap-2 mb-2">
                                             <span class="badge bg-light text-secondary border micro-text">
                                                 <i class="bi bi-file-earmark-post me-1"></i><?= $uPostsCount; ?> <?= $uPostsCount === 1 ? 'post' : 'posts'; ?>
@@ -331,7 +316,6 @@ $totalCount = (int)($totalCount ?? 0);
                                         </div>
                                     </div>
 
-                                    <!-- Action Link -->
                                     <div class="pt-2 border-top insights-border d-flex justify-content-between align-items-center">
                                         <?php if ($isSelf): ?>
                                             <span class="badge bg-secondary-subtle text-secondary micro-text">Your Profile</span>
@@ -359,7 +343,6 @@ $totalCount = (int)($totalCount ?? 0);
                     </div>
                 <?php endif; ?>
 
-                <!-- 5. Post Results List -->
                 <?php if ($type === 'posts' && !empty($posts)): ?>
                     <div class="d-flex flex-column gap-3">
                         <?php foreach ($posts as $post): ?>
@@ -396,7 +379,7 @@ $totalCount = (int)($totalCount ?? 0);
                                 : strtoupper(mb_substr($authorName, 0, 2));
                             ?>
                             <article class="card-modern p-3 p-md-4 border-0 shadow-sm" id="post-<?= (int)$post['id'] ?>">
-                                <!-- Author Header -->
+
                                 <div class="d-flex align-items-center justify-content-between mb-3">
                                     <div class="d-flex align-items-center gap-2">
                                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $authorId ?>" class="text-decoration-none">
@@ -418,18 +401,15 @@ $totalCount = (int)($totalCount ?? 0);
                                         </div>
                                     </div>
 
-                                    <!-- Functional Feed Link -->
                                     <a href="<?= BASE_URL ?>/index.php?action=home#post-<?= (int)$post['id'] ?>" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 micro-text" title="View in Newsfeed">
                                         <i class="bi bi-box-arrow-up-right me-1"></i> Feed
                                     </a>
                                 </div>
 
-                                <!-- Post Content -->
                                 <div class="insights-title mb-3" style="font-size: 0.95rem; line-height: 1.6; word-break: break-word;">
                                     <?= nl2br(htmlspecialchars($post['content'])); ?>
                                 </div>
 
-                                <!-- Image Attachment(s) -->
                                 <?php
                                 $postImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                                 $totalPostImages = count($postImages);
@@ -468,7 +448,6 @@ $totalCount = (int)($totalCount ?? 0);
                                     </div>
                                 <?php endif; ?>
 
-                                <!-- Engagement Stats & Actions -->
                                 <div class="d-flex align-items-center justify-content-between pt-2 border-top insights-border">
                                     <div class="d-flex align-items-center gap-2">
                                         <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline">
@@ -490,7 +469,6 @@ $totalCount = (int)($totalCount ?? 0);
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Comments Expansion Box -->
                                 <div class="comments-container d-none mt-3 pt-2 border-top insights-border" id="search-comments-box-<?= (int)$post['id'] ?>">
                                     <?php if (!empty($post['comments'])): ?>
                                         <div class="d-flex flex-column gap-2 mb-2">
@@ -535,7 +513,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const usersGroup = document.querySelector('.filter-group-users');
     const postsGroup = document.querySelector('.filter-group-posts');
 
-    // Placeholders mapping
     const placeholders = {
         users: 'Search by name or username...',
         posts: 'Search posts by keywords...'
@@ -558,7 +535,6 @@ document.addEventListener('DOMContentLoaded', function() {
             postsGroup?.classList.remove('d-inline-flex');
             postsGroup?.classList.add('d-none');
 
-            // Default filter for users
             if (filterInput && !['all', 'following'].includes(filterInput.value)) {
                 filterInput.value = 'all';
             }
@@ -573,13 +549,11 @@ document.addEventListener('DOMContentLoaded', function() {
             usersGroup?.classList.remove('d-inline-flex');
             usersGroup?.classList.add('d-none');
 
-            // Default filter for posts
             if (filterInput && !['newest', 'most_liked', 'photos'].includes(filterInput.value)) {
                 filterInput.value = 'newest';
             }
         }
 
-        // If user already entered text and clicked the other mode, submit to switch view
         if (submitOnChange && searchInput.value.trim().length > 0) {
             searchForm?.submit();
         } else {
@@ -599,7 +573,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle filter pill clicks
     document.querySelectorAll('.filter-pill').forEach(function(pill) {
         pill.addEventListener('click', function() {
             const fVal = this.getAttribute('data-filter');
@@ -619,7 +592,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Clear input button handler
     clearBtn?.addEventListener('click', function() {
         if (searchInput) {
             searchInput.value = '';
@@ -628,7 +600,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Quick tag pills in initial state
     document.querySelectorAll('.quick-search-tag').forEach(function(pill) {
         pill.addEventListener('click', function() {
             const q = this.getAttribute('data-query');

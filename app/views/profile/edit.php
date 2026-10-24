@@ -1,10 +1,7 @@
 <?php
-// app/views/profile/edit.php
-// Edit Profile View - Redesigned with Modern Dashboard Form Styling & Photo Adjuster
 
 require_once __DIR__ . '/../layouts/header.php';
 
-// Prepare profile image URL or fallback
 $avatarUrl = null;
 if (!empty($user['profile_image'])) {
     $uploadedPath = __DIR__ . '/../../../public/uploads/avatars/' . basename($user['profile_image']);
@@ -15,7 +12,6 @@ if (!empty($user['profile_image'])) {
     }
 }
 
-// Prepare cover photo URL or fallback
 $coverUrl = null;
 if (!empty($user['cover_photo'])) {
     $uploadedCoverPath = __DIR__ . '/../../../public/uploads/covers/' . basename($user['cover_photo']);
@@ -37,7 +33,6 @@ if (!empty($user['full_name'])) {
 }
 ?>
 
-<!-- Cropper.js Stylesheet -->
 <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/css/cropper.min.css">
 
 <div class="row justify-content-center">
@@ -53,7 +48,6 @@ if (!empty($user['full_name'])) {
                 </span>
             </div>
 
-            <!-- Error Messages -->
             <?php if (!empty($errors)): ?>
                 <div class="alert alert-danger fade show border-0 shadow-sm" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -68,27 +62,25 @@ if (!empty($user['full_name'])) {
 
             <form action="<?= BASE_URL ?>/index.php?action=edit_profile" method="POST" enctype="multipart/form-data" id="profileEditForm" novalidate>
                 <?= csrf_field(); ?>
-                
-                <!-- Hidden input for adjusted/cropped image base64 -->
+
                 <input type="hidden" name="cropped_image_data" id="cropped_image_data" value="">
 
-                <!-- Avatar Preview & Upload Area -->
                 <div class="mb-4 p-3 bg-light rounded-3 border border-light-subtle avatar-edit-container" id="avatarDropZone">
                     <div class="d-flex flex-column flex-sm-row align-items-center gap-4">
-                        <!-- Avatar Display Container -->
+
                         <div class="flex-shrink-0 text-center position-relative">
                             <div id="avatarPreviewWrapper" class="position-relative d-inline-block">
                                 <?php if ($avatarUrl): ?>
-                                    <img 
-                                        src="<?= $avatarUrl ?>" 
-                                        alt="Current Avatar" 
+                                    <img
+                                        src="<?= $avatarUrl ?>"
+                                        alt="Current Avatar"
                                         id="avatarPreview"
                                         class="rounded-circle border border-3 border-white shadow-sm"
                                         style="width: 88px; height: 88px; object-fit: cover;"
                                         onerror="this.onerror=null; this.outerHTML='<div id=\'avatarPreviewPlaceholder\' class=\'rounded-circle border border-3 border-white shadow-sm text-white d-inline-flex align-items-center justify-content-center fs-3 fw-bold\' style=\'width: 88px; height: 88px; background-color: #07193d;\'><?= htmlspecialchars($userInitials) ?></div>';"
                                     >
                                 <?php else: ?>
-                                    <div 
+                                    <div
                                         id="avatarPreviewPlaceholder"
                                         class="rounded-circle border border-3 border-white shadow-sm text-white d-inline-flex align-items-center justify-content-center fs-3 fw-bold"
                                         style="width: 88px; height: 88px; background-color: #07193d;"
@@ -99,7 +91,6 @@ if (!empty($user['full_name'])) {
                             </div>
                         </div>
 
-                        <!-- Avatar Actions & Controls -->
                         <div class="flex-grow-1 w-100">
                             <label class="form-label fw-semibold mb-1 small text-secondary">Profile Picture</label>
 
@@ -107,30 +98,28 @@ if (!empty($user['full_name'])) {
                                 Upload a photo and adjust (zoom, reposition, or rotate) to fit perfectly.
                             </p>
 
-                            <!-- Buttons Row -->
                             <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
                                 <label for="profile_image" class="btn btn-sm btn-outline-primary fw-semibold cursor-pointer mb-0">
                                     <i class="bi bi-camera me-1"></i> Choose New Photo
                                 </label>
-                                <input 
-                                    type="file" 
-                                    class="d-none" 
-                                    id="profile_image" 
-                                    name="profile_image" 
+                                <input
+                                    type="file"
+                                    class="d-none"
+                                    id="profile_image"
+                                    name="profile_image"
                                     accept="image/jpeg,image/png,image/gif,image/webp"
                                 >
 
-                                <button 
-                                    type="button" 
-                                    class="btn btn-sm btn-outline-secondary fw-semibold <?= empty($avatarUrl) ? 'd-none' : '' ?>" 
-                                    id="btnOpenAdjustModal" 
+                                <button
+                                    type="button"
+                                    class="btn btn-sm btn-outline-secondary fw-semibold <?= empty($avatarUrl) ? 'd-none' : '' ?>"
+                                    id="btnOpenAdjustModal"
                                     title="Adjust and crop photo position"
                                 >
                                     <i class="bi bi-crop me-1"></i> Adjust Photo
                                 </button>
                             </div>
 
-                            <!-- Success / Status alert when image adjusted -->
                             <div id="cropStatusAlert" class="d-none alert alert-success py-2 px-3 small border-0 mb-2 d-flex align-items-center">
                                 <i class="bi bi-check-circle-fill me-2 fs-6"></i>
                                 <div>Photo adjusted! Click <strong>Save Changes</strong> below to save.</div>
@@ -152,20 +141,19 @@ if (!empty($user['full_name'])) {
                     </div>
                 </div>
 
-                <!-- Cover Photo Preview & Upload Area -->
                 <div class="mb-4 p-3 bg-light rounded-3 border border-light-subtle">
                     <label class="form-label fw-semibold mb-2 small text-secondary">Profile Banner / Cover Photo</label>
-                    
+
                     <div class="rounded-3 overflow-hidden position-relative mb-3 border" style="height: 140px; <?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?>" id="coverPreviewContainer">
                         <div class="position-absolute bottom-0 end-0 m-2">
                             <label for="cover_photo" class="btn btn-sm btn-cover-action shadow fw-semibold mb-0 cursor-pointer">
                                 <i class="bi bi-camera-fill me-1"></i> Change Cover Photo
                             </label>
-                            <input 
-                                type="file" 
-                                class="d-none" 
-                                id="cover_photo" 
-                                name="cover_photo" 
+                            <input
+                                type="file"
+                                class="d-none"
+                                id="cover_photo"
+                                name="cover_photo"
                                 accept="image/jpeg,image/png,image/gif,image/webp"
                             >
                         </div>
@@ -186,21 +174,19 @@ if (!empty($user['full_name'])) {
                     </div>
                 </div>
 
-                <!-- Bio -->
                 <div class="mb-4">
                     <label for="bio" class="form-label fw-semibold small text-secondary">Bio</label>
-                    <textarea 
-                        class="form-control" 
-                        id="bio" 
-                        name="bio" 
-                        rows="3" 
-                        maxlength="500" 
+                    <textarea
+                        class="form-control"
+                        id="bio"
+                        name="bio"
+                        rows="3"
+                        maxlength="500"
                         placeholder="Write a few lines about yourself, your department, hobbies..."
                     ><?= htmlspecialchars($formData['bio'] ?? ''); ?></textarea>
                     <div class="form-text small text-muted text-end">Maximum 500 characters</div>
                 </div>
 
-                <!-- Form Action Buttons -->
                 <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                     <a href="<?= BASE_URL ?>/index.php?action=profile" class="btn btn-outline-secondary px-4">
                         Cancel
@@ -214,9 +200,6 @@ if (!empty($user['full_name'])) {
     </div>
 </div>
 
-<!-- ==============================================
-     MODAL: ADJUST / CROP PROFILE PICTURE
-     ============================================== -->
 <div class="modal fade" id="cropModal" tabindex="-1" aria-labelledby="cropModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content border-0 shadow">
@@ -233,14 +216,13 @@ if (!empty($user['full_name'])) {
                 </p>
 
                 <div class="row g-4 align-items-center">
-                    <!-- Main Cropper Viewport -->
+
                     <div class="col-md-8">
                         <div class="cropper-wrapper">
                             <img id="cropperImageTarget" src="" alt="Adjust Avatar" style="max-width: 100%;">
                         </div>
                     </div>
 
-                    <!-- Live Circular Preview & Guidance -->
                     <div class="col-md-4 text-center">
                         <label class="form-label fw-semibold text-secondary small mb-2 d-block">Live Preview</label>
                         <div class="d-flex justify-content-center mb-3">
@@ -257,10 +239,9 @@ if (!empty($user['full_name'])) {
                     </div>
                 </div>
 
-                <!-- Adjustment Controls Toolbar -->
                 <div class="mt-4 pt-3 border-top">
                     <div class="row g-3 align-items-center">
-                        <!-- Zoom Slider & Controls -->
+
                         <div class="col-lg-6">
                             <div class="d-flex justify-content-between align-items-center mb-1">
                                 <label for="zoomSlider" class="form-label small fw-semibold text-secondary mb-0">
@@ -279,7 +260,6 @@ if (!empty($user['full_name'])) {
                             </div>
                         </div>
 
-                        <!-- Rotate, Flip & Reset Controls -->
                         <div class="col-lg-6 d-flex flex-wrap align-items-center justify-content-lg-end gap-2 pt-2 pt-lg-0">
                             <button type="button" class="btn btn-sm btn-outline-secondary" id="btnRotateCounterClockwise" title="Rotate Counter-Clockwise 90°">
                                 <i class="bi bi-arrow-counterclockwise me-1"></i> -90°
@@ -298,7 +278,6 @@ if (!empty($user['full_name'])) {
                 </div>
             </div>
 
-            <!-- Modal Footer -->
             <div class="modal-footer bg-light px-4 py-3 border-top d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary px-3" data-bs-dismiss="modal">
                     Cancel
@@ -311,10 +290,8 @@ if (!empty($user['full_name'])) {
     </div>
 </div>
 
-<!-- Cropper.js Library Script -->
 <script src="<?= BASE_URL ?>/public/assets/js/cropper.min.js"></script>
 
-<!-- Interactive Image Adjustment Controller Script -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const fileInput = document.getElementById('profile_image');
@@ -327,7 +304,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const cropStatusAlert = document.getElementById('cropStatusAlert');
     const removePictureCheck = document.getElementById('remove_picture');
 
-    // Toolbar elements
     const zoomSlider = document.getElementById('zoomSlider');
     const zoomPercentText = document.getElementById('zoomPercentText');
     const btnZoomIn = document.getElementById('btnZoomIn');
@@ -342,7 +318,6 @@ document.addEventListener('DOMContentLoaded', function() {
     let flipScaleX = 1;
     let currentImageSrc = "<?= $avatarUrl ? addslashes($avatarUrl) : '' ?>";
 
-    // Initialize or re-initialize Cropper instance
     function initCropper() {
         if (cropper) {
             cropper.destroy();
@@ -379,12 +354,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // When modal is fully shown, initialize Cropper to ensure exact DOM dimensions
     cropModalEl.addEventListener('shown.bs.modal', function() {
         initCropper();
     });
 
-    // Clean up cropper on hide to free memory
     cropModalEl.addEventListener('hidden.bs.modal', function() {
         if (cropper) {
             cropper.destroy();
@@ -392,7 +365,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Handle File Selection from Input
     fileInput.addEventListener('change', function(e) {
         const file = e.target.files && e.target.files[0];
         if (!file) return;
@@ -419,7 +391,6 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsDataURL(file);
     });
 
-    // Open Adjustment Modal with existing or selected image
     btnOpenAdjustModal.addEventListener('click', function() {
         if (!currentImageSrc) {
             fileInput.click();
@@ -429,7 +400,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cropModal.show();
     });
 
-    // Zoom Controls
     zoomSlider.addEventListener('input', function() {
         if (!cropper || !baseZoomRatio) return;
         const factor = parseFloat(this.value);
@@ -447,7 +417,6 @@ document.addEventListener('DOMContentLoaded', function() {
         cropper.zoom(-0.1);
     });
 
-    // Rotate Controls
     btnRotateCounterClockwise.addEventListener('click', function() {
         if (!cropper) return;
         cropper.rotate(-90);
@@ -458,14 +427,12 @@ document.addEventListener('DOMContentLoaded', function() {
         cropper.rotate(90);
     });
 
-    // Flip Control
     btnFlipHorizontal.addEventListener('click', function() {
         if (!cropper) return;
         flipScaleX = -flipScaleX;
         cropper.scaleX(flipScaleX);
     });
 
-    // Reset Control
     btnResetAdjust.addEventListener('click', function() {
         if (!cropper) return;
         cropper.reset();
@@ -474,7 +441,6 @@ document.addEventListener('DOMContentLoaded', function() {
         zoomPercentText.textContent = '100%';
     });
 
-    // Apply Adjusted / Cropped Image
     btnApplyCrop.addEventListener('click', function() {
         if (!cropper) return;
 
@@ -492,10 +458,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const croppedDataUrl = canvas.toDataURL('image/jpeg', 0.92);
 
-        // Store base64 data for form submit
         croppedDataInput.value = croppedDataUrl;
 
-        // Update form preview element
         const previewImg = document.getElementById('avatarPreview');
         const previewPlaceholder = document.getElementById('avatarPreviewPlaceholder');
         const wrapper = document.getElementById('avatarPreviewWrapper');
@@ -515,22 +479,18 @@ document.addEventListener('DOMContentLoaded', function() {
             wrapper.replaceChild(newImg, previewPlaceholder);
         }
 
-        // Uncheck remove picture checkbox if checked
         if (removePictureCheck) {
             removePictureCheck.checked = false;
         }
 
-        // Show feedback alert & make sure adjust button is visible
         if (cropStatusAlert) {
             cropStatusAlert.classList.remove('d-none');
         }
         btnOpenAdjustModal.classList.remove('d-none');
 
-        // Close modal
         cropModal.hide();
     });
 
-    // Drag and Drop file support on avatarDropZone
     const dropZone = document.getElementById('avatarDropZone');
     if (dropZone) {
         ['dragenter', 'dragover'].forEach(eventName => {
@@ -560,7 +520,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Cover Photo Instant Preview
     const coverInput = document.getElementById('cover_photo');
     const coverContainer = document.getElementById('coverPreviewContainer');
     if (coverInput && coverContainer) {

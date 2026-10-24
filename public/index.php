@@ -1,27 +1,21 @@
 <?php
-// public/index.php
-// Main entry point and front controller routing for SocialNetworkWebApp
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Load centralized Security and Error Handlers
 require_once __DIR__ . '/../app/helpers/Security.php';
 require_once __DIR__ . '/../app/helpers/ErrorHandler.php';
 ErrorHandler::register();
 
-// Ensure CSRF token is always initialized in the session
 csrf_token();
 
-// Compute BASE_URL for clean routing and asset linking
 if (!defined('BASE_URL')) {
     $scriptDir = str_replace('\\', '/', dirname($_SERVER['SCRIPT_NAME'] ?? ''));
     $base = preg_replace('#/public.*$#', '', $scriptDir);
     define('BASE_URL', rtrim($base, '/'));
 }
 
-// Action-based routing
 $action = $_GET['action'] ?? $_POST['action'] ?? 'home';
 
 switch ($action) {
@@ -61,7 +55,6 @@ switch ($action) {
         $profileController->edit();
         break;
 
-    // Dedicated Account Settings Routing (Change Name, Change Username & Update Password)
     case 'settings':
         require_once __DIR__ . '/../app/controllers/SettingsController.php';
         $settingsController = new SettingsController();
@@ -94,7 +87,6 @@ switch ($action) {
         $profileController->getFollowList();
         break;
 
-    // Post, Comment, Like actions
     case 'view_post':
     case 'post':
         require_once __DIR__ . '/../app/controllers/PostController.php';
@@ -163,7 +155,6 @@ switch ($action) {
         $postController->delete();
         break;
 
-    // Community Insights (Search and Filtering)
     case 'insights':
     case 'search':
         require_once __DIR__ . '/../app/controllers/InsightsController.php';
@@ -181,14 +172,12 @@ switch ($action) {
         header('Location: ' . BASE_URL . '/index.php?action=insights');
         exit;
 
-    // Friends and Connections
     case 'friends':
         require_once __DIR__ . '/../app/controllers/FollowController.php';
         $followController = new FollowController();
         $followController->friends();
         break;
 
-    // Notifications System
     case 'notifications':
         require_once __DIR__ . '/../app/controllers/NotificationController.php';
         $notifController = new NotificationController();
@@ -219,14 +208,12 @@ switch ($action) {
         $notifController->markAllRead();
         break;
 
-    // Follow and Unfollow Actions
     case 'follow_user':
         require_once __DIR__ . '/../app/controllers/FollowController.php';
         $followController = new FollowController();
         $followController->toggle();
         break;
 
-    // Additional Navigation Pages
     case 'people':
     case 'groups':
     case 'events':
@@ -292,7 +279,7 @@ switch ($action) {
         break;
 
     default:
-        // Return friendly 404 Not Found for unrecognized action routes
+
 <<<<<<< HEAD
         ErrorHandler::renderErrorPage(404, 'Page Not Found', 'The page or action you requested ("' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '") does not exist on Unify.');
 =======

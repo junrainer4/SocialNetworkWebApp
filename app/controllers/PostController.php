@@ -1,6 +1,4 @@
 <?php
-// app/controllers/PostController.php
-// Controller handling posts CRUD, comments, and likes
 
 require_once __DIR__ . '/../models/PostModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
@@ -18,9 +16,6 @@ class PostController {
         $this->userModel = new UserModel();
     }
 
-    /**
-     * Enforce authentication.
-     */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error_message'] = 'You must be logged in to perform that action.';
@@ -29,16 +24,6 @@ class PostController {
         }
     }
 
-    /**
-     * Process multiple or single image uploads securely.
-     * Supports array inputs (e.g. post_images[]) or single file inputs.
-     *
-     * @param string $inputKey The $_FILES key to inspect ('post_images' or 'post_image')
-     * @param array &$errors Array to collect error messages
-     * @param int $userId Current user ID for naming
-     * @param int $maxUploads Maximum allowed images (default 10)
-     * @return array Array of saved filenames
-     */
     private function handleMultipleImageUploads($inputKey, &$errors, $userId, $maxUploads = 10) {
         if (!isset($_FILES[$inputKey])) {
             return [];
@@ -83,7 +68,7 @@ class PostController {
 
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         $allowedMimes      = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
-        $maxSize           = 5 * 1024 * 1024; // 5MB per file
+        $maxSize           = 5 * 1024 * 1024;
 
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
 
@@ -138,14 +123,6 @@ class PostController {
         return $savedFiles;
     }
 
-    /**
-     * Process image upload securely (single file backward compatibility).
-     *
-     * @param array $file The $_FILES entry
-     * @param array &$errors Array to collect error messages
-     * @param int $userId Current user ID for naming
-     * @return string|null Filename if uploaded successfully, null otherwise
-     */
     private function handleImageUpload($file, &$errors, $userId) {
         if (!isset($file) || $file['error'] === UPLOAD_ERR_NO_FILE) {
             return null;
@@ -161,14 +138,12 @@ class PostController {
         $fileName = $file['name'];
         $fileSize = $file['size'];
 
-        // Maximum size: 5MB
         $maxSize = 5 * 1024 * 1024;
         if ($fileSize > $maxSize) {
             $errors[] = 'Image size must not exceed 5MB.';
             return null;
         }
 
-        // Validate extension
         $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
         $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
         if (!in_array($extension, $allowedExtensions, true)) {
@@ -176,7 +151,6 @@ class PostController {
             return null;
         }
 
-        // Validate MIME type
         $finfo = finfo_open(FILEINFO_MIME_TYPE);
         $mimeType = finfo_file($finfo, $tmpPath);
         finfo_close($finfo);
@@ -187,14 +161,12 @@ class PostController {
             return null;
         }
 
-        // Validate image content
         $imageInfo = @getimagesize($tmpPath);
         if ($imageInfo === false) {
             $errors[] = 'Uploaded file is not a valid image.';
             return null;
         }
 
-        // Generate safe unique filename
         $uploadDir = __DIR__ . '/../../public/uploads/posts/';
         if (!is_dir($uploadDir)) {
             mkdir($uploadDir, 0755, true);
@@ -211,41 +183,23 @@ class PostController {
         }
     }
 
-    /**
-     * Safely delete an image file using FileHelper (checks path, references, and protection).
-     *
-     * @param string|null $imageName
-     * @param int|null $excludePostId
-     */
     private function deleteImageFile($imageName, ?int $excludePostId = null) {
         if (!empty($imageName)) {
             FileHelper::deletePostImage($imageName, $excludePostId);
         }
     }
 
-    /**
-     * Safely delete multiple image files using FileHelper.
-     *
-     * @param string|array|null $images
-     * @param int|null $excludePostId
-     */
     private function deleteMultipleImageFiles($images, ?int $excludePostId = null) {
         if (!empty($images)) {
             FileHelper::deletePostImages($images, $excludePostId);
         }
     }
 
-    /**
-     * Display feed / posts list.
-     */
     public function index() {
         header('Location: ' . BASE_URL . '/index.php');
         exit;
     }
 
-    /**
-     * Display a single post with comments (Single Post View).
-     */
     public function view() {
         $postId = (int)($_GET['post_id'] ?? $_GET['id'] ?? 0);
 
@@ -268,9 +222,6 @@ class PostController {
         require __DIR__ . '/../views/posts/view.php';
     }
 
-    /**
-     * Create a post.
-     */
     public function create() {
         $this->requireAuth();
 
@@ -279,7 +230,7 @@ class PostController {
             || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // CSRF Token Validation
+
             if (!validate_csrf_token()) {
                 $errMsg = 'Security Error: Invalid or expired CSRF token.';
                 if ($isAjax) {
@@ -325,7 +276,6 @@ class PostController {
                 exit;
             }
 
-            // Handle optional multiple image uploads
             $uploadedImages = [];
             if (isset($_FILES['post_images'])) {
                 $uploadedImages = $this->handleMultipleImageUploads('post_images', $errors, $userId);
@@ -411,9 +361,6 @@ class PostController {
         exit;
     }
 
-    /**
-     * Show edit form for a post owned by the logged-in user.
-     */
     public function edit() {
         $this->requireAuth();
 
@@ -431,7 +378,6 @@ class PostController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
         if ((int)$post['user_id'] !== $userId) {
             ErrorHandler::renderErrorPage(403, 'Permission Denied', 'You do not have permission to edit this post. You can only edit your own posts.');
             exit;
@@ -446,9 +392,6 @@ class PostController {
         require __DIR__ . '/../views/posts/edit.php';
     }
 
-    /**
-     * Process post update submission.
-     */
     public function update() {
         $this->requireAuth();
 
@@ -457,7 +400,6 @@ class PostController {
             exit;
         }
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -480,7 +422,6 @@ class PostController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
         if ((int)$post['user_id'] !== $userId) {
             $_SESSION['error_message'] = 'Unauthorized: You can only edit your own posts.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -514,7 +455,6 @@ class PostController {
         $errors = [];
         $formData = ['content' => $content];
 
-        // Handle new image uploads (supports post_images[] and post_image)
         $newUploadedImages = [];
         if (isset($_FILES['post_images'])) {
             $newUploadedImages = $this->handleMultipleImageUploads('post_images', $errors, $userId);
@@ -528,14 +468,12 @@ class PostController {
 
         $finalImages = array_merge($remainingImages, $newUploadedImages);
 
-        // Validation: post cannot be empty if there's no image
         if (empty($content) && empty($finalImages)) {
             $errors[] = 'Post content or image cannot be empty.';
         }
 
-        // If there were validation or upload errors, render edit form with errors
         if (!empty($errors)) {
-            // Clean up any newly uploaded images from disk
+
             $this->deleteMultipleImageFiles($newUploadedImages);
 
             $pageTitle = 'Edit Post';
@@ -543,11 +481,10 @@ class PostController {
             return;
         }
 
-        // Update post in database
         $updated = $this->postModel->updatePost($postId, $userId, $content, $finalImages);
 
         if ($updated) {
-            // Remove deleted files from disk only after database update succeeds
+
             $this->deleteMultipleImageFiles($filesToDelete, $postId);
 
             $_SESSION['success_message'] = 'Post updated successfully!';
@@ -561,18 +498,12 @@ class PostController {
         }
     }
 
-    /**
-     * Add comment (delegates to CommentController).
-     */
     public function comment() {
         require_once __DIR__ . '/CommentController.php';
         $commentController = new CommentController();
         $commentController->create();
     }
 
-    /**
-     * Toggle like.
-     */
     public function like() {
         $this->requireAuth();
 
@@ -583,7 +514,6 @@ class PostController {
             || isset($_POST['ajax']) || isset($_GET['ajax'])
             || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             if ($isAjax) {
                 header('Content-Type: application/json');
@@ -605,7 +535,6 @@ class PostController {
             exit;
         }
 
-        // Verify that the post actually exists before toggling like
         $post = $this->postModel->getPostById($postId);
         if (!$post) {
             $errMsg = 'The post you are trying to like does not exist or has been removed.';
@@ -665,9 +594,6 @@ class PostController {
         exit;
     }
 
-    /**
-     * AJAX endpoint to get list of users who reacted to a specific post.
-     */
     public function getLikers() {
         $this->requireAuth();
         $currentUserId = (int)$_SESSION['user_id'];
@@ -716,9 +642,6 @@ class PostController {
         exit;
     }
 
-    /**
-     * Delete post.
-     */
     public function delete() {
         $this->requireAuth();
 
@@ -737,7 +660,6 @@ class PostController {
             exit;
         }
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             if ($isAjax) {
                 header('Content-Type: application/json');
@@ -775,7 +697,6 @@ class PostController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check (allows author or administrator)
         $currentUser = $this->userModel->findById($userId);
         $isAdmin = ($currentUser && isset($currentUser['role']) && $currentUser['role'] === 'admin');
         if ((int)$post['user_id'] !== $userId && !$isAdmin) {
@@ -789,14 +710,12 @@ class PostController {
             exit;
         }
 
-        // Cache image list before DB deletion
         $postImagesToDelete = $post['images'] ?? PostModel::parseImages($post['image'] ?? null);
 
-        // Delete post from database FIRST (ensures DB consistency before unlinking disk assets)
         $deleted = $this->postModel->deletePost($postId, $isAdmin ? null : $userId);
 
         if ($deleted) {
-            // ONLY after successful DB deletion, safely unlink exclusive unreferenced image files
+
             if (!empty($postImagesToDelete)) {
                 FileHelper::deletePostImages($postImagesToDelete, $postId);
             }
@@ -808,7 +727,7 @@ class PostController {
             }
             $_SESSION['success_message'] = 'Post deleted successfully.';
         } else {
-            // DB deletion failed; image files are preserved intact!
+
             if ($isAjax) {
                 header('Content-Type: application/json');
                 echo json_encode(['success' => false, 'error' => 'Failed to delete post.']);

@@ -1,8 +1,6 @@
 <?php
 <<<<<<< HEAD
 =======
-// app/views/auth/login.php
-// User Login View - Modernized Design matching Nexus branding
 
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 require_once __DIR__ . '/../layouts/header.php';

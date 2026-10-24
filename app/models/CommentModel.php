@@ -1,6 +1,4 @@
 <?php
-// app/models/CommentModel.php
-// Model handling all database operations for comments
 
 require_once __DIR__ . '/../../config/database.php';
 
@@ -11,16 +9,8 @@ class CommentModel {
         $this->db = Database::connect();
     }
 
-    /**
-     * Create a new comment.
-     *
-     * @param int $postId
-     * @param int $userId
-     * @param string $content
-     * @return int|bool The new comment ID or false on failure
-     */
     public function createComment($postId, $userId, $content) {
-        $sql = "INSERT INTO comments (post_id, user_id, content, created_at) 
+        $sql = "INSERT INTO comments (post_id, user_id, content, created_at)
                 VALUES (:post_id, :user_id, :content, NOW())";
         $stmt = $this->db->prepare($sql);
         $success = $stmt->execute([
@@ -32,12 +22,6 @@ class CommentModel {
         return $success ? (int)$this->db->lastInsertId() : false;
     }
 
-    /**
-     * Get all comments for a specific post with commenter details.
-     *
-     * @param int $postId
-     * @return array
-     */
     public function getCommentsByPost($postId) {
         $sql = "SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
                        u.username, u.full_name, u.profile_image
@@ -51,12 +35,6 @@ class CommentModel {
         return $stmt->fetchAll();
     }
 
-    /**
-     * Get a single comment by ID with commenter and parent post info.
-     *
-     * @param int $commentId
-     * @return array|false
-     */
     public function getCommentById($commentId) {
         $sql = "SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
                        u.username, u.full_name, u.profile_image,
@@ -74,17 +52,9 @@ class CommentModel {
         return $stmt->fetch();
     }
 
-    /**
-     * Update an existing comment (enforces ownership check in SQL).
-     *
-     * @param int $commentId
-     * @param int $userId
-     * @param string $content
-     * @return bool
-     */
     public function updateComment($commentId, $userId, $content) {
-        $sql = "UPDATE comments 
-                SET content = :content 
+        $sql = "UPDATE comments
+                SET content = :content
                 WHERE id = :id AND user_id = :user_id";
 
         $stmt = $this->db->prepare($sql);
@@ -96,15 +66,8 @@ class CommentModel {
         return $executed && $stmt->rowCount() > 0;
     }
 
-    /**
-     * Delete an existing comment (enforces ownership check in SQL).
-     *
-     * @param int $commentId
-     * @param int $userId
-     * @return bool
-     */
     public function deleteComment($commentId, $userId) {
-        $sql = "DELETE FROM comments 
+        $sql = "DELETE FROM comments
                 WHERE id = :id AND user_id = :user_id";
 
         $stmt = $this->db->prepare($sql);

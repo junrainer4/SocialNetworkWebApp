@@ -1,6 +1,4 @@
 <?php
-// app/controllers/ProfileController.php
-// Controller handling viewing and editing of the logged-in user profile
 
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
@@ -21,10 +19,6 @@ class ProfileController {
         $this->followModel = new FollowModel();
     }
 
-    /**
-     * Enforce authentication for profile actions.
-     * Redirects unauthenticated visitors to login.
-     */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error_message'] = 'You must be logged in to access that page.';
@@ -33,10 +27,6 @@ class ProfileController {
         }
     }
 
-    /**
-     * View a user's profile and their posts.
-     * Defaults to the logged-in user or accepts user_id / id query parameter.
-     */
     public function view() {
         $this->requireAuth();
 
@@ -48,7 +38,7 @@ class ProfileController {
 
         if (!$user) {
             if ($userId === $loggedInUserId) {
-                // If session exists but user row was deleted or not found
+
                 unset($_SESSION['user_id'], $_SESSION['username'], $_SESSION['full_name']);
                 $_SESSION['error_message'] = 'User profile not found. Please log in again.';
                 header('Location: ' . BASE_URL . '/index.php?action=login');
@@ -59,7 +49,6 @@ class ProfileController {
             }
         }
 
-        // Retrieve only posts belonging to the profile user, ordered newest first
         $posts = $this->postModel->getPostsByUserId($userId, $loggedInUserId);
 
         $isOwnProfile = ($userId === $loggedInUserId);
@@ -72,9 +61,6 @@ class ProfileController {
         require __DIR__ . '/../views/profile/profile.php';
     }
 
-    /**
-     * Show edit form or process edit submission for the logged-in user's profile.
-     */
     public function edit() {
         $this->requireAuth();
 
@@ -94,7 +80,7 @@ class ProfileController {
         ];
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            // CSRF validation
+
             if (!validate_csrf_token()) {
                 $errors[] = 'Security Error: Invalid or expired CSRF token. Please try submitting again.';
             }
@@ -102,15 +88,12 @@ class ProfileController {
             $bio = trim($_POST['bio'] ?? '');
             $formData['bio'] = $bio;
 
-            // 1. Validate Bio
             if (strlen($bio) > 500) {
                 $errors[] = 'Bio must not exceed 500 characters.';
             }
 
-            // Normalize empty bio to null or empty string
             $cleanBio = ($bio === '') ? null : $bio;
 
-            // 3. Process Profile Picture Upload (if uploaded or adjusted)
             $newProfileImage   = null;
             $newAvatarUploaded = null;
             $oldAvatarToClean  = null;
@@ -118,11 +101,11 @@ class ProfileController {
             $croppedImageData  = trim($_POST['cropped_image_data'] ?? '');
 
             if ($removePicture) {
-                // User opted to remove existing picture (clean after DB confirmation)
+
                 $oldAvatarToClean = $user['profile_image'] ?? null;
-                $newProfileImage  = ''; // flag to set null in db
+                $newProfileImage  = '';
             } elseif (!empty($croppedImageData)) {
-                // Process adjusted / cropped base64 image from canvas
+
                 if (preg_match('#^data:(image/(?:jpeg|png|webp));base64,(.+)$#i', $croppedImageData, $matches)) {
                     $rawImage = base64_decode($matches[2], true);
                     if ($rawImage === false) {
@@ -162,7 +145,7 @@ class ProfileController {
                     $errors[] = 'Invalid image format received from adjustment tool.';
                 }
             } elseif (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] !== UPLOAD_ERR_NO_FILE) {
-                // Standard file upload fallback
+
                 $fileError = $_FILES['profile_image']['error'];
                 if ($fileError !== UPLOAD_ERR_OK) {
                     $errors[] = 'Failed to upload profile picture. (Error code: ' . $fileError . ')';
@@ -171,20 +154,17 @@ class ProfileController {
                     $fileName = $_FILES['profile_image']['name'];
                     $fileSize = $_FILES['profile_image']['size'];
 
-                    // Max 2MB (2 * 1024 * 1024)
                     $maxSize = 2 * 1024 * 1024;
                     if ($fileSize > $maxSize) {
                         $errors[] = 'Profile picture must not exceed 2MB.';
                     }
 
-                    // Validate extension against safe list
                     $extension = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
                     $allowedExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
                     if (!in_array($extension, $allowedExtensions, true)) {
                         $errors[] = 'Invalid image extension. Only JPG, PNG, GIF, and WEBP formats are allowed.';
                     }
 
-                    // Validate MIME type via finfo and getimagesize
                     $finfo = finfo_open(FILEINFO_MIME_TYPE);
                     $mimeType = finfo_file($finfo, $tmpPath);
                     finfo_close($finfo);
@@ -199,7 +179,6 @@ class ProfileController {
                         $errors[] = 'Uploaded file is not a valid image.';
                     }
 
-                    // If file is valid, generate safe unique filename
                     if (empty($errors)) {
                         $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
                         if (!is_dir($uploadDir)) {
@@ -220,7 +199,6 @@ class ProfileController {
                 }
             }
 
-            // 3.5. Process Cover Photo Upload / Removal / Crop
             $newCoverPhoto    = null;
             $newCoverUploaded = null;
             $oldCoverToClean  = null;
@@ -229,7 +207,7 @@ class ProfileController {
 
             if ($removeCover) {
                 $oldCoverToClean = $user['cover_photo'] ?? null;
-                $newCoverPhoto   = ''; // flag to set null in db
+                $newCoverPhoto   = '';
             } elseif (!empty($croppedCoverData)) {
                 if (preg_match('#^data:(image/(?:jpeg|png|webp));base64,(.+)$#i', $croppedCoverData, $matches)) {
                     $rawCover = base64_decode($matches[2], true);
@@ -313,7 +291,6 @@ class ProfileController {
                 }
             }
 
-            // 4. If all validations pass, save changes to DB
             if (empty($errors)) {
                 try {
                     $updated = $this->userModel->updateProfile($userId, $user['full_name'], $cleanBio, $user['username']);
@@ -330,7 +307,7 @@ class ProfileController {
                     }
 
                     if ($updated !== false) {
-                        // DB update succeeded: safely delete old assets only after confirmation
+
                         if (!empty($oldAvatarToClean) && $oldAvatarToClean !== $newProfileImage) {
                             FileHelper::deleteAvatar($oldAvatarToClean, $userId);
                         }
@@ -343,7 +320,7 @@ class ProfileController {
                         header('Location: ' . BASE_URL . '/index.php?action=profile');
                         exit;
                     } else {
-                        // DB update returned false: remove newly uploaded files so they don't become orphans
+
                         if ($newAvatarUploaded) {
                             FileHelper::deleteAvatar($newAvatarUploaded);
                         }
@@ -376,7 +353,7 @@ class ProfileController {
                     $errors[] = 'We could not save your profile changes due to a system issue. Please try again.';
                 }
             } else {
-                // Validation errors occurred: clean up newly uploaded files
+
                 if ($newAvatarUploaded) {
                     FileHelper::deleteAvatar($newAvatarUploaded);
                 }
@@ -390,10 +367,6 @@ class ProfileController {
         require __DIR__ . '/../views/profile/edit.php';
     }
 
-    /**
-     * AJAX endpoint to get list of followers or following for a user,
-     * respecting the user's privacy settings.
-     */
     public function getFollowList() {
         $this->requireAuth();
         $currentUserId = (int)$_SESSION['user_id'];
@@ -413,8 +386,6 @@ class ProfileController {
             exit;
         }
 
-        // Privacy Check:
-        // If profile is private and current user is NOT the owner:
         $isOwner = ($currentUserId === $targetUserId);
         $isPrivate = (($targetUser['privacy_followers'] ?? 'public') === 'private');
 
@@ -427,14 +398,12 @@ class ProfileController {
             exit;
         }
 
-        // Fetch users
         if ($type === 'following') {
             $users = $this->followModel->getFollowing($targetUserId);
         } else {
             $users = $this->followModel->getFollowers($targetUserId);
         }
 
-        // Add initials and formatted fields
         $formatted = [];
         foreach ($users as $u) {
             $uParts = explode(' ', trim($u['full_name']));
@@ -442,8 +411,8 @@ class ProfileController {
                 ? strtoupper(substr($uParts[0], 0, 1) . substr($uParts[count($uParts)-1], 0, 1))
                 : strtoupper(substr($u['full_name'], 0, 2));
 
-            $isFollowingThisUser = ($currentUserId !== (int)$u['id']) 
-                ? $this->followModel->isFollowing($currentUserId, (int)$u['id']) 
+            $isFollowingThisUser = ($currentUserId !== (int)$u['id'])
+                ? $this->followModel->isFollowing($currentUserId, (int)$u['id'])
                 : null;
 
             $isFollowedByThisUser = ($currentUserId !== (int)$u['id'])

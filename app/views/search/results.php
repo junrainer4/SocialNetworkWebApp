@@ -1,6 +1,4 @@
 <?php
-// app/views/search/results.php
-// Centered Modern Search, Filtering & Reports View for Nexus (Step 11 & Step 12)
 
 $currentUserId = $_SESSION['user_id'] ?? null;
 $currentUserInitials = 'U';
@@ -19,7 +17,6 @@ $authorId = $_GET['author_id'] ?? null;
 
 <div class="search-view-container">
 
-    <!-- Flash Notifications -->
     <?php if (!empty($_SESSION['success_message'])): ?>
         <div class="alert alert-success fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -36,13 +33,11 @@ $authorId = $_GET['author_id'] ?? null;
         <?php unset($_SESSION['error_message']); ?>
     <?php endif; ?>
 
-    <!-- Search Header -->
     <div class="search-header-clean mb-4 text-center">
         <h3 class="fw-bold text-dark mb-1">Search</h3>
         <p class="text-muted small mb-0">Find students, faculty, posts, and topics across Nexus</p>
     </div>
 
-    <!-- Main Search Bar -->
     <form action="<?= BASE_URL ?>/index.php" method="GET" class="mb-4" role="search" id="searchMainForm">
         <input type="hidden" name="action" value="search">
         <input type="hidden" name="type" value="<?= htmlspecialchars($type); ?>" id="searchTypeInput">
@@ -50,12 +45,12 @@ $authorId = $_GET['author_id'] ?? null;
 
         <div class="search-input-wrapper mb-3">
             <i class="bi bi-search search-icon-lead"></i>
-            <input 
-                type="text" 
-                name="q" 
-                class="search-main-control" 
-                placeholder="Search by name, username, or keywords..." 
-                value="<?= htmlspecialchars($query ?? ''); ?>" 
+            <input
+                type="text"
+                name="q"
+                class="search-main-control"
+                placeholder="Search by name, username, or keywords..."
+                value="<?= htmlspecialchars($query ?? ''); ?>"
                 autocomplete="off"
             >
             <?php if (!empty($query) || !empty($authorId)): ?>
@@ -68,33 +63,31 @@ $authorId = $_GET['author_id'] ?? null;
             </button>
         </div>
 
-        <!-- Filter & Tab Navigation Bar -->
         <div class="search-nav-toolbar d-flex flex-wrap align-items-center justify-content-between gap-2 p-2 rounded-3">
-            <!-- Type Tabs -->
+
             <ul class="nav nav-pills search-tabs-pills" role="tablist">
                 <li class="nav-item">
-                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=all&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>" 
+                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=all&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>"
                        class="nav-link <?= ($type === 'all') ? 'active' : ''; ?>">
                         All Results
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=users&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>" 
+                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=users&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>"
                        class="nav-link <?= ($type === 'users') ? 'active' : ''; ?>">
                         <i class="bi bi-people me-1"></i> People <?= !empty($users) ? '(' . count($users) . ')' : ''; ?>
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=posts&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>" 
+                    <a href="<?= BASE_URL ?>/index.php?action=search&q=<?= urlencode($query); ?>&type=posts&filter=<?= urlencode($filter); ?><?= !empty($authorId) ? '&author_id=' . (int)$authorId : ''; ?>"
                        class="nav-link <?= ($type === 'posts') ? 'active' : ''; ?>">
                         <i class="bi bi-file-earmark-text me-1"></i> Posts <?= !empty($posts) ? '(' . count($posts) . ')' : ''; ?>
                     </a>
                 </li>
             </ul>
 
-            <!-- Refine Dropdowns: Author & Sort -->
             <div class="d-flex align-items-center gap-2 flex-wrap">
-                <!-- Author Filter -->
+
                 <div class="dropdown">
                     <select name="author_id" id="author_id_select" class="form-select form-select-sm search-select-pill" onchange="this.form.submit()" aria-label="Filter by author">
                         <option value="">All Authors</option>
@@ -108,7 +101,6 @@ $authorId = $_GET['author_id'] ?? null;
                     </select>
                 </div>
 
-                <!-- Sort Order (When posts are shown) -->
                 <?php if ($type !== 'users'): ?>
                     <select name="filter" id="filter_select" class="form-select form-select-sm search-select-pill" onchange="this.form.submit()" aria-label="Sort results">
                         <option value="newest" <?= ($filter === 'newest') ? 'selected' : ''; ?>>Newest</option>
@@ -121,7 +113,6 @@ $authorId = $_GET['author_id'] ?? null;
         </div>
     </form>
 
-    <!-- Results Overview Ribbon (When searching or filtered) -->
     <?php if (!$isEmptySearch || !empty($users) || !empty($posts)): ?>
         <div class="d-flex align-items-center justify-content-between px-1 mb-3">
             <span class="text-muted small">
@@ -136,9 +127,8 @@ $authorId = $_GET['author_id'] ?? null;
         </div>
     <?php endif; ?>
 
-    <!-- 4. SEARCH & REPORT RESULTS CONTENT -->
     <?php if ($isEmptySearch && empty($users) && empty($posts)): ?>
-        <!-- Initial Guidance State -->
+
         <div class="search-empty-state">
             <div class="search-empty-icon">
                 <i class="bi bi-search"></i>
@@ -158,7 +148,7 @@ $authorId = $_GET['author_id'] ?? null;
         </div>
 
     <?php elseif (($type === 'all' && empty($users) && empty($posts)) || ($type === 'users' && empty($users)) || ($type === 'posts' && empty($posts))): ?>
-        <!-- No Results Found State -->
+
         <div class="search-empty-state">
             <div class="search-empty-icon">
                 <i class="bi bi-slash-circle"></i>
@@ -177,7 +167,6 @@ $authorId = $_GET['author_id'] ?? null;
 
     <?php else: ?>
 
-        <!-- USERS SECTION (Step 11: Search Users & Profile Links) -->
         <?php if (($type === 'all' || $type === 'users') && !empty($users)): ?>
             <div class="mb-4">
                 <div class="d-flex align-items-center justify-content-between mb-3 px-1">
@@ -199,9 +188,9 @@ $authorId = $_GET['author_id'] ?? null;
                                 <div class="d-flex align-items-center gap-3 min-w-0">
                                     <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $user['id']; ?>" class="text-decoration-none">
                                         <?php if (!empty($user['profile_image'])): ?>
-                                            <img 
-                                                src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($user['profile_image'])) ?>" 
-                                                alt="<?= htmlspecialchars($user['full_name']); ?>" 
+                                            <img
+                                                src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($user['profile_image'])) ?>"
+                                                alt="<?= htmlspecialchars($user['full_name']); ?>"
                                                 class="post-avatar"
                                                 style="width: 44px; height: 44px; object-fit: cover;"
                                                 onerror="this.onerror=null; this.outerHTML='<div class=\'post-avatar\' style=\'width: 44px; height: 44px; font-size: 1rem;\'><?= htmlspecialchars($uInitials) ?></div>';"
@@ -221,7 +210,7 @@ $authorId = $_GET['author_id'] ?? null;
                                             <?php endif; ?>
                                         </a>
                                         <div class="text-muted small text-truncate">
-                                            @<?= htmlspecialchars($user['username']); ?> &bull; 
+                                            @<?= htmlspecialchars($user['username']); ?> &bull;
                                             <span class="badge bg-light text-secondary border"><?= (int)($user['total_user_posts'] ?? 0); ?> posts</span>
                                         </div>
                                         <?php if (!empty($user['bio'])): ?>
@@ -257,7 +246,6 @@ $authorId = $_GET['author_id'] ?? null;
             </div>
         <?php endif; ?>
 
-        <!-- POSTS SECTION (Step 11 & Step 12 B: Detailed Reports & Sorting) -->
         <?php if (($type === 'all' || $type === 'posts') && !empty($posts)): ?>
             <div>
                 <div class="d-flex align-items-center justify-content-between mb-3 px-1">
@@ -281,14 +269,14 @@ $authorId = $_GET['author_id'] ?? null;
                     $timeBadge = ($diffHours < 24 && $diffHours >= 1) ? $diffHours . 'h ago' : ($diffHours < 1 ? 'Just now' : date('M j, Y', strtotime($post['created_at'])));
                     ?>
                     <article class="post-card mb-3" id="post-<?= $post['id'] ?>">
-                        <!-- Post Author Header -->
+
                         <div class="post-header">
                             <div class="post-author-box">
                                 <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $post['user_id']; ?>" class="text-decoration-none">
                                     <?php if (!empty($post['profile_image'])): ?>
-                                        <img 
-                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>" 
-                                            alt="<?= htmlspecialchars($post['full_name']); ?>" 
+                                        <img
+                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>"
+                                            alt="<?= htmlspecialchars($post['full_name']); ?>"
                                             class="post-avatar"
                                             onerror="this.onerror=null; this.outerHTML='<div class=\'post-avatar\'><?= htmlspecialchars($authorInitials) ?></div>';"
                                         >
@@ -304,13 +292,12 @@ $authorId = $_GET['author_id'] ?? null;
                                         <?= htmlspecialchars($post['full_name']); ?>
                                     </a>
                                     <div class="post-meta">
-                                        @<?= htmlspecialchars($post['username']); ?> &bull; 
+                                        @<?= htmlspecialchars($post['username']); ?> &bull;
                                         <span title="<?= htmlspecialchars($postTime); ?>"><?= htmlspecialchars($timeBadge); ?></span>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Post Menu & Author Filter Link -->
                             <div class="d-flex align-items-center gap-2">
                                 <a href="<?= BASE_URL ?>/index.php?action=search&author_id=<?= $post['user_id']; ?>&type=posts" class="btn btn-sm btn-light text-secondary border-0 rounded-pill px-2 py-1 micro-text" title="View all posts by this author">
                                     <i class="bi bi-funnel me-1"></i>Author Posts
@@ -348,12 +335,10 @@ $authorId = $_GET['author_id'] ?? null;
                             </div>
                         </div>
 
-                        <!-- Post Text Content -->
                         <div class="post-content">
                             <?= nl2br(htmlspecialchars($post['content'])); ?>
                         </div>
 
-                        <!-- Optional Post Image(s) -->
                         <?php
                         $postImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                         $totalPostImages = count($postImages);
@@ -399,7 +384,6 @@ $authorId = $_GET['author_id'] ?? null;
                             </div>
                         <?php endif; ?>
 
-                        <!-- Post Engagement Actions (Like / Comment) -->
                         <div class="post-footer-actions d-flex align-items-center">
                             <div class="d-flex align-items-center gap-3">
                                 <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline">
@@ -418,7 +402,6 @@ $authorId = $_GET['author_id'] ?? null;
                             </div>
                         </div>
 
-                        <!-- Comments Section -->
                         <div class="comments-container d-none" id="comments-box-<?= $post['id'] ?>">
                             <?php if (!empty($post['comments'])): ?>
                                 <?php foreach ($post['comments'] as $comment): ?>
@@ -432,9 +415,9 @@ $authorId = $_GET['author_id'] ?? null;
                                     ?>
                                     <div class="comment-bubble" id="comment-<?= $comment['id'] ?>">
                                         <?php if (!empty($comment['profile_image'])): ?>
-                                            <img 
-                                                src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>" 
-                                                alt="<?= htmlspecialchars($comment['full_name']); ?>" 
+                                            <img
+                                                src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>"
+                                                alt="<?= htmlspecialchars($comment['full_name']); ?>"
                                                 class="comment-avatar"
                                                 onerror="this.onerror=null; this.outerHTML='<div class=\'comment-avatar\'><?= htmlspecialchars($cInitials) ?></div>';"
                                             >
@@ -474,16 +457,15 @@ $authorId = $_GET['author_id'] ?? null;
                                 <?php endforeach; ?>
                             <?php endif; ?>
 
-                            <!-- Add Comment Form -->
                             <?php if ($currentUserId): ?>
                                 <form action="<?= BASE_URL ?>/index.php?action=create_comment" method="POST" class="comment-input-row">
                                     <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                    <input 
-                                        type="text" 
-                                        name="content" 
-                                        class="form-control" 
-                                        placeholder="Write a comment..." 
-                                        maxlength="1000" 
+                                    <input
+                                        type="text"
+                                        name="content"
+                                        class="form-control"
+                                        placeholder="Write a comment..."
+                                        maxlength="1000"
                                         required
                                     >
                                     <button type="submit" class="btn btn-sm btn-accent rounded-pill px-3" title="Post comment">

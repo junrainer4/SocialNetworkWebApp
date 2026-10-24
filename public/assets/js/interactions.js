@@ -1,11 +1,5 @@
-/**
- * Nexus - AJAX Interactions (Post creation, Commenting, Liking)
- * Prevents full page reloads for seamless user experience.
- */
 
-/**
- * Global helper to hide and unhide comment sections smoothly across the app
- */
+
 window.toggleComments = function(postId) {
     if (!postId) return;
     const box = document.getElementById('comments-box-' + postId);
@@ -23,13 +17,9 @@ window.toggleComments = function(postId) {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
-    
-    // Global BASE_URL fallback helper
+
     const baseUrl = (typeof window.BASE_URL !== 'undefined') ? window.BASE_URL : '';
 
-    // =========================================================================
-    // 1. AJAX LIKING
-    // =========================================================================
     document.addEventListener('submit', function(e) {
         const form = e.target;
         if (!form || !form.action || !form.action.includes('action=like_post')) {
@@ -40,14 +30,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const formData = new FormData(form);
         formData.append('ajax', '1');
 
-        // Include CSRF token from form or meta tag
         const csrfMeta = document.querySelector('meta[name="csrf-token"]');
         const csrfToken = csrfMeta ? csrfMeta.getAttribute('content') : '';
         if (csrfToken && !formData.has('csrf_token')) {
             formData.append('csrf_token', csrfToken);
         }
 
-        // Instant UI Toggle (Optimistic Update)
         const submitBtn = form.querySelector('button[type="submit"]');
         const heartIcon = submitBtn ? submitBtn.querySelector('i') : null;
         const countSpan = submitBtn ? submitBtn.querySelector('span') : null;
@@ -81,7 +69,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const heartIcon = btn.querySelector('i');
             let countSpan = btn.querySelector('.post-likes-count') || btn.querySelector('span');
 
-            // Handle feed style button (.post-action-btn)
             if (btn.classList.contains('post-action-btn')) {
                 if (isLiked) {
                     btn.classList.add('liked');
@@ -92,8 +79,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 const labelSpan = btn.querySelector('span');
                 if (labelSpan) labelSpan.textContent = 'Like';
-            } 
-            // Handle insights / search style button (.btn-danger / .btn-outline-danger)
+            }
+
             else {
                 if (isLiked) {
                     btn.classList.remove('btn-outline-danger');
@@ -109,15 +96,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Globally synchronize all reaction count badges for this post
         document.querySelectorAll(`.post-likes-count[data-post-id="${postId}"]`).forEach(el => {
             el.textContent = likesCount;
         });
     }
 
-    // =========================================================================
-    // POST LIKERS MODAL (VIEW WHO REACTED)
-    // =========================================================================
     window.openPostLikersModal = function(postId) {
         if (!postId) return;
         const modalEl = document.getElementById('postLikersModal');
@@ -194,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 let avatarHtml = '';
                 if (u.profile_image) {
                     const imgUrl = `${baseUrl}/public/uploads/avatars/${encodeURIComponent(u.profile_image)}`;
-                    avatarHtml = `<img src="${imgUrl}" alt="${escapeHtml(u.full_name)}" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 44px; height: 44px;" onerror="this.onerror=null; this.outerHTML='<div class=\\'rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0\\' style=\\'width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;\\'>${escapeHtml(u.initials)}</div>';">`;
+                    avatarHtml = `<img src="${imgUrl}" alt="${escapeHtml(u.full_name)}" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 44px; height: 44px;" onerror="this.onerror=null; this.outerHTML='<div class=\\\\\\\\\''''rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0\\\\\\\\\'''' style=\\\\\\\\\''''width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;\\\\\\\\\''''>${escapeHtml(u.initials)}</div>';">`;
                 } else {
                     avatarHtml = `<div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;">${escapeHtml(u.initials)}</div>`;
                 }
@@ -248,12 +231,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     };
 
-    // Capture-phase click listener on document for .post-likes-count
     document.addEventListener('click', function(e) {
         const countTrigger = e.target.closest('.post-likes-count');
         if (!countTrigger) return;
 
-        // Prevent button click from toggling like and submitting form
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
@@ -264,9 +245,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, true);
 
-    // =========================================================================
-    // 2. AJAX COMMENTING
-    // =========================================================================
     document.addEventListener('submit', function(e) {
         const form = e.target;
         if (!form || !form.action || (!form.action.includes('action=create_comment') && !form.action.includes('action=add_comment'))) {
@@ -319,14 +297,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const commentsContainer = document.getElementById(`comments-box-${postId}`);
         if (!commentsContainer) return;
 
-        // If hidden (e.g. insights page), reveal it
         if (commentsContainer.classList.contains('d-none')) {
             commentsContainer.classList.remove('d-none');
         }
 
         const commentAuthorUrl = `${baseUrl}/index.php?action=profile&user_id=${comment.user_id}`;
-        const avatarHtml = comment.profile_image 
-            ? `<a href="${commentAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(comment.full_name)}'s profile"><img src="${baseUrl}/public/uploads/avatars/${comment.profile_image}" alt="${escapeHtml(comment.full_name)}" class="comment-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\\'comment-avatar\\'>${escapeHtml(comment.initials)}</div>';"></a>`
+        const avatarHtml = comment.profile_image
+            ? `<a href="${commentAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(comment.full_name)}'s profile"><img src="${baseUrl}/public/uploads/avatars/${comment.profile_image}" alt="${escapeHtml(comment.full_name)}" class="comment-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\\\\\\\\\''''comment-avatar\\\\\\\\\''''>${escapeHtml(comment.initials)}</div>';"></a>`
             : `<a href="${commentAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(comment.full_name)}'s profile"><div class="comment-avatar">${escapeHtml(comment.initials)}</div></a>`;
 
         const commentBubbleHtml = `
@@ -374,7 +351,6 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
         `;
 
-        // Check if inserting before form or appending to end
         const commentForm = commentsContainer.querySelector('form.comment-input-row');
         if (commentForm) {
             commentForm.insertAdjacentHTML('beforebegin', commentBubbleHtml);
@@ -382,7 +358,6 @@ document.addEventListener('DOMContentLoaded', function() {
             commentsContainer.insertAdjacentHTML('beforeend', commentBubbleHtml);
         }
 
-        // Update comment counter elements
         const postCard = document.getElementById(`post-${postId}`);
         if (postCard) {
             const commentCountSpan = postCard.querySelector('.post-action-btn[onclick*="toggleComments"] span');
@@ -392,9 +367,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // =========================================================================
-    // 3. AJAX POST CREATION
-    // =========================================================================
     const composerForm = document.querySelector('.composer-card form');
     if (composerForm) {
         composerForm.addEventListener('submit', function(e) {
@@ -537,11 +509,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const composerCard = document.querySelector('.composer-card');
         const feedHeader = composerCard ? composerCard.nextElementSibling : null;
 
-        // Parent container for post cards
         let feedParent = composerCard ? composerCard.parentElement : null;
         if (!feedParent) return;
 
-        // If "No posts yet" card is present, remove it
         const emptyStateCard = feedParent.querySelector('.card-modern.p-5.text-center.text-muted');
         if (emptyStateCard) {
             emptyStateCard.remove();
@@ -549,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         const postAuthorUrl = `${baseUrl}/index.php?action=profile&user_id=${post.user_id}`;
         const avatarHtml = post.profile_image
-            ? `<a href="${postAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(post.full_name)}'s profile"><img src="${baseUrl}/public/uploads/avatars/${post.profile_image}" alt="${escapeHtml(post.full_name)}" class="post-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\\'post-avatar\\'>${escapeHtml(post.initials)}</div>';"></a>`
+            ? `<a href="${postAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(post.full_name)}'s profile"><img src="${baseUrl}/public/uploads/avatars/${post.profile_image}" alt="${escapeHtml(post.full_name)}" class="post-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\\\\\\\\\''''post-avatar\\\\\\\\\''''>${escapeHtml(post.initials)}</div>';"></a>`
             : `<a href="${postAuthorUrl}" class="text-decoration-none flex-shrink-0" title="View ${escapeHtml(post.full_name)}'s profile"><div class="post-avatar">${escapeHtml(post.initials)}</div></a>`;
 
         const imageHtml = buildPostImagesHtml(post);
@@ -633,9 +603,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // =========================================================================
-    // 3.5. AJAX POST DELETION (NO FULL PAGE RELOAD / REFRESH)
-    // =========================================================================
     document.addEventListener('submit', function(e) {
         const form = e.target;
         if (!form || !form.action || !form.action.includes('action=delete_post')) {
@@ -658,7 +625,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const postIdInput = form.querySelector('input[name="post_id"]');
         const postId = postIdInput ? postIdInput.value : '';
 
-        // If on the single post view page, redirect to feed upon deletion
         const isSinglePostView = window.location.search.includes('action=view_post') || window.location.search.includes('action=post');
 
         fetch(form.action, {
@@ -678,7 +644,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     return;
                 }
 
-                // Locate the post element on page
                 const postEl = document.getElementById('post-' + postId) || form.closest('.post-card');
                 if (postEl) {
                     postEl.style.transition = 'opacity 0.25s ease, transform 0.25s ease, max-height 0.3s ease, margin 0.3s ease, padding 0.3s ease';
@@ -709,9 +674,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // =========================================================================
-    // 4. AJAX FOLLOW & UNFOLLOW
-    // =========================================================================
     document.addEventListener('submit', function(e) {
         const form = e.target;
         if (!form || !form.action || !form.action.includes('action=follow_user')) {
@@ -744,7 +706,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (submitBtn) submitBtn.disabled = false;
             if (data && data.success) {
-                // Update Follow button state
+
                 if (submitBtn) {
                     const icon = submitBtn.querySelector('i');
                     const textSpan = submitBtn.querySelector('span');
@@ -774,7 +736,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
 
-                // Update Followers counter if present on profile
                 const followersCountEl = document.getElementById('profileFollowersCount');
                 if (followersCountEl && typeof data.followers_count !== 'undefined') {
                     followersCountEl.textContent = data.followers_count;
@@ -789,11 +750,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // =========================================================================
-    // 5. POST & COMMENT ANCHOR SCROLLING
-    // =========================================================================
-
-    // Post highlight helper (no-op to prevent highlight boxes)
     function highlightPostElement(postEl) {
         if (!postEl) return;
         document.querySelectorAll('.post-card.post-highlight').forEach(el => {
@@ -801,10 +757,9 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Comment highlight helper (steady highlight)
     function highlightCommentElement(commentEl) {
         if (!commentEl) return;
-        // Clear all highlighted comments AND posts so ONLY the comment is highlighted
+
         document.querySelectorAll('.comment-bubble.comment-highlight').forEach(el => {
             el.classList.remove('comment-highlight');
         });
@@ -814,14 +769,13 @@ document.addEventListener('DOMContentLoaded', function() {
         commentEl.classList.add('comment-highlight');
     }
 
-    // Handle scroll to comment or post on page load if arriving directly via link hash, then clear hash immediately
     if (window.location.hash) {
         const hash = window.location.hash;
         if (hash.startsWith('#comment-')) {
             const commentId = hash.substring('#comment-'.length);
             const targetComment = document.getElementById('comment-' + commentId);
             if (targetComment) {
-                // Ensure parent comments container is open
+
                 const parentBox = targetComment.closest('.comments-container');
                 if (parentBox && parentBox.classList.contains('d-none')) {
                     parentBox.classList.remove('d-none');
@@ -831,7 +785,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     highlightCommentElement(targetComment);
                 }, 350);
             }
-            // Clear hash from URL so that refreshing the page leaves no highlight
+
             if (window.history && window.history.replaceState) {
                 window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
             }
@@ -840,8 +794,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (targetPost) {
                 setTimeout(() => {
                     targetPost.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    
-                    // If comments box is collapsed, optionally open it
+
                     const postId = hash.replace('#post-', '');
                     const commentsBox = document.getElementById('comments-box-' + postId);
                     if (commentsBox && commentsBox.classList.contains('d-none')) {
@@ -849,14 +802,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }, 300);
             }
-            // Clear hash from URL immediately so that refreshing the page leaves no hash or box
+
             if (window.history && window.history.replaceState) {
                 window.history.replaceState(null, document.title, window.location.pathname + window.location.search);
             }
         }
     }
 
-    // Helper: Escaping HTML
     function escapeHtml(str) {
         if (!str) return '';
         return String(str)
@@ -867,9 +819,6 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/'/g, '&#039;');
     }
 
-    // =========================================================================
-    // 12. LIVE SEARCH DROPDOWN WITH REAL-TIME KEYWORD HIGHLIGHTING
-    // =========================================================================
     const searchInput = document.getElementById('headerSearchInput');
     const searchDropdown = document.getElementById('liveSearchDropdown');
     const searchResultsBox = document.getElementById('liveSearchResults');
@@ -919,7 +868,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
                         let html = '';
 
-                        // 1. Users Section
                         if (users.length > 0) {
                             html += `
                                 <div class="search-section-header px-3 py-2 text-uppercase micro-text fw-bold text-muted border-bottom">
@@ -930,7 +878,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             users.forEach(u => {
                                 const highlightedName = highlightMatch(u.full_name, query);
                                 const highlightedUsername = highlightMatch('@' + u.username, query);
-                                const avatarHtml = u.avatar 
+                                const avatarHtml = u.avatar
                                     ? `<img src="${u.avatar}" alt="" class="rounded-circle object-fit-cover flex-shrink-0" style="width: 36px; height: 36px;">`
                                     : `<div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: var(--fb-blue, #1877f2); font-size: 0.8rem;">${escapeHtml(u.initials)}</div>`;
 
@@ -947,7 +895,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             html += `</div>`;
                         }
 
-                        // 2. Posts Section
                         if (posts.length > 0) {
                             html += `
                                 <div class="search-section-header px-3 py-2 text-uppercase micro-text fw-bold text-muted border-bottom mt-1">
@@ -977,7 +924,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             html += `</div>`;
                         }
 
-                        // 3. Footer link to full search page
                         html += `
                             <div class="search-footer-action p-2 border-top text-center">
                                 <a href="${baseUrl}/index.php?action=search&q=${encodeURIComponent(query)}" class="small text-primary text-decoration-none fw-semibold d-inline-flex align-items-center gap-1">
@@ -996,21 +942,18 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 200);
         });
 
-        // Close dropdown when clicking outside
         document.addEventListener('click', function(e) {
             if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
                 searchDropdown.classList.add('d-none');
             }
         });
 
-        // Re-open on focus if query has content
         searchInput.addEventListener('focus', function() {
             if (this.value.trim().length > 0 && searchResultsBox.innerHTML.trim().length > 0) {
                 searchDropdown.classList.remove('d-none');
             }
         });
 
-        // Close on Escape
         searchInput.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 searchDropdown.classList.add('d-none');
@@ -1018,11 +961,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // =========================================================================
-    // 8. FACEBOOK-STYLE MESSAGES, NOTIFICATIONS & FLOATING CHAT DOCK
-    // =========================================================================
-
-    // --- A. LocalStorage State Management for Read Status ---
     const getStoredSet = (key) => {
         try {
             const data = localStorage.getItem(key);
@@ -1043,7 +981,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const readMsgs = getStoredSet('unify_read_msgs');
     const readNotifs = getStoredSet('unify_read_notifs');
 
-    // --- B. Notifications Management ---
     const notifBadge = document.getElementById('headerNotifBadge');
     const notifCountText = document.getElementById('notifNewBadgeCount');
     const notifItems = document.querySelectorAll('.user-notif-item');
@@ -1081,30 +1018,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Initialize notification states
     updateNotifUI();
 
-    // Notification item click handler
     notifItems.forEach(item => {
         item.addEventListener('click', function() {
             const notifId = this.getAttribute('data-notif-id');
             const target = this.getAttribute('data-target');
 
-            // Mark read
             if (notifId && !readNotifs.has(notifId)) {
                 readNotifs.add(notifId);
                 saveStoredSet('unify_read_notifs', readNotifs);
                 updateNotifUI();
             }
 
-            // Close dropdown
             const notifDropdownBtn = document.getElementById('headerNotifBtn');
             if (notifDropdownBtn && window.bootstrap && bootstrap.Dropdown) {
                 const bsDrop = bootstrap.Dropdown.getInstance(notifDropdownBtn);
                 if (bsDrop) bsDrop.hide();
             }
 
-            // Handle navigation or feed scroll
             if (target === 'profile') {
                 window.location.href = `${baseUrl}/index.php?action=profile`;
             } else if (target === 'feed') {
@@ -1117,7 +1049,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Mark all notifications read
     if (markAllNotifBtn) {
         markAllNotifBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1131,14 +1062,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- C. Messages & Facebook Floating Chat Dock ---
     const msgBadge = document.getElementById('headerMessagesBadge');
     const msgCountText = document.getElementById('msgNewBadgeCount');
     const msgItems = document.querySelectorAll('.msg-item');
     const markAllMsgBtn = document.getElementById('btnMarkAllMessagesRead');
     const chatSearchInput = document.getElementById('chatSearchInput');
 
-    // Floating Chat Elements
     const chatDock = document.getElementById('fbFloatingChat');
     const chatContactName = document.getElementById('fbChatContactName');
     const chatStatusText = document.getElementById('fbChatStatusText');
@@ -1190,10 +1119,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     };
 
-    // Initialize messages states
     updateMsgUI();
 
-    // Mark all chats read
     if (markAllMsgBtn) {
         markAllMsgBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1207,7 +1134,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Live search filter inside messenger dropdown
     if (chatSearchInput) {
         chatSearchInput.addEventListener('input', function() {
             const q = this.value.toLowerCase().trim();
@@ -1223,14 +1149,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Function to scroll chat body to bottom
     const scrollChatToBottom = () => {
         if (chatMessagesBody) {
             chatMessagesBody.scrollTop = chatMessagesBody.scrollHeight;
         }
     };
 
-    // Chat item click: Open floating Facebook chat box!
     msgItems.forEach(item => {
         item.addEventListener('click', function() {
             const msgId = this.getAttribute('data-msg-id');
@@ -1245,21 +1169,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 color: contactColor
             };
 
-            // Mark as read
             if (msgId && !readMsgs.has(msgId)) {
                 readMsgs.add(msgId);
                 saveStoredSet('unify_read_msgs', readMsgs);
                 updateMsgUI();
             }
 
-            // Close header dropdown
             const msgDropdownBtn = document.getElementById('headerMessagesBtn');
             if (msgDropdownBtn && window.bootstrap && bootstrap.Dropdown) {
                 const bsDrop = bootstrap.Dropdown.getInstance(msgDropdownBtn);
                 if (bsDrop) bsDrop.hide();
             }
 
-            // Setup and reveal Floating Chat dock
             if (chatDock) {
                 if (chatContactName) chatContactName.textContent = contactName;
                 if (chatStatusText) chatStatusText.textContent = 'Active now';
@@ -1275,13 +1196,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     chatInitialMsg.textContent = msgPreview;
                 }
 
-                // Show dock & un-minimize
                 chatDock.classList.remove('d-none');
                 chatDock.classList.remove('minimized');
 
                 scrollChatToBottom();
 
-                // Focus input after slight delay
                 if (chatInput) {
                     setTimeout(() => chatInput.focus(), 150);
                 }
@@ -1289,7 +1208,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Minimize & Close controls for Floating Chat Dock
     if (chatMinimizeBtn && chatDock) {
         chatMinimizeBtn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -1330,7 +1248,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Header click on minimized dock un-minimizes it
     const chatHeader = chatDock ? chatDock.querySelector('.fb-chat-header') : null;
     if (chatHeader && chatDock) {
         chatHeader.addEventListener('click', function(e) {
@@ -1344,7 +1261,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Chat Form Submit: Send Message & Simulated Realistic Reply
     if (chatForm && chatInput && chatMessagesBody) {
         const simulatedReplies = [
             "Got it! Thanks for checking in.",
@@ -1359,7 +1275,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const text = chatInput.value.trim();
             if (!text) return;
 
-            // 1. Render User Outgoing Message
             const outRow = document.createElement('div');
             outRow.className = 'd-flex align-items-end justify-content-end mb-2 chat-msg-row outgoing';
             outRow.innerHTML = `
@@ -1371,7 +1286,6 @@ document.addEventListener('DOMContentLoaded', function() {
             chatInput.value = '';
             scrollChatToBottom();
 
-            // 2. Simulated Typing Indicator after 500ms
             setTimeout(() => {
                 const typingRow = document.createElement('div');
                 typingRow.className = 'd-flex align-items-end gap-2 mb-2 chat-msg-row incoming typing-row';
@@ -1387,7 +1301,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 chatMessagesBody.appendChild(typingRow);
                 scrollChatToBottom();
 
-                // 3. Simulated Incoming Response after 1400ms
                 setTimeout(() => {
                     const typingEl = document.getElementById('chatActiveTyping');
                     if (typingEl) typingEl.remove();

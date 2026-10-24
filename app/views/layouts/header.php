@@ -1,6 +1,4 @@
 <?php
-// app/views/layouts/header.php
-// Reusable Modern HTML Header & Navigation Layout for Unify
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
@@ -15,7 +13,6 @@ if (!defined('BASE_URL')) {
 $currentAction = $_GET['action'] ?? 'home';
 $isLoggedIn = isset($_SESSION['user_id']);
 
-// Generate CSRF token if not set
 if (empty($_SESSION['csrf_token'])) {
     if (function_exists('csrf_token')) {
         csrf_token();
@@ -24,11 +21,10 @@ if (empty($_SESSION['csrf_token'])) {
     }
 }
 
-// Get current user avatar if logged in
 $userInitials = 'U';
 $userAvatarPath = null;
 if ($isLoggedIn) {
-    // Sync latest profile details if UserModel available or query DB to keep session fresh
+
     if (!isset($_SESSION['profile_image_synced']) || $_SESSION['profile_image_synced'] < (time() - 60)) {
         require_once __DIR__ . '/../../models/UserModel.php';
         $headerUserModel = new UserModel();
@@ -68,35 +64,28 @@ if ($isLoggedIn) {
     <title><?= isset($pageTitle) ? (strpos($pageTitle, 'Nexus') !== false ? htmlspecialchars($pageTitle) : htmlspecialchars($pageTitle) . ' - Nexus') : 'Nexus - The SMCC Community Hub'; ?></title>
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 
-    <!-- Bootstrap 5.3 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
 
-    <!-- Bootstrap Icons CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Theme Controller (Loads early to prevent flicker & provide window.toggleTheme) -->
     <script>window.BASE_URL = "<?= BASE_URL ?>";</script>
     <script src="<?= BASE_URL ?>/public/assets/js/theme.js"></script>
 
-    <!-- Cropper.js CSS (Image Crop/Adjust) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.css">
 
-    <!-- Custom Modern Stylesheet -->
     <link rel="stylesheet" href="<?= BASE_URL ?>/public/assets/css/style.css?v=<?= filemtime(__DIR__ . '/../../../public/assets/css/style.css') ?>">
 </head>
 <body class="<?= $isLoggedIn ? 'app-logged-in' : 'app-logged-out' ?>">
 
 <div class="app-layout">
 
-    <!-- MAIN CONTENT AREA WRAPPER -->
     <div class="app-main">
 
-        <!-- TOP HEADER -->
         <header class="app-header">
             <div class="header-container d-flex align-items-center justify-content-between w-100">
                 <?php if ($isLoggedIn): ?>
 <<<<<<< HEAD
-                    <!-- Header Left: Modern Unify Logo & Brand Name -->
+
                     <div class="header-left d-flex align-items-center flex-shrink-0">
                         <a href="<?= BASE_URL ?>/" class="brand-link d-flex align-items-center gap-2" id="headerLogoBtn" title="Unify Home">
                             <div class="brand-logo-icon flex-shrink-0">
@@ -115,9 +104,9 @@ if ($isLoggedIn) {
                                             <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0062ff" flood-opacity="0.32"/>
                                         </filter>
                                     </defs>
-                                    <!-- Squircle with soft glow -->
+
                                     <rect width="48" height="48" rx="14" fill="url(#unifyGradPrimary)" filter="url(#unifyGlow)"/>
-                                    <!-- Modern Fluid Geometric Ribbon "U" -->
+
                                     <path d="M15 13V26C15 30.9706 19.0294 35 24 35C28.9706 35 33 30.9706 33 26V13" stroke="#FFFFFF" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
                                     <path d="M21 14V25C21 26.6569 22.3431 28 24 28C25.6569 28 27 26.6569 27 25V14" stroke="url(#unifyGradAccent)" stroke-width="2.5" stroke-linecap="round"/>
                                     <circle cx="24" cy="20" r="2.2" fill="#FFFFFF"/>
@@ -125,7 +114,7 @@ if ($isLoggedIn) {
                             </div>
                             <span class="brand-title fw-bold fs-4 d-none d-sm-inline">Unify</span>
 =======
-                    <!-- Header Left: Nexus Brand Logo and Name -->
+
                     <div class="header-brand-group d-flex align-items-center me-3">
                         <a href="<?= BASE_URL ?>/" class="brand-link align-items-center gap-2" id="headerLogoBtn" title="Nexus Home">
                             <div class="brand-icon-box flex-shrink-0">
@@ -136,7 +125,6 @@ if ($isLoggedIn) {
                         </a>
                     </div>
 
-                    <!-- Header Center: Centered Search Bar with Live Suggestions Dropdown (No K badge) -->
                     <div class="header-center flex-grow-1 d-flex justify-content-center px-2 px-md-4">
                         <div class="header-search-wrapper position-relative w-100" style="max-width: 580px;">
                             <form action="<?= BASE_URL ?>/index.php" method="GET" class="header-search" id="headerSearchForm" role="search">
@@ -153,18 +141,18 @@ if ($isLoggedIn) {
                             </form>
 
 <<<<<<< HEAD
-                            <!-- Live Search Real-Time Highlight Dropdown -->
+
                             <div id="liveSearchDropdown" class="live-search-dropdown shadow-lg rounded-3 d-none">
                                 <div id="liveSearchResults" class="live-search-results">
-                                    <!-- Populated dynamically via interactions.js -->
+
                                 </div>
                             </div>
                         </div>
                     </div>
 =======
-                    <!-- Right Header Actions -->
+
                     <div class="header-actions">
-                        <!-- Notifications Bell -->
+
                         <?php if ($isLoggedIn): ?>
                         <div class="position-relative">
                             <a href="<?= BASE_URL ?>/index.php?action=notifications" class="header-icon-btn notif-bell-btn" title="Notifications" aria-label="Notifications" id="headerNotifBtn">
@@ -180,15 +168,13 @@ if ($isLoggedIn) {
                         </div>
                         <?php endif; ?>
 
-                        <!-- Dark Mode / Light Mode Toggle -->
                         <button class="header-icon-btn theme-toggle-btn" type="button" onclick="toggleTheme()" title="Switch to Dark Mode" aria-label="Switch to Dark Mode">
                             <i class="theme-toggle-icon bi bi-moon-fill"></i>
                         </button>
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 
-                    <!-- Header Right: Messages, Notifications, and Profile Dropdown -->
                     <div class="header-right d-flex align-items-center gap-2 flex-shrink-0">
-                        <!-- 1. Messages Button & Facebook-style Dropdown -->
+
                         <div class="dropdown">
                             <button class="fb-round-btn position-relative" type="button" id="headerMessagesBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Chats & Messages" aria-label="Chats & Messages">
                                 <i class="bi bi-chat-dots fs-5"></i>
@@ -248,7 +234,6 @@ if ($isLoggedIn) {
                             </div>
                         </div>
 
-                        <!-- 2. Notifications Button & Facebook-style Dropdown -->
                         <div class="dropdown">
                             <button class="fb-round-btn position-relative" type="button" id="headerNotifBtn" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false" title="Notifications" aria-label="Notifications">
                                 <i class="bi bi-bell fs-5"></i>
@@ -308,15 +293,14 @@ if ($isLoggedIn) {
                             </div>
                         </div>
 
-                        <!-- 3. Facebook-Style Profile Dropdown (Only Avatar - NO ARROW!) -->
                         <div class="dropdown fb-profile-dropdown">
-                            <button class="fb-profile-trigger d-flex align-items-center" 
-                                    type="button" 
-                                    id="headerUserDropdown" 
-                                    data-bs-toggle="dropdown" 
+                            <button class="fb-profile-trigger d-flex align-items-center"
+                                    type="button"
+                                    id="headerUserDropdown"
+                                    data-bs-toggle="dropdown"
                                     data-bs-auto-close="true"
-                                    aria-expanded="false" 
-                                    title="Account Menu" 
+                                    aria-expanded="false"
+                                    title="Account Menu"
                                     aria-label="Account Menu">
                                 <?php if (!empty($userAvatarPath)): ?>
                                     <img src="<?= $userAvatarPath ?>" alt="<?= htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>" class="fb-avatar-trigger" onerror="this.onerror=null; this.outerHTML='<div class=\'fb-avatar-trigger\'><?= htmlspecialchars($userInitials) ?></div>';">
@@ -328,7 +312,7 @@ if ($isLoggedIn) {
                             </button>
 
                             <div class="dropdown-menu dropdown-menu-end fb-dropdown-menu shadow border-0" aria-labelledby="headerUserDropdown">
-                                <!-- Top Profile Card / Header -->
+
                                 <a href="<?= BASE_URL ?>/index.php?action=profile" class="fb-user-card text-decoration-none">
                                     <?php if (!empty($userAvatarPath)): ?>
                                         <img src="<?= $userAvatarPath ?>" alt="<?= htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>" class="fb-avatar-card" onerror="this.onerror=null; this.outerHTML='<div class=\'fb-avatar-card\'><?= htmlspecialchars($userInitials) ?></div>';">
@@ -345,7 +329,6 @@ if ($isLoggedIn) {
 
                                 <div class="fb-menu-divider"></div>
 
-                                <!-- Option 1: View Profile -->
                                 <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=profile">
                                     <div class="fb-menu-item-left">
                                         <div class="fb-icon-circle">
@@ -356,7 +339,6 @@ if ($isLoggedIn) {
                                     <i class="bi bi-chevron-right fb-arrow-right"></i>
                                 </a>
 
-                                <!-- Option: Friends -->
                                 <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=friends">
                                     <div class="fb-menu-item-left">
                                         <div class="fb-icon-circle">
@@ -367,7 +349,6 @@ if ($isLoggedIn) {
                                     <i class="bi bi-chevron-right fb-arrow-right"></i>
                                 </a>
 
-                                <!-- Option 2: Account Settings -->
                                 <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=settings" title="Account Settings">
                                     <div class="fb-menu-item-left">
                                         <div class="fb-icon-circle">
@@ -378,7 +359,6 @@ if ($isLoggedIn) {
                                     <i class="bi bi-chevron-right fb-arrow-right"></i>
                                 </a>
 
-                                <!-- Option 3: DARK MODE TOGGLE (Placed below Account Settings!) -->
                                 <button type="button" class="dropdown-item fb-menu-item fb-menu-theme-item w-100 border-0 bg-transparent" onclick="toggleTheme(); event.stopPropagation();">
                                     <div class="fb-menu-item-left">
                                         <div class="fb-icon-circle theme-icon-circle">
@@ -394,7 +374,6 @@ if ($isLoggedIn) {
 
                                 <div class="fb-menu-divider"></div>
 
-                                <!-- Option 4: Sign Out -->
                                 <a class="dropdown-item fb-menu-item fb-menu-signout" href="<?= BASE_URL ?>/index.php?action=logout">
                                     <div class="fb-menu-item-left">
                                         <div class="fb-icon-circle fb-icon-signout">
@@ -408,7 +387,7 @@ if ($isLoggedIn) {
                         </div>
                     </div>
                 <?php else: ?>
-                    <!-- Public / Unauthenticated Header -->
+
                     <div class="d-flex align-items-center">
 <<<<<<< HEAD
                         <a href="<?= BASE_URL ?>/" class="brand-link d-flex align-items-center gap-2" title="Unify">
@@ -446,7 +425,7 @@ if ($isLoggedIn) {
                     </div>
 
                     <div class="header-actions">
-                        <!-- Dark Mode Toggle for Guests -->
+
                         <button class="fb-round-btn theme-toggle-btn" type="button" onclick="toggleTheme()" title="Switch Theme" aria-label="Switch Theme">
                             <i class="bi bi-moon fs-5 theme-icon-moon"></i>
                             <i class="bi bi-sun fs-5 theme-icon-sun d-none"></i>
@@ -456,10 +435,8 @@ if ($isLoggedIn) {
             </div>
         </header>
 
-        <!-- PAGE CONTENT CONTAINER -->
         <main class="<?= $isLoggedIn ? 'p-3 p-md-4 flex-grow-1' : 'auth-main flex-grow-1 d-flex align-items-center justify-content-center p-3 p-md-4' ?>">
 
-            <!-- Global Flash Messages -->
             <?php if (!empty($_SESSION['error_message']) && $currentAction !== 'home' && $currentAction !== 'insights' && $currentAction !== 'welcome' && $currentAction !== 'login' && $currentAction !== 'register'): ?>
                 <div class="alert alert-danger fade show border-0 shadow-sm mb-4 mx-auto" style="max-width: 900px;" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>

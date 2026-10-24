@@ -1,11 +1,4 @@
-/**
- * theme.js - Complete Dark Mode & Light Mode Controller with Persistence for Nexus
- * Handles:
- *  - Immediate theme application on documentElement to prevent flash
- *  - Theme toggle functionality (window.toggleTheme)
- *  - Accessible button updates (icons, aria-label, title) across desktop and mobile
- *  - Reliable localStorage persistence with fallback to system preference
- */
+
 (function() {
     'use strict';
 
@@ -14,9 +7,6 @@
     var THEME_DARK = 'dark';
     var THEME_LIGHT = 'light';
 
-    /**
-     * Safely read theme from localStorage or fallback to system preference
-     */
     function getStoredTheme() {
         try {
             var stored = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
@@ -27,7 +17,6 @@
             console.warn('localStorage read error:', e);
         }
 
-        // Check system preference
         if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
             return THEME_DARK;
         }
@@ -35,9 +24,6 @@
         return THEME_LIGHT;
     }
 
-    /**
-     * Apply theme attributes and classes to the root element
-     */
     function applyTheme(theme) {
         var root = document.documentElement;
         if (theme === THEME_DARK) {
@@ -53,9 +39,6 @@
         updateToggleButtons(theme);
     }
 
-    /**
-     * Synchronize all theme toggle buttons across the UI
-     */
     function updateToggleButtons(activeTheme) {
         var current = activeTheme || (document.documentElement.getAttribute('data-bs-theme') === THEME_DARK ? THEME_DARK : THEME_LIGHT);
         var buttons = document.querySelectorAll('.theme-toggle-btn');
@@ -80,13 +63,11 @@
             }
         });
 
-        // Synchronize switch in profile dropdown
         var switches = document.querySelectorAll('.theme-toggle-switch, #themeSwitchCheckbox');
         switches.forEach(function(sw) {
             sw.checked = (current === THEME_DARK);
         });
 
-        // Synchronize moon/sun in profile dropdown item
         var menuMoon = document.querySelectorAll('.fb-menu-theme-item .theme-icon-moon');
         var menuSun = document.querySelectorAll('.fb-menu-theme-item .theme-icon-sun');
         if (current === THEME_DARK) {
@@ -98,9 +79,6 @@
         }
     }
 
-    /**
-     * Global Toggle Function
-     */
     window.toggleTheme = function() {
         var currentTheme = document.documentElement.getAttribute('data-bs-theme') === THEME_DARK ? THEME_DARK : THEME_LIGHT;
         var newTheme = (currentTheme === THEME_DARK) ? THEME_LIGHT : THEME_DARK;
@@ -114,14 +92,11 @@
         applyTheme(newTheme);
     };
 
-    // Public hook to allow re-syncing buttons if DOM is dynamically changed
     window.updateThemeToggleButtons = updateToggleButtons;
 
-    // Apply saved or system theme immediately
     var initialTheme = getStoredTheme();
     applyTheme(initialTheme);
 
-    // Sync button icons once DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {
             updateToggleButtons();

@@ -1,12 +1,9 @@
 <?php
-// app/views/posts/view.php
-// Dedicated Single Post & Discussion View (Direct link from notifications, bookmarks, and shares)
 
 require_once __DIR__ . '/../layouts/header.php';
 
 $currentUserId = $_SESSION['user_id'] ?? null;
 
-// Author initials
 $authorParts = explode(' ', trim($post['full_name']));
 $authorInitials = count($authorParts) >= 2
     ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
@@ -21,7 +18,6 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
     <div class="row justify-content-center">
         <div class="col-lg-7 col-xl-8">
 
-            <!-- Flash Notifications -->
             <?php if (!empty($_SESSION['success_message'])): ?>
                 <div class="alert alert-success fade show border-0 shadow-sm mb-3" role="alert">
                     <i class="bi bi-check-circle-fill me-2"></i>
@@ -38,7 +34,6 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                 <?php unset($_SESSION['error_message']); ?>
             <?php endif; ?>
 
-            <!-- Navigation Back Bar -->
             <div class="d-flex align-items-center justify-content-between mb-3">
                 <a href="<?= BASE_URL ?>/" class="btn btn-sm btn-outline-secondary rounded-pill px-3 d-inline-flex align-items-center gap-1 shadow-sm">
                     <i class="bi bi-arrow-left"></i>
@@ -49,16 +44,15 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                 </span>
             </div>
 
-            <!-- Single Post Card -->
             <article class="post-card shadow-sm mb-4" id="post-<?= (int)$post['id'] ?>">
-                <!-- Post Author Header -->
+
                 <div class="post-header">
                     <div class="post-author-box">
                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$post['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($post['full_name']); ?>'s profile">
                             <?php if (!empty($post['profile_image'])): ?>
-                                <img 
-                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>" 
-                                    alt="<?= htmlspecialchars($post['full_name']); ?>" 
+                                <img
+                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>"
+                                    alt="<?= htmlspecialchars($post['full_name']); ?>"
                                     class="post-avatar"
                                     onerror="this.onerror=null; this.outerHTML='<div class=\'post-avatar\'><?= htmlspecialchars($authorInitials) ?></div>';"
                                 >
@@ -79,7 +73,6 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                         </div>
                     </div>
 
-                    <!-- Post Menu Dropdown -->
                     <?php if ($currentUserId && (int)$currentUserId === (int)$post['user_id']): ?>
                     <div class="dropdown">
                         <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post actions">
@@ -105,12 +98,10 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                     <?php endif; ?>
                 </div>
 
-                <!-- Post Text Content -->
                 <div class="post-content fs-6">
                     <?= nl2br(htmlspecialchars($post['content'])); ?>
                 </div>
 
-                <!-- Optional Post Image(s) -->
                 <?php
                 $postImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                 $totalPostImages = count($postImages);
@@ -160,7 +151,6 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                     </div>
                 <?php endif; ?>
 
-                <!-- Post Engagement Actions (Like / Comment) -->
                 <div class="post-footer-actions d-flex align-items-center py-2 border-top border-bottom my-3">
                     <div class="d-flex align-items-center gap-3">
                         <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline">
@@ -179,7 +169,6 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                     </div>
                 </div>
 
-                <!-- Dedicated Comments Discussion Section -->
                 <div class="comments-container mt-3" id="comments-box-<?= $post['id'] ?>">
                     <h6 class="fw-bold text-dark mb-3 small d-flex align-items-center gap-2">
                         <i class="bi bi-chat-dots text-primary"></i>
@@ -201,9 +190,9 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                             <div class="comment-bubble <?= $isCommentTarget ? 'comment-highlight' : '' ?>" id="comment-<?= $comment['id'] ?>">
                                 <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$comment['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($comment['full_name']); ?>'s profile">
                                     <?php if (!empty($comment['profile_image'])): ?>
-                                        <img 
-                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>" 
-                                            alt="<?= htmlspecialchars($comment['full_name']); ?>" 
+                                        <img
+                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>"
+                                            alt="<?= htmlspecialchars($comment['full_name']); ?>"
                                             class="comment-avatar"
                                             onerror="this.onerror=null; this.outerHTML='<div class=\'comment-avatar\'><?= htmlspecialchars($cInitials) ?></div>';"
                                         >
@@ -267,17 +256,16 @@ $highlightCommentId = (int)($highlightCommentId ?? ($_GET['comment_id'] ?? 0));
                         </div>
                     <?php endif; ?>
 
-                    <!-- Add Comment Form -->
                     <?php if ($currentUserId): ?>
                         <form action="<?= BASE_URL ?>/index.php?action=create_comment" method="POST" class="comment-input-row mt-3">
                             <?= csrf_field(); ?>
                             <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                            <input 
-                                type="text" 
-                                name="content" 
-                                class="form-control" 
-                                placeholder="Write a comment..." 
-                                maxlength="1000" 
+                            <input
+                                type="text"
+                                name="content"
+                                class="form-control"
+                                placeholder="Write a comment..."
+                                maxlength="1000"
                                 required
                             >
                             <button type="submit" class="btn btn-sm btn-accent rounded-pill px-3" title="Post comment">
@@ -312,7 +300,7 @@ function toggleComments(postId) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // If a comment was specifically targeted by notification, scroll smoothly into view
+
     <?php if ($highlightCommentId): ?>
         const targetComment = document.getElementById('comment-<?= (int)$highlightCommentId ?>');
         if (targetComment) {
@@ -322,7 +310,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     <?php endif; ?>
 
-    // Clear hash/query param state on refresh so reloading leaves the highlight clear
     if (window.history && window.history.replaceState) {
         const cleanUrl = window.location.pathname + '?action=view_post&post_id=<?= (int)$post['id'] ?>';
         window.history.replaceState(null, document.title, cleanUrl);

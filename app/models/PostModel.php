@@ -1,6 +1,4 @@
 <?php
-// app/models/PostModel.php
-// Model handling all database operations for posts, comments, and likes
 
 require_once __DIR__ . '/../../config/database.php';
 
@@ -11,18 +9,11 @@ class PostModel {
         $this->db = Database::connect();
     }
 
-    /**
-     * Get all posts with author info, like counts, and comment counts.
-     *
-     * @param int|null $currentUserId To check if the current user liked each post
-     * @param string $order 'newest' or 'oldest'
-     * @return array
-     */
     public function getAllPosts($currentUserId = null, $order = 'newest') {
         $orderBy = ($order === 'oldest') ? 'p.created_at ASC, p.id ASC' : 'p.created_at DESC, p.id DESC';
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image,
                        COUNT(DISTINCT l.id) AS likes_count,
                        COUNT(DISTINCT c.id) AS comments_count,
@@ -38,7 +29,6 @@ class PostModel {
         $stmt->execute([':current_user_id' => $currentUserId ?? 0]);
         $posts = $stmt->fetchAll();
 
-        // Attach comments and parsed images to each post
         foreach ($posts as &$post) {
             $post['images'] = self::parseImages($post['image'] ?? null);
             $post['comments'] = $this->getCommentsByPostId($post['id']);
@@ -47,17 +37,10 @@ class PostModel {
         return $posts;
     }
 
-    /**
-     * Get all posts created by a specific user with author info, like counts, and comment counts.
-     *
-     * @param int $userId Profile user ID whose posts to retrieve
-     * @param int|null $currentUserId Currently logged-in user ID (to check if they liked the post)
-     * @return array
-     */
     public function getPostsByUserId($userId, $currentUserId = null) {
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image,
                        COUNT(DISTINCT l.id) AS likes_count,
                        COUNT(DISTINCT c.id) AS comments_count,
@@ -77,7 +60,6 @@ class PostModel {
         ]);
         $posts = $stmt->fetchAll();
 
-        // Attach comments and parsed images to each post
         foreach ($posts as &$post) {
             $post['images'] = self::parseImages($post['image'] ?? null);
             $post['comments'] = $this->getCommentsByPostId($post['id']);
@@ -86,25 +68,12 @@ class PostModel {
         return $posts;
     }
 
-    /**
-     * Get all comments for a specific post.
-     *
-     * @param int $postId
-     * @return array
-     */
     public function getCommentsByPostId($postId) {
         require_once __DIR__ . '/CommentModel.php';
         $commentModel = new CommentModel();
         return $commentModel->getCommentsByPost($postId);
     }
 
-    /**
-     * Parse an image column into a clean array of image filenames.
-     * Supports JSON array string, comma-separated string, PHP array, or single filename string.
-     *
-     * @param mixed $imageField
-     * @return array
-     */
     public static function parseImages($imageField) {
         if (empty($imageField)) {
             return [];
@@ -133,14 +102,6 @@ class PostModel {
         return [$trimmed];
     }
 
-    /**
-     * Create a new post.
-     *
-     * @param int $userId
-     * @param string $content
-     * @param string|array|null $image Single filename or array of filenames
-     * @return int|bool
-     */
     public function createPost($userId, $content, $image = null) {
         $imageValue = null;
         if (is_array($image)) {
@@ -165,27 +126,12 @@ class PostModel {
         return $success ? (int)$this->db->lastInsertId() : false;
     }
 
-    /**
-     * Add a comment to a post.
-     *
-     * @param int $postId
-     * @param int $userId
-     * @param string $content
-     * @return bool
-     */
     public function addComment($postId, $userId, $content) {
         require_once __DIR__ . '/CommentModel.php';
         $commentModel = new CommentModel();
         return (bool)$commentModel->createComment($postId, $userId, $content);
     }
 
-    /**
-     * Toggle like on a post.
-     *
-     * @param int $postId
-     * @param int $userId
-     * @return bool True if liked, False if unliked
-     */
     public function toggleLike($postId, $userId) {
         $checkSql = "SELECT id FROM likes WHERE post_id = :post_id AND user_id = :user_id LIMIT 1";
         $stmt = $this->db->prepare($checkSql);
@@ -205,25 +151,12 @@ class PostModel {
         }
     }
 
-    /**
-     * Get the total likes count for a specific post.
-     *
-     * @param int $postId
-     * @return int
-     */
     public function getLikesCount($postId) {
         $stmt = $this->db->prepare("SELECT COUNT(*) FROM likes WHERE post_id = :post_id");
         $stmt->execute([':post_id' => $postId]);
         return (int)$stmt->fetchColumn();
     }
 
-    /**
-     * Get list of users who liked/reacted to a specific post.
-     *
-     * @param int $postId
-     * @param int|null $currentUserId
-     * @return array
-     */
     public function getPostLikers($postId, $currentUserId = null) {
         $postId = (int)$postId;
         $currentUserId = $currentUserId ? (int)$currentUserId : 0;
@@ -261,13 +194,6 @@ class PostModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Delete a post (transaction-safe; verifies ownership if userId is provided).
-     *
-     * @param int $postId
-     * @param int|null $userId
-     * @return bool
-     */
     public function deletePost($postId, $userId = null) {
         $postId = (int)$postId;
         if ($postId <= 0) {
@@ -310,20 +236,14 @@ class PostModel {
         }
     }
 
-    /**
-     * Get a post by its ID (including author information).
-     *
-     * @param int $postId
-     * @return array|false
-     */
     public function getPostById($postId) {
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image
                 FROM posts p
                 JOIN users u ON p.user_id = u.id
-                WHERE p.id = :id 
+                WHERE p.id = :id
                 LIMIT 1";
         $stmt = $this->db->prepare($sql);
         $stmt->execute([':id' => $postId]);
@@ -334,17 +254,10 @@ class PostModel {
         return $post;
     }
 
-    /**
-     * Get a single post with author info, like counts, comment counts, and attached comments.
-     *
-     * @param int $postId
-     * @param int|null $currentUserId
-     * @return array|false
-     */
     public function getPostWithDetails($postId, $currentUserId = null) {
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image,
                        COUNT(DISTINCT l.id) AS likes_count,
                        COUNT(DISTINCT c.id) AS comments_count,
@@ -372,17 +285,8 @@ class PostModel {
         return $post;
     }
 
-    /**
-     * Update an existing post (only if user is author).
-     *
-     * @param int $postId
-     * @param int $userId
-     * @param string $content
-     * @param string|array|null $image
-     * @return bool
-     */
     public function updatePost($postId, $userId, $content, $image = null) {
-        // Verify ownership first
+
         $checkStmt = $this->db->prepare("SELECT id FROM posts WHERE id = :post_id AND user_id = :user_id");
         $checkStmt->execute([':post_id' => $postId, ':user_id' => $userId]);
         if (!$checkStmt->fetch()) {
@@ -401,8 +305,8 @@ class PostModel {
             $imageValue = (string)$image;
         }
 
-        $sql = "UPDATE posts 
-                SET content = :content, image = :image 
+        $sql = "UPDATE posts
+                SET content = :content, image = :image
                 WHERE id = :post_id AND user_id = :user_id";
         $stmt = $this->db->prepare($sql);
         $executed = $stmt->execute([
@@ -414,16 +318,6 @@ class PostModel {
         return $executed;
     }
 
-    /**
-     * Search posts by content with optional author filtering, sorting, and engagement metrics.
-     * Demonstrates SQL JOIN, Aggregate functions (COUNT), GROUP BY, ORDER BY, and Subqueries.
-     *
-     * @param string $query Search keyword
-     * @param string $filter Sort order: 'newest', 'oldest', 'most_liked', 'most_commented'
-     * @param int|null $currentUserId Currently logged-in user ID
-     * @param int|null $authorId Optional user ID to filter posts by author
-     * @return array
-     */
     public function searchPosts($query = '', $filter = 'newest', $currentUserId = null, $authorId = null, $limit = 50, $mediaOnly = false) {
         $trimmedQuery = trim($query);
         if ($trimmedQuery === '' && empty($authorId)) {
@@ -455,7 +349,6 @@ class PostModel {
 
         $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
 
-        // Determine sorting order based on filter parameter (ORDER BY)
         switch ($filter) {
             case 'oldest':
                 $orderBy = 'p.created_at ASC, p.id ASC';
@@ -474,16 +367,9 @@ class PostModel {
 
         $limitVal = max(1, min(100, (int)$limit));
 
-        // SQL Query demonstrating:
-        // 1. JOIN (JOIN users u ON p.user_id = u.id, LEFT JOIN likes l, LEFT JOIN comments c)
-        // 2. Aggregate functions (COUNT(DISTINCT l.id), COUNT(DISTINCT c.id))
-        // 3. Subquery for user like status (SELECT COUNT(*) FROM likes ...)
-        // 4. GROUP BY (GROUP BY p.id)
-        // 5. ORDER BY ($orderBy)
-        // 6. LIMIT ($limitVal)
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image,
                        COUNT(DISTINCT l.id) AS likes_count,
                        COUNT(DISTINCT c.id) AS comments_count,
@@ -501,7 +387,6 @@ class PostModel {
         $stmt->execute($params);
         $posts = $stmt->fetchAll();
 
-        // Attach comments and parsed images to each post
         foreach ($posts as &$post) {
             $post['images'] = self::parseImages($post['image'] ?? null);
             $post['comments'] = $this->getCommentsByPostId($post['id']);
@@ -510,14 +395,6 @@ class PostModel {
         return $posts;
     }
 
-    /**
-     * Count matching posts for keyword search.
-     * Demonstrates: SQL Aggregate Function COUNT().
-     *
-     * @param string $query
-     * @param bool $mediaOnly
-     * @return int
-     */
     public function countSearchPosts($query = '', $mediaOnly = false) {
         $trimmed = trim($query);
         if ($trimmed === '') {
@@ -535,15 +412,6 @@ class PostModel {
         return (int)$stmt->fetchColumn();
     }
 
-    /**
-     * Calculate summary statistics for matching posts and filters.
-     * Demonstrates SQL JOIN, Aggregate functions (COUNT DISTINCT), and Subqueries.
-     * Avoids double-counting comments and likes.
-     *
-     * @param string $query Search keyword
-     * @param int|null $authorId Optional user ID filter
-     * @return array
-     */
     public function getSearchSummaryStats($query = '', $authorId = null) {
         $whereConditions = [];
         $params = [];
@@ -560,8 +428,7 @@ class PostModel {
 
         $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
 
-        // Query using JOIN and Aggregate functions with DISTINCT to prevent duplicate counting
-        $sql = "SELECT 
+        $sql = "SELECT
                     COUNT(DISTINCT p.id) AS total_posts,
                     COUNT(DISTINCT p.user_id) AS total_authors,
                     COUNT(DISTINCT c.id) AS total_comments,
@@ -584,13 +451,6 @@ class PostModel {
         ];
     }
 
-    /**
-     * Advanced Post Search for Community Insights.
-     * Supports query, author_id, date range, content_type, sorting, and user like status.
-     *
-     * @param array $params
-     * @return array
-     */
     public function searchPostsAdvanced($params = []) {
         $query = trim($params['query'] ?? '');
         $authorId = !empty($params['author_id']) ? (int)$params['author_id'] : null;
@@ -650,9 +510,9 @@ class PostModel {
                 break;
         }
 
-        $sql = "SELECT p.*, 
-                       u.username, 
-                       u.full_name, 
+        $sql = "SELECT p.*,
+                       u.username,
+                       u.full_name,
                        u.profile_image,
                        COUNT(DISTINCT l.id) AS likes_count,
                        COUNT(DISTINCT c.id) AS comments_count,

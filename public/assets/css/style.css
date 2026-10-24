@@ -1,7 +1,7 @@
 <<<<<<< HEAD
-/* Custom Modern Dashboard Stylesheet for SMCC Connect */
+
 =======
-/* Custom Modern Dashboard Stylesheet for Nexus */
+
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 :root,
 [data-bs-theme="light"],
@@ -47,18 +47,12 @@ body {
     overflow-x: hidden;
 }
 
-/* ========================================================
-   DASHBOARD LAYOUT WRAPPER
-======================================================== */
 .app-layout {
     display: flex;
     min-height: 100vh;
     width: 100%;
 }
 
-/* ========================================================
-   BRAND & NAVIGATION ELEMENTS
-======================================================== */
 .brand-link {
     display: inline-flex;
     align-items: center;
@@ -119,20 +113,16 @@ body {
     box-shadow: 0 3px 8px rgba(245, 158, 11, 0.6);
 }
 
-/* ========================================================
-   MAIN CONTENT WRAPPER
-======================================================== */
 .app-main {
     flex: 1;
     margin-left: 0;
     display: flex;
     flex-direction: column;
-    min-width: 0; /* Prevents flex children from overflowing */
+    min-width: 0;
     min-height: 100vh;
     transition: margin-left 0.3s ease;
 }
 
-/* Feed Container Max Width & Balance */
 .feed-layout-container {
     width: 100%;
     max-width: 1180px;
@@ -145,9 +135,6 @@ body {
     background-color: var(--body-bg);
 }
 
-/* ========================================================
-   NEXUS MINIMALIST CARD-FREE LANDING HERO (ENHANCED)
-======================================================== */
 .landing-hero-container {
     background: transparent;
     border: none;
@@ -156,7 +143,6 @@ body {
     z-index: 1;
 }
 
-/* Atmospheric Ambient Glow behind hero */
 .landing-hero-container::before {
     content: "";
     position: absolute;
@@ -181,7 +167,6 @@ body {
     background: transparent;
 }
 
-/* Sleek Badge Pill */
 .landing-badge-pill {
     background: rgba(25, 47, 93, 0.05);
     border: 1px solid rgba(25, 47, 93, 0.12);
@@ -235,7 +220,6 @@ body {
     border-color: rgba(241, 189, 39, 0.45);
 }
 
-/* Brand Emblem */
 .landing-brand-emblem {
     width: 64px;
     height: 64px;
@@ -261,7 +245,6 @@ body {
     box-shadow: 0 10px 26px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(241, 189, 39, 0.35) inset;
 }
 
-/* 1. Main Heading */
 .landing-heading {
     font-size: clamp(3rem, 7vw, 4.5rem);
     font-weight: 850;
@@ -283,7 +266,6 @@ body {
     text-shadow: 0 2px 24px rgba(147, 197, 253, 0.3);
 }
 
-/* 2. Subheading */
 .landing-subheading {
     font-size: clamp(1.2rem, 3vw, 1.55rem);
     font-weight: 700;
@@ -299,7 +281,6 @@ body {
     text-shadow: 0 0 18px rgba(241, 189, 39, 0.35);
 }
 
-/* 3. Website Description */
 .landing-description {
     font-size: clamp(1.05rem, 2.2vw, 1.18rem);
     line-height: 1.75;
@@ -316,7 +297,6 @@ body {
     color: #bfdbfe !important;
 }
 
-/* 4. Action Buttons */
 .landing-actions {
     margin-top: 1.75rem;
 }
@@ -413,7 +393,6 @@ body {
     }
 }
 
-/* Trust / Feature highlights bar */
 .landing-trust-bar {
     border-top: 1px solid rgba(226, 232, 240, 0.85);
     color: #64748b;
@@ -449,7 +428,6 @@ body {
     color: #1b356d;
 }
 
-/* Navy & Accent Color Utilities */
 .text-navy {
     color: #192f5d !important;
 }
@@ -506,9 +484,6 @@ body {
     padding-bottom: 0.625rem !important;
 }
 
-/* ========================================================
-   TOP HEADER (Facebook Style Fixed Top Navbar)
-======================================================== */
 .app-header {
     height: var(--header-height, 56px);
     background-color: var(--card-bg, #ffffff);
@@ -532,7 +507,6 @@ body {
     gap: 1rem;
 }
 
-/* 1. Header Left: Brand Logo & Title */
 .header-left {
     display: flex;
     align-items: center;
@@ -550,7 +524,6 @@ body {
     transform: scale(1.05);
 }
 
-/* 2. Header Center: Centered Pill Search Bar with Live Suggestions Dropdown */
 .header-center {
     flex: 1 1 auto;
     max-width: 580px;
@@ -638,7 +611,6 @@ body {
     user-select: none;
 }
 
-/* LIVE SEARCH REAL-TIME DROPDOWN */
 .live-search-dropdown {
     position: absolute;
     top: calc(100% + 6px);
@@ -676,7 +648,6 @@ body {
     color: #58a6ff;
 }
 
-/* Badge for Messages & Notifications */
 .fb-badge {
     position: absolute;
     top: -3px;
@@ -759,7 +730,6 @@ body {
     border-width: 1.5px;
 }
 
-/* Floating Facebook Chat Dock (Spacious, Modern, Responsive) */
 .fb-chat-dock {
     position: fixed;
     bottom: 0;
@@ -789,7 +759,6 @@ body {
     }
 }
 
-/* Expanded / Maximized full-size view */
 .fb-chat-dock.expanded {
     width: min(940px, calc(100vw - 36px)) !important;
     height: calc(100vh - 65px) !important;
@@ -915,7 +884,6 @@ body {
     40% { transform: scale(1); }
 }
 
-/* Theme Switch Item in Profile Menu */
 .fb-menu-theme-item {
     display: flex;
     align-items: center;
@@ -930,7 +898,6 @@ body {
     background-color: var(--fb-btn-bg, #f0f2f5) !important;
 }
 
-/* Settings Separated Tabs */
 .fb-settings-tabs .nav-link {
     color: var(--text-secondary);
     font-weight: 600;
@@ -953,7 +920,6 @@ body {
     box-shadow: 0 2px 6px rgba(24, 119, 242, 0.35);
 }
 
-/* Avatar Camera Overlay Button on Profile */
 .avatar-camera-btn {
     position: absolute;
     bottom: 2px;
@@ -976,7 +942,6 @@ body {
     transform: scale(1.08);
 }
 
-/* 3. Header Right: Actions */
 .header-actions {
     flex: 1 1 280px;
     max-width: 380px;
@@ -1041,9 +1006,6 @@ body {
     transform: scale(1.08) rotate(8deg);
 }
 
-/* ========================================================
-   FACEBOOK-STYLE PROFILE DROPDOWN
-======================================================== */
 .fb-profile-dropdown {
     position: relative;
 }
@@ -1094,7 +1056,6 @@ body {
     flex-shrink: 0;
 }
 
-/* Profile avatar styling – copy of fb avatar layout but larger */
 .profile-avatar {
     width: 120px;
     height: 120px;
@@ -1112,7 +1073,6 @@ body {
     box-shadow: 0 0 0 4px #ffffff;
 }
 
-/* Post avatar styling */
 .post-avatar {
     width: 40px;
     height: 40px;
@@ -1137,7 +1097,6 @@ body {
     border-radius: 50%;
 }
 
-/* Composer avatar: circular, fixed 40x40, centered with object-fit */
 .user-avatar-sm {
     width: 40px;
     height: 40px;
@@ -1170,7 +1129,6 @@ body {
     transform: rotate(180deg);
 }
 
-/* Dropdown Menu Container */
 .fb-dropdown-menu {
     min-width: 290px;
     width: 320px;
@@ -1191,7 +1149,6 @@ body {
     box-shadow: 0 12px 28px 0 rgba(0, 0, 0, 0.55), 0 2px 6px 0 rgba(0, 0, 0, 0.3) !important;
 }
 
-/* User Card inside Dropdown */
 .fb-user-card {
     display: flex;
     align-items: center;
@@ -1261,7 +1218,6 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Menu Items */
 .fb-menu-item {
     display: flex;
     align-items: center;
@@ -1354,9 +1310,6 @@ body {
     color: #f87171 !important;
 }
 
-/* ========================================================
-   CARDS & WIDGETS (Facebook Style Post Cards)
-======================================================== */
 .card-modern {
     background-color: var(--card-bg, #ffffff);
     border-radius: 8px;
@@ -1365,7 +1318,6 @@ body {
     margin-bottom: 1rem;
 }
 
-/* Post Composer Card */
 .composer-card {
     background-color: var(--card-bg, #ffffff);
     border-radius: 8px;
@@ -1446,7 +1398,6 @@ body {
     color: #ffffff;
 }
 
-/* Post Card */
 .post-card {
     background-color: var(--card-bg, #ffffff);
     border-radius: 8px;
@@ -1533,7 +1484,6 @@ a:hover .comment-avatar {
     word-wrap: break-word;
 }
 
-/* Base Post Image Container - Facebook Feed Format */
 .post-image-container {
     width: calc(100% + 2.5rem);
     margin-left: -1.25rem;
@@ -1559,7 +1509,6 @@ a:hover .comment-avatar {
     text-decoration: none;
 }
 
-/* 1. Landscape & standard images: full-bleed across card width, proportional natural height */
 .post-image-container.is-landscape,
 .post-image-container:not(.is-portrait) {
     width: calc(100% + 2.5rem);
@@ -1585,7 +1534,6 @@ a:hover .comment-avatar {
     transition: opacity 0.15s ease;
 }
 
-/* 2. Portrait images: clean square crop, edge-to-edge */
 .post-image-container.is-portrait {
     width: calc(100% + 2.5rem);
     margin-left: -1.25rem;
@@ -1635,7 +1583,6 @@ a:hover .comment-avatar {
     font-size: 2.2rem;
 }
 
-/* Multi-Image Post Gallery Styles - Facebook Feed Grid Format */
 .post-gallery {
     display: grid;
     gap: 2px;
@@ -1680,7 +1627,6 @@ a:hover .comment-avatar {
     opacity: 0.95;
 }
 
-/* 2 Images: 2 equal columns */
 .post-gallery.post-gallery-2 {
     grid-template-columns: 1fr 1fr;
     max-height: 380px;
@@ -1692,7 +1638,6 @@ a:hover .comment-avatar {
     height: 100%;
 }
 
-/* 3 Images: 1 large left, 2 stacked right */
 .post-gallery.post-gallery-3 {
     grid-template-columns: 2fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -1703,7 +1648,6 @@ a:hover .comment-avatar {
     grid-row: 1 / span 2;
 }
 
-/* 4 or more Images: 2x2 grid */
 .post-gallery.post-gallery-4 {
     grid-template-columns: 1fr 1fr;
     grid-template-rows: 1fr 1fr;
@@ -1716,7 +1660,6 @@ a:hover .comment-avatar {
     height: 100%;
 }
 
-/* Overlay for 4th image when 5+ images */
 .post-gallery-overlay {
     position: absolute;
     inset: 0;
@@ -1735,7 +1678,6 @@ a:hover .comment-avatar {
     background: rgba(0, 0, 0, 0.72);
 }
 
-/* Facebook Stats and Reaction Bar */
 .post-stats-row {
     padding: 0.35rem 0.25rem;
     font-size: 0.85rem;
@@ -1779,7 +1721,6 @@ a:hover .comment-avatar {
     text-decoration: underline;
 }
 
-/* Facebook 3-Button Action Row */
 .post-footer-actions {
     display: flex;
     align-items: center;
@@ -1835,7 +1776,6 @@ a:hover .comment-avatar {
     text-decoration: underline;
 }
 
-/* Post Comments Box */
 .comments-container {
     margin-top: 0.85rem;
     padding-top: 0.85rem;
@@ -1934,9 +1874,6 @@ a:hover .comment-avatar {
     border-color: #cbd5e1;
 }
 
-/* ========================================================
-   RIGHT SIDEBAR WIDGETS
-======================================================== */
 .widget-card {
     background: #ffffff;
     border-radius: 12px;
@@ -1971,7 +1908,6 @@ a:hover .comment-avatar {
     text-decoration: underline;
 }
 
-/* Event List */
 .event-item {
     display: flex;
     align-items: center;
@@ -2074,7 +2010,6 @@ a:hover .comment-avatar {
     font-size: 1.1rem;
 }
 
-/* Trending Topics */
 .trending-item {
     padding: 0.5rem 0;
 }
@@ -2096,7 +2031,6 @@ a:hover .comment-avatar {
     color: var(--text-muted);
 }
 
-/* Who to Follow */
 .follow-item {
     display: flex;
     align-items: center;
@@ -2175,9 +2109,6 @@ a:hover .comment-avatar {
     border-color: #192f5d;
 }
 
-/* ========================================================
-   RESPONSIVE HEADER & SEARCH BAR BEHAVIOR
-======================================================== */
 @media (max-width: 991.98px) {
     .header-brand-group {
         min-width: auto;
@@ -2264,17 +2195,13 @@ a:hover .comment-avatar {
     }
 }
 
-/* ========================================================
-   DARK MODE STYLING & OVERRIDES (Facebook Dark Mode Standard)
-   Activates when data-bs-theme="dark" or .dark-theme is set
-======================================================== */
 [data-bs-theme="dark"],
 :root[data-bs-theme="dark"],
 html.dark-theme,
 .dark-theme,
 body.dark-theme {
     color-scheme: dark;
-    /* Bootstrap 5.3 theme variables for Facebook Dark Mode */
+
     --bs-body-bg: #18191a;
     --bs-body-color: #e4e6eb;
     --bs-emphasis-color: #ffffff;
@@ -2297,10 +2224,10 @@ body.dark-theme {
     --bs-modal-footer-border-color: #393a3b;
 
 <<<<<<< HEAD
-    /* SMCC Connect Facebook Dark Mode Palette */
+
     --sidebar-bg: #242526;
 =======
-    /* Nexus Navy Dark Mode Palette */
+
     --sidebar-bg: #081534;
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
     --sidebar-hover: rgba(255, 255, 255, 0.08);
@@ -2324,16 +2251,11 @@ body.dark-theme {
     --input-focus-border: #5a5b5c;
     --subtle-bg: #3a3b3c;
 
-    /* Aliases for inline styles */
     --bg-card: #242526;
     --text-main: #e4e6eb;
     --border-color: #393a3b;
 }
 
-/* ========================================================
-   ALERT & FLASH NOTIFICATION CARDS (Light & Dark)
-   Clean, premium glassmorphism styling eliminating muddy default Bootstrap looks
-======================================================== */
 .alert {
     border-radius: 12px;
     font-weight: 500;
@@ -2356,7 +2278,6 @@ body.dark-theme {
     transform: scale(1.08);
 }
 
-/* Light Mode Alerts */
 .alert-success {
     background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
     border: 1px solid #a7f3d0 !important;
@@ -2381,7 +2302,6 @@ body.dark-theme {
     font-size: 1.15rem;
 }
 
-/* Dark Mode Glassmorphism Alerts */
 [data-bs-theme="dark"] .alert-success,
 .dark-theme .alert-success {
     background: linear-gradient(135deg, rgba(6, 78, 59, 0.45) 0%, rgba(4, 47, 36, 0.6) 100%) !important;
@@ -2420,7 +2340,6 @@ body.dark-theme {
     opacity: 0.75;
 }
 
-/* Top Header & Navigation (Facebook Dark Mode) */
 [data-bs-theme="dark"] .app-header {
     background-color: var(--card-bg, #242526);
     border-bottom: 1px solid var(--card-border, #393a3b);
@@ -2500,7 +2419,6 @@ body.dark-theme {
     color: #ffffff;
 }
 
-/* Dropdown Menu */
 [data-bs-theme="dark"] .dropdown-menu {
     background-color: var(--card-bg, #242526);
     border: 1px solid var(--card-border, #393a3b);
@@ -2521,7 +2439,6 @@ body.dark-theme {
     border-top-color: var(--card-border, #393a3b);
 }
 
-/* Content Containers, Cards, and Composer */
 [data-bs-theme="dark"] .card-modern,
 [data-bs-theme="dark"] .composer-card,
 [data-bs-theme="dark"] .post-card,
@@ -2572,7 +2489,6 @@ body.dark-theme {
     color: #f8fafc;
 }
 
-/* Feed Filter Segmented Control */
 [data-bs-theme="dark"] .btn-group[aria-label="Feed Filter"],
 .dark-theme .btn-group[aria-label="Feed Filter"] {
     background-color: #080d19;
@@ -2605,7 +2521,6 @@ body.dark-theme {
     color: #f8fafc !important;
 }
 
-/* Post Card Typography & Elements */
 [data-bs-theme="dark"] .post-author-name,
 .dark-theme .post-author-name {
     color: #f8fafc;
@@ -2669,7 +2584,6 @@ body.dark-theme {
     background: rgba(0, 0, 0, 0.8);
 }
 
-/* Comments Section */
 [data-bs-theme="dark"] .comment-content-box,
 .dark-theme .comment-content-box {
     background-color: #0b1324;
@@ -2720,7 +2634,6 @@ body.dark-theme {
     color: #f8fafc;
 }
 
-/* Sidebar Widgets & Upcoming Events */
 [data-bs-theme="dark"] .event-item,
 [data-bs-theme="dark"] .follow-item,
 .dark-theme .event-item,
@@ -2790,7 +2703,6 @@ body.dark-theme {
     color: #090e1a;
 }
 
-/* Form Controls & Inputs */
 .form-control,
 .form-select,
 textarea {
@@ -2855,7 +2767,6 @@ textarea::placeholder,
     color: #94a3b8 !important;
 }
 
-/* Headings, Text & Labels in Dark Mode */
 [data-bs-theme="dark"] h1,
 [data-bs-theme="dark"] h2,
 [data-bs-theme="dark"] h3,
@@ -2878,7 +2789,6 @@ textarea::placeholder,
     color: #cbd5e1 !important;
 }
 
-/* Cover Photo Overlay Action Button */
 .btn-cover-action {
     background-color: #ffffff !important;
     color: #0f172a !important;
@@ -2928,7 +2838,6 @@ textarea::placeholder,
     color: #0f172a !important;
 }
 
-/* Bootstrap Light / White Utility Overrides in Dark Mode */
 [data-bs-theme="dark"] .bg-white,
 .dark-theme .bg-white {
     background-color: var(--card-bg, #242526) !important;
@@ -2977,13 +2886,11 @@ textarea::placeholder,
     color: #7e8c9f !important;
 }
 
-/* Ensure paragraph, span, div, small text visibility */
 [data-bs-theme="dark"] p,
 .dark-theme p {
     color: inherit;
 }
 
-/* Specific component text visibility in Dark Mode */
 [data-bs-theme="dark"] .brand-link.text-dark,
 .dark-theme .brand-link.text-dark {
     color: #f8fafc !important;
@@ -3036,7 +2943,6 @@ textarea::placeholder,
     border-color: rgba(148, 163, 184, 0.12) !important;
 }
 
-/* Modals & Dialogs (Delete confirmations, etc.) */
 [data-bs-theme="dark"] .modal-content,
 .dark-theme .modal-content {
     background-color: var(--card-bg, #10192d);
@@ -3058,9 +2964,6 @@ textarea::placeholder,
     filter: invert(1) grayscale(100%) brightness(200%);
 }
 
-/* ========================================================
-   MODERN COLLEGIATE FOOTER STYLES (Light & Dark)
-======================================================== */
 .app-footer {
     background-color: var(--card-bg, #ffffff);
     border-top: 1px solid var(--card-border, #ced0d4) !important;
@@ -3105,7 +3008,6 @@ textarea::placeholder,
     color: #7e8c9f !important;
 }
 
-/* Navy & Outline Buttons in Dark Mode */
 [data-bs-theme="dark"] .btn-navy,
 .dark-theme .btn-navy {
     background-color: #f8fafc !important;
@@ -3141,7 +3043,6 @@ textarea::placeholder,
     color: #ffffff !important;
 }
 
-/* Accent & Outline Accent Buttons in Dark Mode (e.g. Sign Up button in header) */
 [data-bs-theme="dark"] .btn-outline-accent,
 .dark-theme .btn-outline-accent {
     background-color: transparent !important;
@@ -3176,7 +3077,6 @@ textarea::placeholder,
     color: #090e1a !important;
 }
 
-/* Outline Buttons */
 [data-bs-theme="dark"] .btn-outline-secondary,
 .dark-theme .btn-outline-secondary {
     color: #94a3b8;
@@ -3190,14 +3090,12 @@ textarea::placeholder,
     border-color: rgba(148, 163, 184, 0.35);
 }
 
-/* Badges */
 [data-bs-theme="dark"] .badge.bg-secondary-subtle,
 .dark-theme .badge.bg-secondary-subtle {
     background-color: rgba(148, 163, 184, 0.12) !important;
     color: #cbd5e1 !important;
 }
 
-/* Ensure Bootstrap bg-body and bg-card adapt */
 [data-bs-theme="dark"] .bg-body,
 .dark-theme .bg-body {
     background-color: var(--body-bg) !important;
@@ -3210,11 +3108,6 @@ textarea::placeholder,
     color: var(--text-primary) !important;
 }
 
-/* ========================================================
-   CENTERED SEARCH PAGE DESIGN (Nexus Design System)
-   Solid, clean, responsive, and dark-mode compatible
-======================================================== */
-/* Flexbox min-width helper for text truncation */
 .min-w-0 {
     min-width: 0 !important;
 }
@@ -3230,7 +3123,6 @@ textarea::placeholder,
     letter-spacing: -0.02em;
 }
 
-/* Unified Main Search Input */
 .search-input-wrapper {
     position: relative;
     display: flex;
@@ -3310,7 +3202,6 @@ textarea::placeholder,
     flex-shrink: 0;
 }
 
-/* Nav Toolbar (Tabs + Filter Selects) */
 .search-nav-toolbar {
     background-color: var(--card-bg, #ffffff);
     border: 1px solid var(--card-border, #e8ecf2);
@@ -3323,7 +3214,6 @@ textarea::placeholder,
     border-color: var(--card-border, rgba(148, 163, 184, 0.12));
 }
 
-/* Pill Tabs */
 .search-tabs-pills .nav-link {
     color: var(--text-muted);
     font-size: 0.86rem;
@@ -3355,7 +3245,6 @@ textarea::placeholder,
     color: #ffffff !important;
 }
 
-/* Clean Select Pills */
 .search-select-pill {
     border-radius: 8px;
     font-size: 0.82rem;
@@ -3374,7 +3263,6 @@ textarea::placeholder,
     color: #f8fafc;
 }
 
-/* User Card in Search */
 .search-user-card {
     background-color: var(--card-bg, #ffffff);
     border: 1px solid var(--card-border, #e8ecf2);
@@ -3400,7 +3288,6 @@ textarea::placeholder,
     border-color: rgba(148, 163, 184, 0.25);
 }
 
-/* Empty & Guidance States */
 .search-empty-state {
     background-color: var(--card-bg, #ffffff);
     border: 1px solid var(--card-border, #e8ecf2);
@@ -3435,9 +3322,6 @@ textarea::placeholder,
     color: #60a5fa;
 }
 
-/* ========================================================
-   COMMUNITY INSIGHTS & SEARCH MODULE - DARK MODE COMPATIBILITY
-======================================================== */
 .insights-container {
     background-color: var(--body-bg, #f8fafc);
     min-height: 100vh;
@@ -3479,7 +3363,6 @@ textarea::placeholder,
     border-color: rgba(148, 163, 184, 0.12) !important;
 }
 
-/* Segmented Control Selector Group */
 .insights-segmented-wrap {
     background-color: var(--subtle-bg, #f1f5f9);
     border: 1px solid var(--card-border, #e2e8f0);
@@ -3533,7 +3416,6 @@ textarea::placeholder,
     color: #f8fafc;
 }
 
-/* Filter Toggle Button */
 .btn-filter-toggle {
     color: var(--text-primary, #0f172a);
     border: 1px solid var(--card-border, #cbd5e1);
@@ -3555,14 +3437,12 @@ textarea::placeholder,
     color: #ffffff !important;
 }
 
-/* Sub-cards and List Items inside Dark Mode */
 [data-bs-theme="dark"] .insights-sub-item {
     background-color: #141f36 !important;
     border-color: rgba(148, 163, 184, 0.12) !important;
     color: #f1f5f9 !important;
 }
 
-/* Table Dark Mode Adjustments in Insights */
 [data-bs-theme="dark"] .insights-table {
     --bs-table-bg: transparent;
     --bs-table-color: #e2e8f0;
@@ -3578,14 +3458,12 @@ textarea::placeholder,
     border-color: rgba(148, 163, 184, 0.12) !important;
 }
 
-/* Secondary Badges in Dark Mode */
 [data-bs-theme="dark"] .insights-badge-subtle {
     background-color: rgba(148, 163, 184, 0.12) !important;
     color: #cbd5e1 !important;
     border-color: rgba(148, 163, 184, 0.18) !important;
 }
 
-/* Primary Dark Buttons in Dark Mode */
 [data-bs-theme="dark"] .btn-dark {
     background-color: var(--accent-yellow, #f59e0b) !important;
     color: #090e1a !important;
@@ -3600,7 +3478,6 @@ textarea::placeholder,
     border-color: #e5ad19 !important;
 }
 
-/* Comments Box in Insights Dark Mode */
 [data-bs-theme="dark"] .comments-container .bg-light,
 [data-bs-theme="dark"] .comments-container div.small {
     background-color: #0b1324 !important;
@@ -3608,12 +3485,6 @@ textarea::placeholder,
     color: #f1f5f9 !important;
 }
 
-/* ========================================================
-   SEARCH FEED WIDTH & CENTERING BALANCE
-======================================================== */
-/* ========================================================
-   SEARCH & REPORTS PAGE DESIGN SPECIFICATIONS
-======================================================== */
 .search-reports-container {
     max-width: 780px;
     margin-left: auto;
@@ -3689,9 +3560,6 @@ textarea::placeholder,
     color: #192f5d !important;
 }
 
-/* ========================================================
-   GENERATE FULL COMMUNITY REPORT BUTTON (LIGHT & DARK MODE)
-======================================================== */
 .btn-report-generate {
     background-color: #fafafb !important;
     color: #171719 !important;
@@ -3721,7 +3589,6 @@ textarea::placeholder,
     box-shadow: none !important;
 }
 
-/* Dark Mode Overrides for Generate Report Button */
 [data-bs-theme="dark"] .btn-report-generate,
 .dark-theme .btn-report-generate {
     background-color: #2563eb !important;
@@ -3756,9 +3623,6 @@ textarea::placeholder,
     color: #7e8c9f !important;
 }
 
-/* ========================================================
-   PROFILE PICTURE ADJUSTMENT & CROPPER MODAL STYLES
-======================================================== */
 .cropper-wrapper {
     background-color: #050e20;
     min-height: 340px;
@@ -3779,7 +3643,6 @@ textarea::placeholder,
     display: block;
 }
 
-/* Circular Crop Mask View */
 .cropper-wrapper .cropper-view-box,
 .cropper-wrapper .cropper-face {
     border-radius: 50% !important;
@@ -3790,7 +3653,6 @@ textarea::placeholder,
     box-shadow: 0 0 0 2000px rgba(5, 14, 32, 0.7) !important;
 }
 
-/* Hide square handles since drag & zoom operates directly */
 .cropper-wrapper .cropper-point,
 .cropper-wrapper .cropper-line {
     display: none !important;
@@ -3821,10 +3683,6 @@ textarea::placeholder,
     border-color: #cbd5e1 !important;
 }
 
-/* ========================================================
-   POST HIGHLIGHT ANIMATION
-======================================================== */
-
 @keyframes postHighlightPulse {
     0% {
         box-shadow: 0 0 0 0 rgba(13, 110, 253, 0.6);
@@ -3840,9 +3698,6 @@ textarea::placeholder,
     }
 }
 
-/* ========================================================
-   NAVIGATION MENU TOGGLE BUTTON (HEADER FAR-LEFT)
-======================================================== */
 .header-menu-toggle-btn {
     width: auto;
     height: auto;
@@ -3914,7 +3769,6 @@ textarea::placeholder,
     color: #ffffff;
 }
 
-/* Post highlight styling removed to prevent highlight boxes around posts */
 .post-highlight {
     border: none !important;
     box-shadow: none !important;
@@ -3944,11 +3798,6 @@ textarea::placeholder,
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3) !important;
 }
 
-/* ==========================================================================
-   EDIT AND DELETE / UNSEND THEME ADAPTIVE COLORS (LIGHT = BLACK, DARK = WHITE)
-   ========================================================================== */
-
-/* Three-dots menu toggle buttons */
 .dropdown > button.btn-link[data-bs-toggle="dropdown"],
 .dropdown > button.btn-link[data-bs-toggle="dropdown"] i {
     color: #000000 !important;
@@ -3960,7 +3809,6 @@ textarea::placeholder,
     color: #ffffff !important;
 }
 
-/* Edit action items (text, icons, spans) */
 .action-item-edit,
 .action-item-edit *,
 .dropdown-item[href*="edit_post"],
@@ -3985,7 +3833,6 @@ textarea::placeholder,
     color: #ffffff !important;
 }
 
-/* Delete and Unsend action items (text, icons, spans) */
 .action-item-delete,
 .action-item-delete *,
 form[action*="delete_post"] button.dropdown-item,
@@ -4010,7 +3857,6 @@ form[action*="delete_comment"] button.dropdown-item * {
     color: #ffffff !important;
 }
 
-/* Hover background for edit and delete dropdown items */
 .action-item-edit:hover,
 .action-item-delete:hover,
 .dropdown-item[href*="edit_post"]:hover,
@@ -4035,9 +3881,6 @@ form[action*="delete_comment"] button.dropdown-item:hover {
     background-color: rgba(255, 255, 255, 0.15) !important;
 }
 
-/* ========================================================
-   PASSWORD COMPLEXITY REQUIREMENTS & VALIDATION
-======================================================== */
 .password-requirements {
     background-color: var(--subtle-bg, #f8fafc);
     border-color: var(--card-border, #e2e8f0) !important;
@@ -4101,10 +3944,7 @@ form[action*="delete_comment"] button.dropdown-item:hover {
 }
 
 <<<<<<< HEAD
-/* ========================================================
-   DISABLE NATIVE BROWSER PASSWORD REVEAL & CLEAR BUTTONS
-   Eliminates Edge/IE duplicate eye icons inside password inputs
-   ======================================================== */
+
 input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none !important;
@@ -4113,14 +3953,12 @@ input[type="password"]::-ms-clear {
     pointer-events: none !important;
 }
 
-/* Prevent Bootstrap validation feedback background SVGs from overlapping input buttons */
 .input-group .form-control.is-valid,
 .input-group .form-control.is-invalid {
     background-image: none !important;
     padding-right: 0.75rem !important;
 }
 
-/* Unified focus state for input groups */
 .input-group:focus-within {
     border-radius: 0.375rem;
     box-shadow: 0 0 0 0.2rem rgba(100, 116, 139, 0.15) !important;
@@ -4152,7 +3990,6 @@ input[type="password"]::-ms-clear {
     color: #ffffff !important;
 }
 
-/* Prevent Chrome / Safari / Edge autofill from turning inputs blue in both themes */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
@@ -4177,14 +4014,12 @@ input:-webkit-autofill:active {
     transition: background-color 5000s ease-in-out 0s;
 }
 
-/* Settings action buttons base & transitions */
 #saveAccountBtn,
 #updatePasswordBtn,
 #saveAvatarBtn {
     transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease, transform 0.15s ease !important;
 }
 
-/* Enabled state: Vibrant Blue when user wants to update */
 #saveAccountBtn:not(:disabled),
 #updatePasswordBtn:not(:disabled),
 #saveAvatarBtn:not(:disabled) {
@@ -4213,7 +4048,6 @@ input:-webkit-autofill:active {
     box-shadow: 0 2px 6px rgba(24, 119, 242, 0.3) !important;
 }
 
-/* Disabled state: Clean Gray & Inaccessible */
 #saveAccountBtn:disabled,
 #updatePasswordBtn:disabled,
 #saveAvatarBtn:disabled {
@@ -4227,7 +4061,6 @@ input:-webkit-autofill:active {
     opacity: 1 !important;
 }
 
-/* Dark mode disabled state: Sleek Dark Neutral Gray */
 [data-bs-theme="dark"] #saveAccountBtn:disabled,
 [data-bs-theme="dark"] #updatePasswordBtn:disabled,
 [data-bs-theme="dark"] #saveAvatarBtn:disabled,
@@ -4242,11 +4075,6 @@ input:-webkit-autofill:active {
 
 =======
 
-/* ==========================================================================
-   NOTIFICATIONS — Bell, Badge, Notification Page
-   ========================================================================== */
-
-/* Bell button in header (same shape as .header-icon-btn) */
 .notif-bell-btn {
     position: relative;
     display: inline-flex;
@@ -4270,7 +4098,6 @@ input:-webkit-autofill:active {
     text-decoration: none;
 }
 
-/* Red unread-count badge on bell */
 .notif-badge-count {
     position: absolute;
     top: 2px;
@@ -4289,7 +4116,6 @@ input:-webkit-autofill:active {
     border: 2px solid var(--card-bg, #fff);
 }
 
-/* Notification page — header icon box */
 .notif-header-icon-box {
     width: 48px;
     height: 48px;
@@ -4303,7 +4129,6 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Notification list item */
 .notification-item {
     transition: background 0.15s;
     border-radius: 8px;
@@ -4316,7 +4141,6 @@ input:-webkit-autofill:active {
     background-color: rgba(37, 99, 235, 0.06) !important;
 }
 
-/* Actor avatar */
 .notif-avatar {
     width: 44px;
     height: 44px;
@@ -4338,7 +4162,6 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Small type bubble (like, comment, follow) on avatar corner */
 .notif-type-bubble {
     width: 20px;
     height: 20px;
@@ -4350,7 +4173,6 @@ input:-webkit-autofill:active {
     border: 2px solid var(--card-bg, #fff);
 }
 
-/* Unread dot indicator */
 .notif-unread-dot {
     width: 10px;
     height: 10px;
@@ -4360,13 +4182,11 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Notification body text */
 .notif-text {
     font-size: 0.92rem;
     line-height: 1.45;
 }
 
-/* Two-line text clamp */
 .text-truncate-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -4374,7 +4194,6 @@ input:-webkit-autofill:active {
     overflow: hidden;
 }
 
-/* Empty state icon */
 .notif-empty-icon {
     width: 72px;
     height: 72px;
@@ -4387,7 +4206,6 @@ input:-webkit-autofill:active {
     font-size: 1.9rem;
 }
 
-/* Subtle icon button (mark-read X) */
 .btn-icon-subtle {
     background: transparent;
     border: none;
@@ -4403,7 +4221,6 @@ input:-webkit-autofill:active {
     color: var(--text-primary, #1e293b);
 }
 
-/* Dark mode — notifications */
 [data-bs-theme="dark"] .notif-bell-btn,
 .dark-theme .notif-bell-btn {
     color: var(--text-secondary, #93c5fd);
@@ -4442,12 +4259,6 @@ input:-webkit-autofill:active {
     color: #fff;
 }
 
-
-/* ==========================================================================
-   FRIENDS — Followers / Following Page
-   ========================================================================== */
-
-/* Header icon box */
 .friends-header-icon-box {
     width: 48px;
     height: 48px;
@@ -4461,7 +4272,6 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Stat pill (follower/following count summary) */
 .friends-stat-pill {
     display: flex;
     flex-direction: column;
@@ -4469,14 +4279,12 @@ input:-webkit-autofill:active {
     gap: 1px;
 }
 
-/* Divider between stat pills */
 .friends-stat-divider {
     width: 1px;
     height: 36px;
     background: var(--border-color, #e2e8f0);
 }
 
-/* Pill-style tab navigation */
 .friends-nav-pills .nav-link {
     color: var(--text-secondary, #475569);
     border-radius: 999px;
@@ -4494,7 +4302,6 @@ input:-webkit-autofill:active {
     color: #fff;
 }
 
-/* Friend card avatar */
 .friend-card-avatar {
     width: 52px;
     height: 52px;
@@ -4516,14 +4323,12 @@ input:-webkit-autofill:active {
     flex-shrink: 0;
 }
 
-/* Friend card name */
 .friend-card-name {
     font-size: 0.95rem;
     font-weight: 600;
     color: var(--text-primary, #1e293b);
 }
 
-/* Empty state */
 .friends-empty-icon {
     width: 72px;
     height: 72px;
@@ -4536,13 +4341,11 @@ input:-webkit-autofill:active {
     font-size: 1.9rem;
 }
 
-/* Compact vertical padding */
 .py-1-5 {
     padding-top: 0.375rem !important;
     padding-bottom: 0.375rem !important;
 }
 
-/* Dark mode — friends */
 [data-bs-theme="dark"] .friends-stat-divider,
 .dark-theme .friends-stat-divider {
     background: var(--border-color, #1e3a78);
@@ -4571,10 +4374,6 @@ input:-webkit-autofill:active {
     color: var(--text-muted, #475569);
 }
 
-
-/* ==========================================================================
-   COMMUNITY SEARCH PAGE MODERN POLISH
-   ========================================================================== */
 .search-input-group {
     background-color: var(--input-bg, #ffffff);
     border: 1px solid var(--card-border, #cbd5e1);
@@ -4610,7 +4409,6 @@ input:-webkit-autofill:active {
     transform: translateY(-1px);
 }
 
-/* Dark mode for community search */
 [data-bs-theme="dark"] .search-input-group,
 .dark-theme .search-input-group {
     background-color: var(--card-bg, #0d1e44);
@@ -4640,10 +4438,6 @@ input:-webkit-autofill:active {
     border-color: var(--accent-yellow, #f1bd27);
 }
 
-
-/* ==========================================================================
-   COMMUNITY SEARCH QUICK FILTER PILLS
-   ========================================================================== */
 .filter-pill {
     border-radius: 50rem;
     font-size: 0.8rem;

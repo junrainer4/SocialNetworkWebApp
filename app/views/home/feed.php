@@ -1,13 +1,10 @@
 <?php
-// app/views/home/feed.php
-// Main Social Feed and Dashboard view matching reference design
 
 $currentUserId = $_SESSION['user_id'] ?? null;
 ?>
 
 <div class="feed-layout-container mx-auto" style="max-width: 880px; width: 100%;">
 
-    <!-- Flash Notifications -->
     <?php if (!empty($_SESSION['success_message'])): ?>
         <div class="alert alert-success fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -25,13 +22,11 @@ $currentUserId = $_SESSION['user_id'] ?? null;
     <?php endif; ?>
 
     <div class="row g-4 justify-content-center">
-        <!-- ==============================================
-             CENTER COLUMN: POST COMPOSER & SOCIAL FEED
-             ============================================== -->
+
         <div class="col-12">
 
             <?php if (!$currentUserId): ?>
-                <!-- Guest Landing Home Page (No social posts exposed to guests) -->
+
                 <div class="card-modern p-5 text-center mb-4">
                     <div class="mb-3">
                         <div class="brand-icon-box mx-auto" style="width: 58px; height: 58px; font-size: 1.8rem; border-radius: 14px;">
@@ -56,7 +51,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                     </div>
                 </div>
 
-                <!-- Campus Highlights Cards for Guests -->
                 <div class="row g-3">
                     <div class="col-md-4">
                         <div class="card-modern p-4 text-center h-100">
@@ -82,16 +76,16 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 </div>
 
             <?php else: ?>
-                <!-- 1. Post Creation Card -->
+
                 <div class="composer-card">
                     <form action="<?= BASE_URL ?>/index.php?action=create_post" method="POST" enctype="multipart/form-data">
                         <?= csrf_field(); ?>
                         <div class="composer-input-row">
                             <?php if (!empty($userAvatarPath)): ?>
-                                <img 
-                                    src="<?= $userAvatarPath ?>" 
-                                    alt="<?= htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>" 
-                                    class="user-avatar-sm" 
+                                <img
+                                    src="<?= $userAvatarPath ?>"
+                                    alt="<?= htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>"
+                                    class="user-avatar-sm"
                                     style="width: 40px; height: 40px; object-fit: cover;"
                                     onerror="this.onerror=null; this.outerHTML='<div class=&quot;user-avatar-sm&quot; style=&quot;width: 40px; height: 40px; font-size: 0.9rem;&quot;><?= htmlspecialchars($userInitials ?? 'U') ?></div>';"
                                 >
@@ -100,16 +94,15 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                     <?= htmlspecialchars($userInitials ?? 'U'); ?>
                                 </div>
                             <?php endif; ?>
-                            <textarea 
-                                name="content" 
+                            <textarea
+                                name="content"
                                 id="composerTextarea"
-                                class="composer-input" 
-                                rows="2" 
+                                class="composer-input"
+                                rows="2"
                                 placeholder="What's on your mind, <?= htmlspecialchars(explode(' ', trim($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'User'))[0]); ?>?"
                             ></textarea>
                         </div>
 
-                        <!-- Multi-Image Preview Container -->
                         <div id="imagePreviewContainer" class="mt-2 ps-2 ps-sm-5 d-none">
                             <div class="d-flex align-items-center justify-content-between mb-2">
                                 <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill" id="imageCountBadge">
@@ -137,7 +130,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                     </form>
                 </div>
 
-                <!-- Feed Header and Filter Bar -->
                 <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                     <h6 class="fw-bold text-dark mb-0">
                         <i class="bi bi-rss-fill text-warning me-2"></i>Campus Feed
@@ -152,29 +144,27 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                     </div>
                 </div>
 
-                <!-- 2. Social Posts Feed -->
                 <?php if (!empty($posts)): ?>
                     <?php foreach ($posts as $post): ?>
                     <?php
-                    // Compute author initials
+
                     $authorParts = explode(' ', trim($post['full_name']));
                     $authorInitials = count($authorParts) >= 2
                         ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
                         : strtoupper(substr($post['full_name'], 0, 2));
 
-                    // Time formatting
                     $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
                     $timeBadge = format_time_ago($post['created_at']);
                     ?>
                     <article class="post-card" id="post-<?= $post['id'] ?>">
-                        <!-- Post Author Header -->
+
                         <div class="post-header">
                             <div class="post-author-box">
                                 <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$post['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($post['full_name']); ?>'s profile">
                                     <?php if (!empty($post['profile_image'])): ?>
-                                        <img 
-                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>" 
-                                            alt="<?= htmlspecialchars($post['full_name']); ?>" 
+                                        <img
+                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>"
+                                            alt="<?= htmlspecialchars($post['full_name']); ?>"
                                             class="post-avatar"
                                             onerror="this.onerror=null; this.outerHTML='<div class=\'post-avatar\'><?= htmlspecialchars($authorInitials) ?></div>';"
                                         >
@@ -193,7 +183,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 </div>
                             </div>
 
-                            <!-- Post Menu Dropdown -->
                             <?php if ($currentUserId && $currentUserId == $post['user_id']): ?>
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post actions">
@@ -219,12 +208,10 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             <?php endif; ?>
                         </div>
 
-                        <!-- Post Text Content -->
                         <div class="post-content">
                             <?= nl2br(htmlspecialchars($post['content'])); ?>
                         </div>
 
-                        <!-- Optional Post Image(s) -->
                         <?php
                         $postImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                         $totalPostImages = count($postImages);
@@ -274,7 +261,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             </div>
                         <?php endif; ?>
 
-                        <!-- Post Engagement Stats & Reactions (Facebook Style) -->
                         <div class="post-stats-row d-flex align-items-center justify-content-between px-1 py-1 small text-secondary">
                             <div class="d-flex align-items-center gap-1">
                                 <span class="fb-reaction-pill" data-post-id="<?= (int)$post['id']; ?>" title="Reactions">
@@ -289,7 +275,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             </div>
                         </div>
 
-                        <!-- Post Engagement Action Buttons (Facebook 3-Button Row) -->
                         <div class="post-footer-actions d-flex align-items-center justify-content-between gap-1 py-1 border-top border-bottom">
                             <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline flex-grow-1 m-0">
                                 <?= csrf_field(); ?>
@@ -311,7 +296,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             </button>
                         </div>
 
-                        <!-- Comments Section -->
                         <div class="comments-container d-none" id="comments-box-<?= $post['id'] ?>">
                             <?php if (!empty($post['comments'])): ?>
                                 <?php foreach ($post['comments'] as $comment): ?>
@@ -327,9 +311,9 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                     <div class="comment-bubble" id="comment-<?= $comment['id'] ?>">
                                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$comment['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($comment['full_name']); ?>'s profile">
                                             <?php if (!empty($comment['profile_image'])): ?>
-                                                <img 
-                                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>" 
-                                                    alt="<?= htmlspecialchars($comment['full_name']); ?>" 
+                                                <img
+                                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>"
+                                                    alt="<?= htmlspecialchars($comment['full_name']); ?>"
                                                     class="comment-avatar"
                                                     onerror="this.onerror=null; this.outerHTML='<div class=\'comment-avatar\'><?= htmlspecialchars($cInitials) ?></div>';"
                                                 >
@@ -386,16 +370,15 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 <?php endforeach; ?>
                             <?php endif; ?>
 
-                            <!-- Add Comment Form -->
                             <?php if ($currentUserId): ?>
                                 <form action="<?= BASE_URL ?>/index.php?action=create_comment" method="POST" class="comment-input-row">
                                     <?= csrf_field(); ?>
                                     <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                    <input 
-                                        type="text" 
-                                        name="content" 
-                                        class="form-control" 
-                                        placeholder="Write a comment..." 
+                                    <input
+                                        type="text"
+                                        name="content"
+                                        class="form-control"
+                                        placeholder="Write a comment..."
                                         maxlength="1000"
                                         required
                                     >
@@ -424,17 +407,14 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
                 </div>
             <?php endif; ?>
-            <?php endif; // End if (!$currentUserId) ?>
+            <?php endif;  ?>
         </div>
 
 <<<<<<< HEAD
 =======
-        <!-- ==============================================
-             RIGHT SIDEBAR: UPCOMING EVENTS
-             ============================================== -->
+
         <div class="col-lg-5 col-xl-4">
 
-            <!-- 1. Upcoming Events Card -->
             <div class="widget-card">
                 <div class="widget-header d-flex justify-content-between align-items-center">
                     <h6 class="widget-title mb-0 d-flex align-items-center gap-2">
@@ -494,7 +474,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 <i class="bi bi-chevron-right text-muted opacity-50 ms-1"></i>
                             </div>
 
-                            <!-- EVENT FULL DETAILS MODAL -->
                             <div class="modal fade" id="modalEventDetails<?= (int)$evt['id']; ?>" tabindex="-1" aria-labelledby="eventModalLabel<?= (int)$evt['id']; ?>" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered modal-lg">
                                     <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
@@ -513,7 +492,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
                                         <div class="modal-body p-4">
-                                            <!-- Status Banner -->
+
                                             <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
                                                 <?php if ($isToday): ?>
                                                     <span class="badge bg-success rounded-pill px-3 py-1.5"><i class="bi bi-broadcast me-1"></i>Happening Today</span>
@@ -525,7 +504,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                                 <span class="badge bg-light text-secondary border rounded-pill px-3 py-1.5"><i class="bi bi-people me-1"></i>Campus Community</span>
                                             </div>
 
-                                            <!-- Info Cards Grid -->
                                             <div class="row g-3 mb-4">
                                                 <div class="col-sm-6 col-md-4">
                                                     <div class="p-3 rounded-3 bg-light border h-100">
@@ -547,7 +525,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                                 </div>
                                             </div>
 
-                                            <!-- Full Description / Guidelines Section -->
                                             <div class="p-4 rounded-3 bg-white border shadow-sm">
                                                 <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
                                                     <i class="bi bi-file-text-fill text-primary"></i>
@@ -590,7 +567,6 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 <?php endif; ?>
             </div>
 
-            <!-- MODAL: ALL UPCOMING CAMPUS EVENTS -->
             <?php if (!empty($upcomingEvents)): ?>
                 <div class="modal fade" id="modalAllUpcomingEvents" tabindex="-1" aria-labelledby="allEventsModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
@@ -663,7 +639,6 @@ function toggleComments(postId) {
     }
 }
 
-// Multi-Image Preview Handler with Crop/Adjust using Cropper.js
 let postFilesDataTransfer = new DataTransfer();
 let cropQueue = [];
 let currentCropper = null;
@@ -672,7 +647,6 @@ let cropModalInstance = null;
 function previewImages(input) {
     if (!input.files || input.files.length === 0) return;
 
-    // Build the queue of new files to crop
     cropQueue = [];
     for (let i = 0; i < input.files.length; i++) {
         if (postFilesDataTransfer.items.length + cropQueue.length >= 10) {
@@ -682,16 +656,14 @@ function previewImages(input) {
         cropQueue.push(input.files[i]);
     }
 
-    // Reset the raw input (we'll manage files via DataTransfer)
     input.value = '';
 
-    // Start processing the queue
     processNextCropItem();
 }
 
 function processNextCropItem() {
     if (cropQueue.length === 0) {
-        // All done - update the file input and render previews
+
         const input = document.getElementById('postImageInput');
         if (input) input.files = postFilesDataTransfer.files;
         renderSelectedPreviews();
@@ -706,7 +678,7 @@ function openCropModal(file) {
     const modalEl = document.getElementById('imageCropModal');
     const cropperImg = document.getElementById('cropperImage');
     if (!modalEl || !cropperImg) {
-        // Fallback: no modal available, add file as-is
+
         postFilesDataTransfer.items.add(file);
         processNextCropItem();
         return;
@@ -716,20 +688,17 @@ function openCropModal(file) {
         cropModalInstance = new bootstrap.Modal(modalEl, { backdrop: 'static', keyboard: false });
     }
 
-    // Update modal title with queue info
     const label = document.getElementById('imageCropModalLabel');
     const remaining = cropQueue.length;
     if (label) {
         label.textContent = remaining > 0 ? `Adjust Photo (${remaining + 1} remaining)` : 'Adjust Photo';
     }
 
-    // Load image into cropper
     const reader = new FileReader();
     reader.onload = function(e) {
         cropperImg.src = e.target.result;
         cropModalInstance.show();
 
-        // Wait for modal fully shown to init cropper
         modalEl.addEventListener('shown.bs.modal', function onShown() {
             modalEl.removeEventListener('shown.bs.modal', onShown);
 
@@ -756,10 +725,8 @@ function openCropModal(file) {
     };
     reader.readAsDataURL(file);
 
-    // Store file reference for skip
     modalEl._currentFile = file;
 
-    // Wire up buttons (remove old listeners by cloning)
     wireUpCropButtons(file);
 }
 
@@ -772,7 +739,6 @@ function wireUpCropButtons(originalFile) {
     const flipHBtn = document.getElementById('cropFlipH');
     const resetBtn = document.getElementById('cropReset');
 
-    // Clone buttons to remove old event listeners
     function replaceBtn(btn) {
         if (!btn) return btn;
         const clone = btn.cloneNode(true);
@@ -788,7 +754,6 @@ function wireUpCropButtons(originalFile) {
     const newFlipH = replaceBtn(flipHBtn);
     const newReset = replaceBtn(resetBtn);
 
-    // Rotate/Flip/Reset
     if (newRotateLeft) newRotateLeft.addEventListener('click', () => { if (currentCropper) currentCropper.rotate(-90); });
     if (newRotateRight) newRotateRight.addEventListener('click', () => { if (currentCropper) currentCropper.rotate(90); });
     if (newFlipH) {
@@ -802,7 +767,6 @@ function wireUpCropButtons(originalFile) {
     }
     if (newReset) newReset.addEventListener('click', () => { if (currentCropper) currentCropper.reset(); });
 
-    // Apply: crop the image and add as new file
     if (newApply) {
         newApply.addEventListener('click', () => {
             if (!currentCropper) return;
@@ -824,7 +788,7 @@ function wireUpCropButtons(originalFile) {
                 if (!blob) {
                     postFilesDataTransfer.items.add(originalFile);
                 } else {
-                    // Create a new file from the cropped blob
+
                     const ext = originalFile.name.split('.').pop() || 'jpg';
                     const croppedFile = new File([blob], originalFile.name, {
                         type: blob.type || originalFile.type || 'image/jpeg',
@@ -837,7 +801,6 @@ function wireUpCropButtons(originalFile) {
         });
     }
 
-    // Skip: add original file without cropping
     if (newSkip) {
         newSkip.addEventListener('click', () => {
             postFilesDataTransfer.items.add(originalFile);
@@ -845,10 +808,9 @@ function wireUpCropButtons(originalFile) {
         });
     }
 
-    // Cancel: discard this image entirely
     if (newCancel) {
         newCancel.addEventListener('click', () => {
-            // Don't add the file, also clear the rest of the queue
+
             cropQueue = [];
             closeCropAndNext();
         });
@@ -864,7 +826,6 @@ function closeCropAndNext() {
         cropModalInstance.hide();
     }
 
-    // Small delay to let modal close animation finish
     setTimeout(() => {
         processNextCropItem();
     }, 300);
@@ -928,7 +889,6 @@ function renderSelectedPreviews() {
     });
 }
 
-// Expose clear handlers globally for AJAX composer reset
 window.clearAllSelectedImages = clearAllSelectedImages;
 window.clearSelectedImage = clearAllSelectedImages;
 </script>

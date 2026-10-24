@@ -1,6 +1,4 @@
 <?php
-// app/controllers/FollowController.php
-// Handles following, unfollowing, and the Friends/Followers management page for Nexus
 
 require_once __DIR__ . '/../models/FollowModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
@@ -34,9 +32,6 @@ class FollowController {
         }
     }
 
-    /**
-     * Dedicated Friends (Followers & Following) page.
-     */
     public function friends() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -49,7 +44,6 @@ class FollowController {
         $followersCount = count($rawFollowers);
         $followingCount = count($rawFollowing);
 
-        // Pre-compute whether current user follows each follower (for Follow / Following buttons)
         $followers = [];
         foreach ($rawFollowers as $f) {
             $f['is_following'] = $this->followModel->isFollowing($userId, (int)$f['id']);
@@ -68,9 +62,6 @@ class FollowController {
         require_once __DIR__ . '/../views/layouts/footer.php';
     }
 
-    /**
-     * Toggle follow/unfollow for a user.
-     */
     public function toggle() {
         $this->requireAuth();
 
@@ -113,7 +104,6 @@ class FollowController {
             exit;
         }
 
-        // Check if target user exists
         $targetUser = $this->userModel->findById($followingId);
         if (!$targetUser) {
             if ($isAjax) {
@@ -135,7 +125,6 @@ class FollowController {
             $this->followModel->follow($followerId, $followingId);
             $newStatus = true;
 
-            // Send notification to target user
             $this->notificationModel->create(
                 $followingId,
                 $followerId,
@@ -148,7 +137,6 @@ class FollowController {
         $followingCount = $this->followModel->getFollowingCount($followingId);
         $isFollowedBy   = $this->followModel->isFollowing($followingId, $followerId);
 
-        // Also get acting user's following count
         $myFollowingCount = $this->followModel->getFollowingCount($followerId);
 
         if ($isAjax) {

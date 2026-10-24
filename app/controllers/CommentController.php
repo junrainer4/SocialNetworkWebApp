@@ -1,6 +1,4 @@
 <?php
-// app/controllers/CommentController.php
-// Controller handling comments CRUD operations and server-side authorization
 
 require_once __DIR__ . '/../models/CommentModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
@@ -20,9 +18,6 @@ class CommentController {
         $this->userModel    = new UserModel();
     }
 
-    /**
-     * Enforce authentication for comment actions.
-     */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error_message'] = 'You must be logged in to perform that action.';
@@ -31,9 +26,6 @@ class CommentController {
         }
     }
 
-    /**
-     * Create / Add a comment to a post.
-     */
     public function create() {
         $this->requireAuth();
 
@@ -51,7 +43,6 @@ class CommentController {
             exit;
         }
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             $errMsg = 'Security Error: Invalid or expired CSRF token.';
             if ($isAjax) {
@@ -68,7 +59,6 @@ class CommentController {
         $content = trim($_POST['content'] ?? '');
         $userId  = (int)$_SESSION['user_id'];
 
-        // Validate post ID
         if ($postId <= 0) {
             $errMsg = 'Invalid post ID.';
             if ($isAjax) {
@@ -81,7 +71,6 @@ class CommentController {
             exit;
         }
 
-        // Verify that the post exists
         $post = $this->postModel->getPostById($postId);
         if (!$post) {
             $errMsg = 'The post you are trying to comment on does not exist or has been deleted.';
@@ -95,7 +84,6 @@ class CommentController {
             exit;
         }
 
-        // Validate content
         if ($content === '') {
             $errMsg = 'Comment cannot be empty.';
             if ($isAjax) {
@@ -193,9 +181,6 @@ class CommentController {
         exit;
     }
 
-    /**
-     * Show edit form for a comment owned by the logged-in user.
-     */
     public function edit() {
         $this->requireAuth();
 
@@ -213,7 +198,6 @@ class CommentController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
         if ((int)$comment['user_id'] !== $userId) {
             ErrorHandler::renderErrorPage(403, 'Permission Denied', 'You do not have permission to edit this comment. You can only edit your own comments.');
             exit;
@@ -228,9 +212,6 @@ class CommentController {
         require __DIR__ . '/../views/comments/edit.php';
     }
 
-    /**
-     * Process comment update submission.
-     */
     public function update() {
         $this->requireAuth();
 
@@ -239,7 +220,6 @@ class CommentController {
             exit;
         }
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -262,7 +242,6 @@ class CommentController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
         if ((int)$comment['user_id'] !== $userId) {
             $_SESSION['error_message'] = 'Unauthorized: You can only edit your own comments.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -297,9 +276,6 @@ class CommentController {
         }
     }
 
-    /**
-     * Delete an existing comment owned by the logged-in user.
-     */
     public function delete() {
         $this->requireAuth();
 
@@ -309,7 +285,6 @@ class CommentController {
             exit;
         }
 
-        // CSRF Token Validation
         if (!validate_csrf_token()) {
             $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
             header('Location: ' . BASE_URL . '/index.php');
@@ -332,7 +307,6 @@ class CommentController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
         if ((int)$comment['user_id'] !== $userId) {
             $_SESSION['error_message'] = 'Unauthorized: You can only delete your own comments.';
             header('Location: ' . BASE_URL . '/index.php');

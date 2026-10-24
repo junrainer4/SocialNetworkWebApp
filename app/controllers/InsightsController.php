@@ -1,6 +1,4 @@
 <?php
-// app/controllers/InsightsController.php
-// Controller handling Community Search (Users and Posts) for Nexus
 
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
@@ -17,9 +15,6 @@ class InsightsController {
         $this->postModel = new PostModel();
     }
 
-    /**
-     * Enforce authentication for Community Search.
-     */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
             $_SESSION['error_message'] = 'You must be logged in to access Community Search.';
@@ -28,28 +23,19 @@ class InsightsController {
         }
     }
 
-    /**
-     * Main action for Community Search (Users & Posts).
-     * Supports fast, relationship-driven search with modern quick filters:
-     * - Posts: 'newest' (Latest), 'most_liked' (Top Liked), 'photos' (With Photos)
-     * - Users: 'all' (All Members), 'following' (People You Follow)
-     */
     public function index() {
         $this->requireAuth();
 
         $currentUserId = (int)$_SESSION['user_id'];
         $errorMessage = '';
 
-        // 1. Sanitize & Retrieve Inputs
         $query = trim($_GET['q'] ?? '');
         $type = strtolower(trim($_GET['type'] ?? 'users'));
 
-        // Validate type: only 'users' or 'posts' allowed
         if (!in_array($type, ['users', 'posts'], true)) {
             $type = 'users';
         }
 
-        // Validate filter:
         $rawFilter = strtolower(trim($_GET['filter'] ?? ''));
         if ($type === 'posts') {
             $validPostFilters = ['newest', 'most_liked', 'photos'];
@@ -64,7 +50,6 @@ class InsightsController {
         $totalCount = 0;
         $hasSearched = ($query !== '');
 
-        // 2. Execute Search Queries when query is provided
         if ($hasSearched) {
             try {
                 if ($type === 'users') {
@@ -85,7 +70,6 @@ class InsightsController {
 
         $pageTitle = 'Community Search';
 
-        // Render Community Search View
         require_once __DIR__ . '/../views/layouts/header.php';
         require_once __DIR__ . '/../views/insights/index.php';
         require_once __DIR__ . '/../views/layouts/footer.php';

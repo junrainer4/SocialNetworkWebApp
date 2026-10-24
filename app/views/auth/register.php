@@ -1,12 +1,10 @@
 <?php
-// app/views/auth/register.php
-// User Registration View - Modernized Design matching Nexus branding
 
 require_once __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="auth-card-wrapper w-100" style="max-width: 480px;">
-    <!-- Flash Success Message (Placed above the card container) -->
+
     <?php if (!empty($_SESSION['success_message'])): ?>
         <div class="alert alert-success fade show border-0 shadow-sm mb-3" role="alert">
             <i class="bi bi-check-circle-fill me-1"></i>
@@ -15,7 +13,6 @@ require_once __DIR__ . '/../layouts/header.php';
         <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
 
-    <!-- Flash Error Message (Placed above the card container) -->
     <?php if (!empty($_SESSION['error_message'])): ?>
         <div class="alert alert-danger fade show border-0 shadow-sm mb-3" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-1"></i>
@@ -49,7 +46,7 @@ require_once __DIR__ . '/../layouts/header.php';
 
         <form action="<?= BASE_URL ?>/index.php?action=register" method="POST" id="registerForm" novalidate>
             <?= csrf_field(); ?>
-            <!-- Full Name -->
+
             <div class="mb-3">
                 <label for="full_name" class="form-label fw-semibold small text-navy">Full Name <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -67,7 +64,6 @@ require_once __DIR__ . '/../layouts/header.php';
                 </div>
             </div>
 
-            <!-- Username -->
             <div class="mb-3">
                 <label for="username" class="form-label fw-semibold small text-navy">Username <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -85,7 +81,6 @@ require_once __DIR__ . '/../layouts/header.php';
                 <div class="form-text small text-muted">Letters, numbers, and underscores only.</div>
             </div>
 
-            <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label fw-semibold small text-navy">Password <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -105,7 +100,6 @@ require_once __DIR__ . '/../layouts/header.php';
                     </button>
                 </div>
 
-                <!-- Password Requirements Checklist -->
                 <div class="password-requirements p-3 mt-2 rounded-3 border" id="passwordRequirements" aria-live="polite">
                     <div class="d-flex align-items-center justify-content-between mb-2">
                         <span class="fw-semibold text-secondary" style="font-size: 0.78rem; letter-spacing: 0.3px;">PASSWORD REQUIREMENTS</span>
@@ -136,7 +130,6 @@ require_once __DIR__ . '/../layouts/header.php';
                 </div>
             </div>
 
-            <!-- Confirm Password -->
             <div class="mb-4">
                 <label for="confirm_password" class="form-label fw-semibold small text-navy">Confirm Password <span class="text-danger">*</span></label>
                 <div class="input-group">
@@ -155,18 +148,16 @@ require_once __DIR__ . '/../layouts/header.php';
                         <i class="bi bi-eye"></i>
                     </button>
                 </div>
-                <!-- Confirmation Validation Indicator -->
+
                 <div id="confirmFeedback" class="mt-1" style="font-size: 0.8rem; min-height: 20px;" aria-live="polite"></div>
             </div>
 
-            <!-- Functional Create Account Submit Button -->
             <div class="d-grid mb-3">
                 <button type="submit" class="btn btn-navy py-2-5 fw-semibold shadow-sm" id="submitBtn">
                     <i class="bi bi-person-check-fill me-1"></i> Create Account
                 </button>
             </div>
 
-            <!-- Form Navigation Links -->
             <div class="text-center pt-3 border-top">
                 <span class="text-muted small">Already have an account?</span>
                 <a href="<?= BASE_URL ?>/index.php?action=login" class="text-navy small fw-bold text-decoration-none ms-1">
@@ -298,7 +289,6 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmInput.addEventListener('input', validateConfirmation);
     }
 
-    // Toggle Password Visibility
     document.querySelectorAll('.toggle-password-btn').forEach(function (btn) {
         btn.addEventListener('click', function () {
             const targetId = this.getAttribute('data-target');
@@ -324,7 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // Form Submission Interception
     if (registerForm) {
         registerForm.addEventListener('submit', function (e) {
             const isPasswordValid = validatePassword();
@@ -346,7 +335,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return false;
             }
 
-            // Prevent duplicate submissions:
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Creating account...';

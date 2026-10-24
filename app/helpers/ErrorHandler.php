@@ -1,8 +1,6 @@
 <?php
 <<<<<<< HEAD
 =======
-// app/helpers/ErrorHandler.php
-// Centralized Error and Exception Handling for Nexus
 
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 if (session_status() === PHP_SESSION_NONE) {
@@ -14,9 +12,6 @@ class ErrorHandler {
 =======
     private static $logFile = __DIR__ . '/../../logs/app.log';
 
-    /**
-     * Sanitize message to prevent passwords, tokens, and hashes from appearing in logs.
-     */
     public static function sanitizeLogMessage(string $msg): string {
         $msg = preg_replace('/(password|passwd|pwd)(\s*[:=]\s*|\s*=>\s*[\'"]?)[^\s,;\'"]+/i', '$1$2***', $msg);
         $msg = preg_replace('/(csrf_token|token|session_id)(\s*[:=]\s*|\s*=>\s*[\'"]?)[^\s,;\'"]+/i', '$1$2***', $msg);
@@ -24,9 +19,6 @@ class ErrorHandler {
         return $msg;
     }
 
-    /**
-     * Write sanitized message to system error_log and storage/logs/app.log.
-     */
     public static function writeLog(string $level, string $message, array $context = []): void {
         $timestamp = date('Y-m-d H:i:s');
         $sanitizedMessage = self::sanitizeLogMessage($message);
@@ -36,16 +28,10 @@ class ErrorHandler {
 
         $entry = "[{$timestamp}] [{$level}] {$sanitizedMessage}{$contextStr}" . PHP_EOL;
 
-        // Write to PHP/Apache error log
         error_log("[Nexus {$level}] {$sanitizedMessage}");
 
-        // Also write to dedicated app log file if directory exists
-        // File logging disabled (logs folder removed)
     }
 
-    /**
-     * Register global exception and error handlers.
-     */
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
     public static function register(): void {
         error_reporting(E_ALL);

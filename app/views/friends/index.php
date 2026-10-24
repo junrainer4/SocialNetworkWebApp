@@ -1,13 +1,10 @@
 <?php
-// app/views/friends/index.php
-// Dedicated Friends & Connections Management View for Nexus
 
 $currentUserId = (int)($_SESSION['user_id'] ?? 0);
 ?>
 
 <div class="friends-page-container mx-auto py-4" style="max-width: 820px;">
 
-    <!-- Friends Header Card -->
     <div class="card-modern p-4 mb-4 border-0 shadow-sm">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div class="d-flex align-items-center gap-3">
@@ -34,14 +31,13 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
         </div>
     </div>
 
-    <!-- Navigation Tabs: Followers & Following -->
     <div class="card-modern border-0 shadow-sm p-2 mb-4">
         <ul class="nav nav-pills nav-fill friends-nav-pills gap-2" id="friendsTabs" role="tablist">
             <li class="nav-item" role="presentation">
-                <a class="nav-link <?= $activeTab === 'followers' ? 'active' : '' ?> d-flex align-items-center justify-content-center gap-2 py-2-5 rounded-3 fw-semibold" 
-                   id="followers-tab" 
-                   href="<?= BASE_URL ?>/index.php?action=friends&tab=followers" 
-                   role="tab" 
+                <a class="nav-link <?= $activeTab === 'followers' ? 'active' : '' ?> d-flex align-items-center justify-content-center gap-2 py-2-5 rounded-3 fw-semibold"
+                   id="followers-tab"
+                   href="<?= BASE_URL ?>/index.php?action=friends&tab=followers"
+                   role="tab"
                    aria-selected="<?= $activeTab === 'followers' ? 'true' : 'false' ?>">
                     <i class="bi bi-person-check-fill"></i>
                     <span>Followers</span>
@@ -49,10 +45,10 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                 </a>
             </li>
             <li class="nav-item" role="presentation">
-                <a class="nav-link <?= $activeTab === 'following' ? 'active' : '' ?> d-flex align-items-center justify-content-center gap-2 py-2-5 rounded-3 fw-semibold" 
-                   id="following-tab" 
-                   href="<?= BASE_URL ?>/index.php?action=friends&tab=following" 
-                   role="tab" 
+                <a class="nav-link <?= $activeTab === 'following' ? 'active' : '' ?> d-flex align-items-center justify-content-center gap-2 py-2-5 rounded-3 fw-semibold"
+                   id="following-tab"
+                   href="<?= BASE_URL ?>/index.php?action=friends&tab=following"
+                   role="tab"
                    aria-selected="<?= $activeTab === 'following' ? 'true' : 'false' ?>">
                     <i class="bi bi-person-plus-fill"></i>
                     <span>Following</span>
@@ -62,12 +58,8 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
         </ul>
     </div>
 
-    <!-- Tab Content -->
     <div class="tab-content" id="friendsTabContent">
 
-        <!-- ==============================================
-             TAB 1: FOLLOWERS
-             ============================================== -->
         <?php if ($activeTab === 'followers'): ?>
             <div class="tab-pane fade show active" id="followersPane" role="tabpanel">
                 <?php if (!empty($followers)): ?>
@@ -96,7 +88,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                             <div class="col-md-6" id="friend-card-<?= $uId ?>">
                                 <div class="card-modern p-3 h-100 border-0 shadow-sm d-flex flex-column justify-content-between">
                                     <div class="d-flex align-items-center gap-3">
-                                        <!-- Avatar Link -->
+
                                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none flex-shrink-0">
                                             <?php if (!empty($uAvatarPath)): ?>
                                                 <img src="<?= $uAvatarPath ?>" alt="<?= htmlspecialchars($uFullName); ?>" class="friend-card-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\'friend-card-avatar-initials\'><?= htmlspecialchars($uInitials); ?></div>';">
@@ -107,7 +99,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                             <?php endif; ?>
                                         </a>
 
-                                        <!-- User Info -->
                                         <div class="min-w-0 flex-grow-1">
                                             <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none">
                                                 <h6 class="fw-bold text-navy mb-0 text-truncate friend-card-name"><?= htmlspecialchars($uFullName); ?></h6>
@@ -121,13 +112,12 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                         </div>
                                     </div>
 
-                                    <!-- Follow / Following Action Button -->
                                     <div class="mt-3 pt-2 border-top d-flex justify-content-end align-items-center">
                                         <form action="<?= BASE_URL ?>/index.php?action=follow_user" method="POST" class="follow-action-form" data-user-id="<?= $uId ?>">
                                             <?= csrf_field(); ?>
                                             <input type="hidden" name="user_id" value="<?= $uId ?>">
                                             <input type="hidden" name="redirect" value="friends">
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="btn btn-sm <?= $isFollowing ? 'btn-outline-secondary' : 'btn-navy' ?> rounded-pill px-3 py-1-5 fw-semibold d-inline-flex align-items-center gap-2 friend-toggle-btn shadow-sm"
                                                     data-following="<?= $isFollowing ? '1' : '0' ?>">
                                                 <i class="bi <?= $isFollowing ? 'bi-check-lg' : 'bi-person-plus-fill' ?>"></i>
@@ -140,7 +130,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <!-- Empty Followers State -->
+
                     <div class="card-modern p-5 text-center border-0 shadow-sm">
                         <div class="friends-empty-icon mx-auto mb-3">
                             <i class="bi bi-people"></i>
@@ -157,9 +147,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
             </div>
         <?php endif; ?>
 
-        <!-- ==============================================
-             TAB 2: FOLLOWING
-             ============================================== -->
         <?php if ($activeTab === 'following'): ?>
             <div class="tab-pane fade show active" id="followingPane" role="tabpanel">
                 <?php if (!empty($following)): ?>
@@ -187,7 +174,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                             <div class="col-md-6" id="friend-card-<?= $uId ?>">
                                 <div class="card-modern p-3 h-100 border-0 shadow-sm d-flex flex-column justify-content-between">
                                     <div class="d-flex align-items-center gap-3">
-                                        <!-- Avatar Link -->
+
                                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none flex-shrink-0">
                                             <?php if (!empty($uAvatarPath)): ?>
                                                 <img src="<?= $uAvatarPath ?>" alt="<?= htmlspecialchars($uFullName); ?>" class="friend-card-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\'friend-card-avatar-initials\'><?= htmlspecialchars($uInitials); ?></div>';">
@@ -198,7 +185,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                             <?php endif; ?>
                                         </a>
 
-                                        <!-- User Info -->
                                         <div class="min-w-0 flex-grow-1">
                                             <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= $uId ?>" class="text-decoration-none">
                                                 <h6 class="fw-bold text-navy mb-0 text-truncate friend-card-name"><?= htmlspecialchars($uFullName); ?></h6>
@@ -212,13 +198,12 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                         </div>
                                     </div>
 
-                                    <!-- Unfollow Button -->
                                     <div class="mt-3 pt-2 border-top d-flex justify-content-end align-items-center">
                                         <form action="<?= BASE_URL ?>/index.php?action=follow_user" method="POST" class="follow-action-form" data-user-id="<?= $uId ?>" data-context="following-tab">
                                             <?= csrf_field(); ?>
                                             <input type="hidden" name="user_id" value="<?= $uId ?>">
                                             <input type="hidden" name="redirect" value="friends">
-                                            <button type="submit" 
+                                            <button type="submit"
                                                     class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1-5 fw-semibold d-inline-flex align-items-center gap-2 friend-toggle-btn shadow-sm"
                                                     data-following="1">
                                                 <i class="bi bi-check-lg"></i>
@@ -231,7 +216,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                         <?php endforeach; ?>
                     </div>
                 <?php else: ?>
-                    <!-- Empty Following State -->
+
                     <div class="card-modern p-5 text-center border-0 shadow-sm">
                         <div class="friends-empty-icon mx-auto mb-3">
                             <i class="bi bi-person-plus"></i>
@@ -255,7 +240,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-    // Handle Follow / Unfollow via AJAX in Friends Page
     document.querySelectorAll('.follow-action-form').forEach(function(form) {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -296,7 +280,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         btnIcon.className = 'bi bi-person-plus-fill';
                         btnText.textContent = 'Follow';
 
-                        // If on following tab and unfollowed, optionally animate card removal
                         if (context === 'following-tab') {
                             const card = document.getElementById('friend-card-' + userId);
                             if (card) {
@@ -314,7 +297,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
 
-                    // Update header counters if present
                     if (data.my_following_count !== undefined) {
                         const hFollowing = document.getElementById('headerFollowingCount');
                         const tFollowing = document.getElementById('tabFollowingBadge');
@@ -328,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(err => {
                 btn.disabled = false;
                 console.error('Follow toggle error:', err);
-                form.submit(); // fallback
+                form.submit();
             });
         });
     });

@@ -119,16 +119,16 @@ if (!empty($user['full_name'])) {
                                     <span class="input-group-text bg-light text-muted border-end-0">
                                         <i class="bi bi-person"></i>
                                     </span>
-                                    <input 
-                                        type="text" 
-                                        name="full_name" 
-                                        id="full_name" 
+                                    <input
+                                        type="text"
+                                        name="full_name"
+                                        id="full_name"
                                         data-initial="<?= htmlspecialchars(trim($user['full_name'] ?? '')); ?>"
-                                        class="form-control border-start-0" 
-                                        value="<?= htmlspecialchars($user['full_name'] ?? ''); ?>" 
-                                        required 
-                                        minlength="2" 
-                                        maxlength="100" 
+                                        class="form-control border-start-0"
+                                        value="<?= htmlspecialchars($user['full_name'] ?? ''); ?>"
+                                        required
+                                        minlength="2"
+                                        maxlength="100"
                                         placeholder="Enter your full name"
                                         autocomplete="name"
                                     >
@@ -146,16 +146,16 @@ if (!empty($user['full_name'])) {
                                     <span class="input-group-text bg-light text-muted border-end-0">
                                         <i class="bi bi-at"></i>
                                     </span>
-                                    <input 
-                                        type="text" 
-                                        name="username" 
-                                        id="username" 
+                                    <input
+                                        type="text"
+                                        name="username"
+                                        id="username"
                                         data-initial="<?= htmlspecialchars(trim($user['username'] ?? '')); ?>"
-                                        class="form-control border-start-0" 
-                                        value="<?= htmlspecialchars($user['username'] ?? ''); ?>" 
-                                        required 
-                                        minlength="3" 
-                                        maxlength="50" 
+                                        class="form-control border-start-0"
+                                        value="<?= htmlspecialchars($user['username'] ?? ''); ?>"
+                                        required
+                                        minlength="3"
+                                        maxlength="50"
                                         pattern="[a-zA-Z0-9_]+"
                                         placeholder="Enter your username"
                                         autocomplete="username"
@@ -199,12 +199,12 @@ if (!empty($user['full_name'])) {
                                     <span class="input-group-text bg-light text-muted border-end-0">
                                         <i class="bi bi-key"></i>
                                     </span>
-                                    <input 
-                                        type="password" 
-                                        name="current_password" 
-                                        id="current_password" 
-                                        class="form-control border-start-0 border-end-0 ps-0" 
-                                        required 
+                                    <input
+                                        type="password"
+                                        name="current_password"
+                                        id="current_password"
+                                        class="form-control border-start-0 border-end-0 ps-0"
+                                        required
                                         placeholder="Enter current password"
                                         autocomplete="current-password"
                                     >
@@ -222,13 +222,13 @@ if (!empty($user['full_name'])) {
                                     <span class="input-group-text bg-light text-muted border-end-0">
                                         <i class="bi bi-lock"></i>
                                     </span>
-                                    <input 
-                                        type="password" 
-                                        name="new_password" 
-                                        id="new_password" 
-                                        class="form-control border-start-0 border-end-0 ps-0" 
-                                        required 
-                                        minlength="8" 
+                                    <input
+                                        type="password"
+                                        name="new_password"
+                                        id="new_password"
+                                        class="form-control border-start-0 border-end-0 ps-0"
+                                        required
+                                        minlength="8"
                                         placeholder="Enter new password (min. 8 characters)"
                                         autocomplete="new-password"
                                     >
@@ -270,13 +270,13 @@ if (!empty($user['full_name'])) {
                                     <span class="input-group-text bg-light text-muted border-end-0">
                                         <i class="bi bi-shield-check"></i>
                                     </span>
-                                    <input 
-                                        type="password" 
-                                        name="confirm_password" 
-                                        id="confirm_password" 
-                                        class="form-control border-start-0 border-end-0 ps-0" 
-                                        required 
-                                        minlength="8" 
+                                    <input
+                                        type="password"
+                                        name="confirm_password"
+                                        id="confirm_password"
+                                        class="form-control border-start-0 border-end-0 ps-0"
+                                        required
+                                        minlength="8"
                                         placeholder="Re-enter new password"
                                         autocomplete="new-password"
                                     >

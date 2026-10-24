@@ -1,6 +1,4 @@
 <?php
-// app/controllers/NotificationController.php
-// Controller handling user notifications, unread counting, and mark-as-read actions for Nexus
 
 require_once __DIR__ . '/../models/NotificationModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
@@ -18,9 +16,6 @@ class NotificationController {
         $this->userModel         = new UserModel();
     }
 
-    /**
-     * Enforce authentication for notification routes.
-     */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
             if ($this->isAjax()) {
@@ -41,9 +36,6 @@ class NotificationController {
             || (isset($_SERVER['HTTP_ACCEPT']) && strpos($_SERVER['HTTP_ACCEPT'], 'application/json') !== false);
     }
 
-    /**
-     * Dedicated Notifications Page.
-     */
     public function index() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -61,9 +53,6 @@ class NotificationController {
         require_once __DIR__ . '/../views/layouts/footer.php';
     }
 
-    /**
-     * Return JSON data for header notification dropdown.
-     */
     public function getDropdown() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -76,7 +65,7 @@ class NotificationController {
             'success'       => true,
             'unread_count'  => $unreadCount,
             'notifications' => array_map(function($n) {
-                // Determine destination URL
+
                 $destUrl = BASE_URL . '/index.php';
                 if ($n['type'] === 'follow') {
                     $destUrl = BASE_URL . '/index.php?action=profile&user_id=' . (int)$n['actor_id'];
@@ -84,7 +73,6 @@ class NotificationController {
                     $destUrl = BASE_URL . '/index.php?action=view_post&id=' . (int)$n['related_post_id'];
                 }
 
-                // Format actor avatar
                 $avatarUrl = null;
                 if (!empty($n['actor_profile_image'])) {
                     $path = __DIR__ . '/../../../public/uploads/avatars/' . basename($n['actor_profile_image']);
@@ -118,9 +106,6 @@ class NotificationController {
         exit;
     }
 
-    /**
-     * Open a notification: marks as read and redirects to destination.
-     */
     public function open() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -147,9 +132,6 @@ class NotificationController {
         exit;
     }
 
-    /**
-     * Mark single notification as read (POST / AJAX).
-     */
     public function markRead() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -186,9 +168,6 @@ class NotificationController {
         exit;
     }
 
-    /**
-     * Mark all notifications as read (POST / AJAX).
-     */
     public function markAllRead() {
         $this->requireAuth();
         $userId = (int)$_SESSION['user_id'];
@@ -223,9 +202,6 @@ class NotificationController {
         exit;
     }
 
-    /**
-     * Helper to format relative time ago.
-     */
     public static function formatTimeAgo(string $datetime): string {
         $time = strtotime($datetime);
         $diff = time() - $time;

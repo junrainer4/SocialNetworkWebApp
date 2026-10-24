@@ -1,6 +1,4 @@
 <?php
-// app/models/EventModel.php
-// Model handling all database queries for Campus Events
 
 require_once __DIR__ . '/../../config/database.php';
 
@@ -11,14 +9,8 @@ class EventModel {
         $this->db = Database::connect();
     }
 
-    /**
-     * Retrieve upcoming events for students (displayed on feed and events widget).
-     *
-     * @param int $limit
-     * @return array
-     */
     public function getUpcomingEvents($limit = 5) {
-        $sql = "SELECT e.*, u.full_name AS organizer_name 
+        $sql = "SELECT e.*, u.full_name AS organizer_name
                 FROM events e
                 LEFT JOIN users u ON e.created_by = u.id
                 WHERE e.event_date >= CURDATE()
@@ -30,11 +22,6 @@ class EventModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Retrieve all events sorted by event_date.
-     *
-     * @return array
-     */
     public function getAllEvents() {
         $sql = "SELECT e.*, u.full_name AS organizer_name, u.username AS organizer_username
                 FROM events e
@@ -44,12 +31,6 @@ class EventModel {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Get single event by ID.
-     *
-     * @param int $id
-     * @return array|false
-     */
     public function getEventById($id) {
         $sql = "SELECT * FROM events WHERE id = :id LIMIT 1";
         $stmt = $this->db->prepare($sql);
@@ -57,17 +38,6 @@ class EventModel {
         return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Create a new campus event (authorized action).
-     *
-     * @param string $title
-     * @param string|null $description
-     * @param string $eventDate Format YYYY-MM-DD
-     * @param string|null $eventTime
-     * @param string $location
-     * @param int|null $createdBy
-     * @return bool
-     */
     public function createEvent($title, $description, $eventDate, $eventTime, $location, $createdBy = null) {
         $sql = "INSERT INTO events (title, description, event_date, event_time, location, created_by)
                 VALUES (:title, :description, :event_date, :event_time, :location, :created_by)";
@@ -82,19 +52,8 @@ class EventModel {
         ]);
     }
 
-    /**
-     * Update an existing event (authorized action).
-     *
-     * @param int $id
-     * @param string $title
-     * @param string|null $description
-     * @param string $eventDate Format YYYY-MM-DD
-     * @param string|null $eventTime
-     * @param string $location
-     * @return bool
-     */
     public function updateEvent($id, $title, $description, $eventDate, $eventTime, $location) {
-        $sql = "UPDATE events 
+        $sql = "UPDATE events
                 SET title = :title,
                     description = :description,
                     event_date = :event_date,
@@ -112,12 +71,6 @@ class EventModel {
         ]);
     }
 
-    /**
-     * Delete an event by ID (authorized action).
-     *
-     * @param int $id
-     * @return bool
-     */
     public function deleteEvent($id) {
         $sql = "DELETE FROM events WHERE id = :id";
         $stmt = $this->db->prepare($sql);

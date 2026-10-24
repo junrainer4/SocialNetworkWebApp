@@ -1,43 +1,35 @@
 <?php
-// app/views/layouts/footer.php
-// Reusable Modern HTML Footer Layout
+
 ?>
-        <!-- Closing Page Content Container -->
+
         </main>
 
 <<<<<<< HEAD
-        <!-- Clean Centered Footer -->
+
         <footer class="app-footer border-top py-3 px-4 small text-center mt-auto">
             <div class="container-fluid text-center">
                 <span class="text-muted">&copy; <?= date('Y'); ?> <strong>Unify</strong>. All rights reserved.</span>
             </div>
 =======
-        <!-- Modern Footer -->
+
         <footer class="bg-white border-top py-3 px-4 text-muted small text-start">
             &copy; <?= date('Y'); ?> <strong>Nexus</strong>. All rights reserved.
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
         </footer>
 
-    <!-- Closing Main Content Area Wrapper -->
     </div>
 
-<!-- Closing App Layout Wrapper -->
 </div>
 
-<!-- Cropper.js Script (Image Crop/Adjust) -->
 <script src="https://cdn.jsdelivr.net/npm/cropperjs@1.6.2/dist/cropper.min.js"></script>
 
-<!-- Bootstrap 5.3 Bundle with Popper JS CDN -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 
-<!-- Theme Script loaded in header.php -->
-<!-- AJAX Interactions Script (Likes, Comments, Post Creation) -->
 <script src="<?= BASE_URL ?>/public/assets/js/interactions.js?v=<?= filemtime(__DIR__ . '/../../../public/assets/js/interactions.js') ?>"></script>
 
-<!-- Keyboard Event Handlers: Quick Search Shortcut (Cmd+K / Ctrl+K and '/') -->
 <script>
 document.addEventListener('keydown', function(e) {
-    // Quick search with Cmd+K or Ctrl+K
+
     if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
         const searchInput = document.getElementById('headerSearchInput') || document.querySelector('.header-search input[name="q"]');
         if (searchInput) {
@@ -46,7 +38,7 @@ document.addEventListener('keydown', function(e) {
             searchInput.select();
         }
     }
-    // Quick search with '/' key when not already focused inside an input or textarea
+
     if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
         const searchInput = document.getElementById('headerSearchInput') || document.querySelector('.header-search input[name="q"]');
         if (searchInput) {
@@ -57,7 +49,6 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
-// Universal Auto-Dismiss Flash Alerts after 3 seconds
 document.addEventListener('DOMContentLoaded', function () {
     const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
     if (alerts.length > 0) {
@@ -84,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
-<!-- FLOATING FACEBOOK CHAT DOCK -->
 <div id="fbFloatingChat" class="fb-chat-dock d-none shadow-lg">
     <div class="fb-chat-header d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
         <div class="d-flex align-items-center gap-2 min-w-0">
@@ -112,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
     <div class="fb-chat-body p-3 p-md-4" id="fbChatMessagesBody">
         <div class="text-center micro-text text-muted mb-3" id="fbChatTimestamp" style="font-size: 0.82rem;">Today</div>
-        <!-- Initial Incoming Message -->
+
         <div class="d-flex align-items-end gap-2 mb-3 chat-msg-row incoming" id="fbChatInitialRow">
             <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 fb-chat-avatar-mini" id="fbChatMiniAvatar" style="width: 32px; height: 32px; background: #1877f2; font-size: 0.8rem;">AW</div>
             <div class="chat-bubble chat-bubble-in shadow-sm" id="fbChatInitialMsg">
@@ -130,7 +120,6 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 </div>
 
-<!-- Image Crop/Adjust Modal -->
 <div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered" style="max-width: 520px;">
         <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
@@ -175,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <style>
-/* Cropper modal overrides */
+
 #imageCropModal .cropper-view-box,
 #imageCropModal .cropper-face {
     border-radius: 0;
@@ -192,7 +181,6 @@ document.addEventListener('DOMContentLoaded', function () {
 }
 </style>
 
-<!-- Universal Post Likers / Who Reacted Modal -->
 <div class="modal fade" id="postLikersModal" tabindex="-1" aria-labelledby="postLikersModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="max-width: 460px;">
         <div class="modal-content border-0 shadow rounded-4 overflow-hidden">
@@ -217,7 +205,6 @@ document.addEventListener('DOMContentLoaded', function () {
     </div>
 </div>
 
-<!-- Universal Image Lightbox Modal -->
 <div class="modal fade" id="postImageLightboxModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content bg-black border-0">
@@ -241,7 +228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </div>
 
 <script>
-// Universal Lightbox Handler
+
 document.addEventListener('DOMContentLoaded', function() {
     let currentGalleryLinks = [];
     let currentGalleryIndex = 0;
@@ -318,9 +305,8 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-
 <script>
-// ===== Notification Badge Updater =====
+
 window.updateHeaderNotificationBadge = function(count) {
     var badge = document.getElementById('headerNotifBadge');
     var btn   = document.getElementById('headerNotifBtn');

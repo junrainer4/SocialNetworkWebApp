@@ -1,13 +1,10 @@
 <?php
-// app/views/notifications/index.php
-// Dedicated Notifications View for Nexus
 
 $currentUserId = (int)($_SESSION['user_id'] ?? 0);
 ?>
 
 <div class="notifications-page-container mx-auto py-4" style="max-width: 780px;">
 
-    <!-- Notifications Header Card -->
     <div class="card-modern p-4 mb-4 border-0 shadow-sm">
         <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
             <div class="d-flex align-items-center gap-3">
@@ -34,7 +31,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
         </div>
     </div>
 
-    <!-- Notifications List -->
     <div class="notifications-list-wrapper">
         <?php if (!empty($notifications)): ?>
             <div class="card-modern border-0 shadow-sm overflow-hidden p-0" id="notificationsListCard">
@@ -45,7 +41,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                         $actorName = $n['actor_full_name'] ?? 'User';
                         $actorUsername = $n['actor_username'] ?? '';
                         $actorAvatar = $n['actor_profile_image'] ?? null;
-                        
+
                         $avatarPath = null;
                         if (!empty($actorAvatar)) {
                             $checkPath = __DIR__ . '/../../../public/uploads/avatars/' . basename($actorAvatar);
@@ -59,10 +55,8 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                             ? strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[count($parts)-1], 0, 1))
                             : strtoupper(mb_substr($actorName, 0, 2));
 
-                        // Determine destination
                         $destUrl = BASE_URL . '/index.php?action=open_notification&id=' . (int)$n['id'];
 
-                        // Determine icon & badge color by notification type
                         $typeIcon = 'bi-bell-fill';
                         $typeBadgeClass = 'bg-primary text-white';
                         if ($n['type'] === 'follow') {
@@ -78,9 +72,9 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                         ?>
                         <div class="list-group-item list-group-item-action p-3 notification-item <?= $isUnread ? 'notification-unread' : '' ?>" id="notif-item-<?= (int)$n['id'] ?>">
                             <div class="d-flex align-items-center justify-content-between gap-3">
-                                
+
                                 <a href="<?= $destUrl ?>" class="d-flex align-items-center gap-3 text-decoration-none text-reset flex-grow-1 min-w-0">
-                                    <!-- Actor Avatar with Type Badge -->
+
                                     <div class="position-relative flex-shrink-0">
                                         <?php if (!empty($avatarPath)): ?>
                                             <img src="<?= $avatarPath ?>" alt="<?= htmlspecialchars($actorName); ?>" class="notif-avatar" onerror="this.onerror=null; this.outerHTML='<div class=\'notif-avatar-initials\'><?= htmlspecialchars($initials); ?></div>';">
@@ -94,7 +88,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                         </span>
                                     </div>
 
-                                    <!-- Content -->
                                     <div class="flex-grow-1 min-w-0">
                                         <div class="notif-text mb-1 text-truncate-2">
                                             <strong class="text-navy"><?= htmlspecialchars($actorName); ?></strong>
@@ -110,12 +103,11 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                                     </div>
                                 </a>
 
-                                <!-- Action Buttons: Unread Dot / Mark as Read -->
                                 <div class="d-flex align-items-center gap-2 flex-shrink-0">
                                     <?php if ($isUnread): ?>
-                                        <button type="button" 
-                                                class="btn btn-sm btn-icon-subtle mark-read-single-btn" 
-                                                data-id="<?= (int)$n['id'] ?>" 
+                                        <button type="button"
+                                                class="btn btn-sm btn-icon-subtle mark-read-single-btn"
+                                                data-id="<?= (int)$n['id'] ?>"
                                                 title="Mark as read"
                                                 aria-label="Mark as read">
                                             <span class="notif-unread-dot"></span>
@@ -128,7 +120,7 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
                 </div>
             </div>
         <?php else: ?>
-            <!-- Empty State -->
+
             <div class="card-modern p-5 text-center border-0 shadow-sm">
                 <div class="notif-empty-icon mx-auto mb-3">
                     <i class="bi bi-bell-slash"></i>
@@ -146,7 +138,6 @@ $currentUserId = (int)($_SESSION['user_id'] ?? 0);
 document.addEventListener('DOMContentLoaded', function() {
     const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-    // Mark single notification as read via AJAX
     document.querySelectorAll('.mark-read-single-btn').forEach(function(btn) {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
@@ -182,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Mark all as read via AJAX
     const markAllForm = document.getElementById('markAllReadForm');
     if (markAllForm) {
         markAllForm.addEventListener('submit', function(e) {
@@ -210,7 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(err => {
-                // Fallback to normal form submit
+
                 markAllForm.submit();
             });
         });

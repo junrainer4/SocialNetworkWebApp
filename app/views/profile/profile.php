@@ -1,10 +1,7 @@
 <?php
-// app/views/profile/profile.php
-// User Profile View - Redesigned with Modern Dashboard Card Layout
 
 require_once __DIR__ . '/../layouts/header.php';
 
-// Prepare profile image URL or fallback placeholder
 $avatarUrl = null;
 if (!empty($user['profile_image'])) {
     $uploadedPath = __DIR__ . '/../../../public/uploads/avatars/' . basename($user['profile_image']);
@@ -15,7 +12,6 @@ if (!empty($user['profile_image'])) {
     }
 }
 
-// Prepare cover photo URL or fallback placeholder
 $coverUrl = null;
 if (!empty($user['cover_photo'])) {
     $uploadedCoverPath = __DIR__ . '/../../../public/uploads/covers/' . basename($user['cover_photo']);
@@ -26,8 +22,8 @@ if (!empty($user['cover_photo'])) {
     }
 }
 
-$formattedDate = !empty($user['created_at']) 
-    ? date('F j, Y', strtotime($user['created_at'])) 
+$formattedDate = !empty($user['created_at'])
+    ? date('F j, Y', strtotime($user['created_at']))
     : 'N/A';
 
 $userInitials = 'U';
@@ -43,7 +39,6 @@ if (!empty($user['full_name'])) {
 
 <div class="profile-layout-container mx-auto" style="max-width: 1040px; width: 100%;">
 
-    <!-- Flash Success Message -->
     <?php if (!empty($_SESSION['success_message'])): ?>
         <div class="alert alert-success fade show mb-4 border-0 shadow-sm" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
@@ -52,9 +47,8 @@ if (!empty($user['full_name'])) {
         <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
 
-    <!-- PROFILE HERO HEADER CARD -->
     <div class="card-modern overflow-hidden mb-4 border-0 shadow-sm">
-        <!-- Cover Photo Banner -->
+
         <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 50%, #0062ff 100%);" ?> height: 260px;" class="position-relative">
             <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2">
                 <span class="badge" style="background-color: var(--accent-yellow, #f1bd27); color: #07193d; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: 50px;">
@@ -70,22 +64,22 @@ if (!empty($user['full_name'])) {
         </div>
 
 <<<<<<< HEAD
-        <!-- Profile Bar (Avatar + Details + Actions) -->
+
         <div class="px-4 py-3 border-bottom">
             <div class="d-flex align-items-md-end justify-content-between flex-column flex-md-row gap-3">
-                <!-- Left: Big Avatar + Names -->
+
                 <div class="d-flex align-items-center align-items-md-end gap-3 flex-wrap">
                     <div class="position-relative flex-shrink-0" style="margin-top: -75px;">
                         <?php if ($avatarUrl): ?>
-                            <img 
-                                src="<?= $avatarUrl ?>" 
-                                alt="<?= htmlspecialchars($user['full_name']); ?>" 
+                            <img
+                                src="<?= $avatarUrl ?>"
+                                alt="<?= htmlspecialchars($user['full_name']); ?>"
                                 class="rounded-circle border border-4 border-white shadow bg-white"
                                 style="width: 136px; height: 136px; object-fit: cover;"
                                 onerror="this.onerror=null; this.outerHTML='<div class=\'rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-1 fw-bold\' style=\'width: 136px; height: 136px; background-color: #07193d;\'><?= htmlspecialchars($userInitials) ?></div>';"
                             >
                         <?php else: ?>
-                            <div 
+                            <div
                                 class="rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-1 fw-bold"
                                 style="width: 136px; height: 136px; background-color: #07193d;"
                             >
@@ -93,9 +87,9 @@ if (!empty($user['full_name'])) {
                             </div>
                         <?php endif; ?>
 =======
-        <!-- Profile Card -->
+
         <div class="card-modern overflow-hidden mb-4">
-            <!-- Header Banner / Cover Photo -->
+
             <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?> height: 200px;" class="position-relative">
             </div>
 >>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
@@ -115,8 +109,7 @@ if (!empty($user['full_name'])) {
                             <?php endif; ?>
                         </div>
                         <div class="text-muted fw-semibold mb-2">@<?= htmlspecialchars($user['username']); ?></div>
-                        
-                        <!-- Follower / Following Quick Counter Line -->
+
                         <div class="d-flex align-items-center gap-2 small text-muted">
                             <button type="button" class="btn btn-link p-0 text-decoration-none text-muted fw-semibold follow-stat-btn" onclick="openFollowListModal('followers', <?= (int)$user['id'] ?>)">
                                 <strong class="text-dark fs-6" id="profileFollowersCount"><?= (int)($followersCount ?? 0) ?></strong> Followers
@@ -131,7 +124,6 @@ if (!empty($user['full_name'])) {
                     </div>
                 </div>
 
-                <!-- Right: Action Buttons -->
                 <div class="d-flex align-items-center gap-2 pb-2 flex-wrap">
                     <?php if (!empty($isOwnProfile)): ?>
                         <a href="<?= BASE_URL ?>/index.php?action=edit_profile" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
@@ -143,7 +135,7 @@ if (!empty($user['full_name'])) {
                             <span>Settings</span>
                         </a>
                     <?php else: ?>
-                        <!-- Follow / Unfollow AJAX Button -->
+
                         <form action="<?= BASE_URL ?>/index.php?action=follow_user" method="POST" class="d-inline" id="profileFollowForm">
                             <?= csrf_field(); ?>
                             <input type="hidden" name="user_id" value="<?= (int)$user['id']; ?>">
@@ -161,27 +153,22 @@ if (!empty($user['full_name'])) {
             </div>
         </div>
 
-        <!-- Profile Sub-navigation Tabs -->
         <div class="px-4 d-flex align-items-center gap-3">
             <span class="py-3 px-2 text-primary fw-bold border-bottom border-3 border-primary" style="font-size: 0.95rem;">Timeline Posts (<?= !empty($posts) ? count($posts) : 0; ?>)</span>
             <a href="#aboutDetailsCard" class="py-3 px-2 text-muted fw-semibold text-decoration-none" style="font-size: 0.95rem;">About & Details</a>
         </div>
     </div>
 
-    <!-- 2-COLUMN ORGANIZED PROFILE CONTENT -->
     <div class="row g-4">
-        <!-- ==============================================
-             LEFT COLUMN: INTRO, BIO & PROFILE DETAILS
-             ============================================== -->
+
         <div class="col-lg-5 col-xl-4" id="aboutDetailsCard">
-            <!-- Intro & Bio Card -->
+
             <div class="card-modern p-4 mb-4 border-0 shadow-sm">
                 <h5 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
                     <i class="bi bi-info-circle text-primary"></i>
                     <span>Intro</span>
                 </h5>
 
-                <!-- Bio -->
                 <?php if (!empty($user['bio'])): ?>
                     <p class="text-dark small mb-3 lh-base fst-italic">“<?= nl2br(htmlspecialchars($user['bio'])); ?>”</p>
                 <?php else: ?>
@@ -214,16 +201,12 @@ if (!empty($user['full_name'])) {
                 </div>
             </div>
 
-            <!-- Community Card -->
             <div class="card-modern p-4 mb-4 border-0 shadow-sm">
                 <h6 class="fw-bold mb-2 text-dark">Unify Network</h6>
                 <p class="text-muted small mb-0">Connected member of the Unify campus social platform.</p>
             </div>
         </div>
 
-        <!-- ==============================================
-             RIGHT COLUMN: USER'S TIMELINE POSTS
-             ============================================== -->
         <div class="col-lg-7 col-xl-8">
             <div class="user-posts-section mb-5">
             <div class="d-flex align-items-center justify-content-between mb-3 px-1">
@@ -239,25 +222,24 @@ if (!empty($user['full_name'])) {
             <?php if (!empty($posts)): ?>
                 <?php foreach ($posts as $post): ?>
                     <?php
-                    // Compute author initials
+
                     $authorParts = explode(' ', trim($post['full_name']));
                     $authorInitials = count($authorParts) >= 2
                         ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
                         : strtoupper(substr($post['full_name'], 0, 2));
 
-                    // Time formatting
                     $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
                     $timeBadge = format_time_ago($post['created_at']);
                     ?>
                     <article class="post-card" id="post-<?= $post['id'] ?>">
-                        <!-- Post Author Header -->
+
                         <div class="post-header">
                             <div class="post-author-box">
                                 <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$post['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($post['full_name']); ?>'s profile">
                                     <?php if (!empty($post['profile_image'])): ?>
-                                        <img 
-                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>" 
-                                            alt="<?= htmlspecialchars($post['full_name']); ?>" 
+                                        <img
+                                            src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>"
+                                            alt="<?= htmlspecialchars($post['full_name']); ?>"
                                             class="post-avatar"
                                             onerror="this.onerror=null; this.outerHTML='<div class=\'post-avatar\'><?= htmlspecialchars($authorInitials) ?></div>';"
                                         >
@@ -276,7 +258,6 @@ if (!empty($user['full_name'])) {
                                 </div>
                             </div>
 
-                            <!-- Post Menu Dropdown -->
                             <?php if (!empty($_SESSION['user_id']) && (int)$_SESSION['user_id'] === (int)$post['user_id']): ?>
                             <div class="dropdown">
                                 <button class="btn btn-sm btn-link text-muted p-0 text-decoration-none" data-bs-toggle="dropdown" aria-expanded="false" aria-label="Post actions">
@@ -302,12 +283,10 @@ if (!empty($user['full_name'])) {
                             <?php endif; ?>
                         </div>
 
-                        <!-- Post Text Content -->
                         <div class="post-content">
                             <?= nl2br(htmlspecialchars($post['content'])); ?>
                         </div>
 
-                        <!-- Optional Post Image(s) -->
                         <?php
                         $postImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                         $totalPostImages = count($postImages);
@@ -357,7 +336,6 @@ if (!empty($user['full_name'])) {
                             </div>
                         <?php endif; ?>
 
-                        <!-- Post Engagement Actions (Like / Comment) -->
                         <div class="post-footer-actions d-flex align-items-center">
                             <div class="d-flex align-items-center gap-3">
                                 <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline">
@@ -375,7 +353,6 @@ if (!empty($user['full_name'])) {
                             </div>
                         </div>
 
-                        <!-- Comments Section -->
                         <div class="comments-container d-none" id="comments-box-<?= $post['id'] ?>">
                             <?php if (!empty($post['comments'])): ?>
                                 <?php foreach ($post['comments'] as $comment): ?>
@@ -391,9 +368,9 @@ if (!empty($user['full_name'])) {
                                     <div class="comment-bubble" id="comment-<?= $comment['id'] ?>">
                                         <a href="<?= BASE_URL ?>/index.php?action=profile&user_id=<?= (int)$comment['user_id']; ?>" class="text-decoration-none flex-shrink-0" title="View <?= htmlspecialchars($comment['full_name']); ?>'s profile">
                                             <?php if (!empty($comment['profile_image'])): ?>
-                                                <img 
-                                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>" 
-                                                    alt="<?= htmlspecialchars($comment['full_name']); ?>" 
+                                                <img
+                                                    src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($comment['profile_image'])) ?>"
+                                                    alt="<?= htmlspecialchars($comment['full_name']); ?>"
                                                     class="comment-avatar"
                                                     onerror="this.onerror=null; this.outerHTML='<div class=\'comment-avatar\'><?= htmlspecialchars($cInitials) ?></div>';"
                                                 >
@@ -436,15 +413,14 @@ if (!empty($user['full_name'])) {
                                 <?php endforeach; ?>
                             <?php endif; ?>
 
-                            <!-- Add Comment Form -->
                             <?php if (!empty($_SESSION['user_id'])): ?>
                                 <form action="<?= BASE_URL ?>/index.php?action=create_comment" method="POST" class="comment-input-row">
                                     <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                    <input 
-                                        type="text" 
-                                        name="content" 
-                                        class="form-control" 
-                                        placeholder="Write a comment..." 
+                                    <input
+                                        type="text"
+                                        name="content"
+                                        class="form-control"
+                                        placeholder="Write a comment..."
                                         maxlength="1000"
                                         required
                                     >
@@ -463,7 +439,7 @@ if (!empty($user['full_name'])) {
                     </article>
                 <?php endforeach; ?>
             <?php else: ?>
-                <!-- Empty State -->
+
                 <div class="card-modern p-5 text-center text-muted">
                     <i class="bi bi-chat-square-text fs-1 mb-3 text-secondary"></i>
                     <h5 class="fw-semibold text-dark">No posts yet.</h5>
@@ -492,7 +468,6 @@ if (!empty($user['full_name'])) {
 }
 </style>
 
-<!-- Followers & Following Modal -->
 <div class="modal fade" id="followListModal" tabindex="-1" aria-labelledby="followListModalTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content shadow border-0 rounded-4">
@@ -504,7 +479,7 @@ if (!empty($user['full_name'])) {
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body p-0" id="followListModalBody" style="min-height: 200px; max-height: 420px; overflow-y: auto;">
-                <!-- Content loaded dynamically via openFollowListModal() -->
+
             </div>
         </div>
     </div>
@@ -622,7 +597,7 @@ function openFollowListModal(type, targetUserId) {
             let avatarHtml = '';
             if (u.profile_image) {
                 const imgUrl = `<?= BASE_URL ?>/public/uploads/avatars/${encodeURIComponent(u.profile_image)}`;
-                avatarHtml = `<img src="${imgUrl}" alt="${escapeHtml(u.full_name)}" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 44px; height: 44px;" onerror="this.onerror=null; this.outerHTML='<div class=\\'rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0\\' style=\\'width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;\\'>${escapeHtml(u.initials)}</div>';">`;
+                avatarHtml = `<img src="${imgUrl}" alt="${escapeHtml(u.full_name)}" class="rounded-circle object-fit-cover shadow-sm flex-shrink-0" style="width: 44px; height: 44px;" onerror="this.onerror=null; this.outerHTML='<div class=\\\\\\\\\''''rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0\\\\\\\\\'''' style=\\\\\\\\\''''width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;\\\\\\\\\''''>${escapeHtml(u.initials)}</div>';">`;
             } else {
                 avatarHtml = `<div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center shadow-sm flex-shrink-0" style="width: 44px; height: 44px; background-color: #07193d; font-size: 0.85rem;">${escapeHtml(u.initials)}</div>`;
             }
@@ -675,7 +650,7 @@ function openFollowListModal(type, targetUserId) {
 </script>
 
 <?php if (!empty($isOwnProfile)): ?>
-<!-- Modal for Quick Profile Picture Update -->
+
 <div class="modal fade" id="modalEditAvatar" tabindex="-1" aria-labelledby="editAvatarModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">

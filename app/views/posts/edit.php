@@ -1,6 +1,4 @@
 <?php
-// app/views/posts/edit.php
-// Edit Post View matching the application's clean Bootstrap design
 
 require_once __DIR__ . '/../layouts/header.php';
 
@@ -13,7 +11,6 @@ $authorInitials = count($authorParts) >= 2
 <div class="row justify-content-center">
     <div class="col-lg-8 col-xl-7">
 
-        <!-- Flash Error Notifications -->
         <?php if (!empty($errors)): ?>
             <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -27,7 +24,7 @@ $authorInitials = count($authorParts) >= 2
         <?php endif; ?>
 
         <div class="card-modern p-4 p-md-5 my-2">
-            <!-- Header -->
+
             <div class="d-flex align-items-center justify-content-between mb-4 border-bottom pb-3">
                 <div class="d-flex align-items-center gap-3">
                     <div class="brand-icon-box" style="width: 40px; height: 40px; font-size: 1.25rem;">
@@ -43,12 +40,11 @@ $authorInitials = count($authorParts) >= 2
                 </a>
             </div>
 
-            <!-- Author Preview Snippet -->
             <div class="d-flex align-items-center gap-3 p-3 bg-light rounded-3 mb-4 border border-light-subtle">
                 <?php if (!empty($post['profile_image'])): ?>
-                    <img 
-                        src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>" 
-                        alt="<?= htmlspecialchars($post['full_name']); ?>" 
+                    <img
+                        src="<?= BASE_URL ?>/public/uploads/avatars/<?= htmlspecialchars(basename($post['profile_image'])) ?>"
+                        alt="<?= htmlspecialchars($post['full_name']); ?>"
                         class="rounded-circle"
                         style="width: 42px; height: 42px; object-fit: cover;"
                         onerror="this.onerror=null; this.outerHTML='<div class=\'user-avatar-sm\' style=\'width: 42px; height: 42px;\'><?= htmlspecialchars($authorInitials) ?></div>';"
@@ -66,27 +62,24 @@ $authorInitials = count($authorParts) >= 2
                 </div>
             </div>
 
-            <!-- Edit Form -->
             <form action="<?= BASE_URL ?>/index.php?action=update_post" method="POST" enctype="multipart/form-data">
                 <?= csrf_field(); ?>
                 <input type="hidden" name="post_id" value="<?= (int)$post['id']; ?>">
 
-                <!-- Content Textarea -->
                 <div class="mb-4">
                     <label for="postContentInput" class="form-label fw-semibold text-secondary small">
                         Post Content <span class="text-muted fw-normal">(required if no image)</span>
                     </label>
-                    <textarea 
+                    <textarea
                         id="postContentInput"
-                        name="content" 
-                        class="form-control" 
-                        rows="5" 
+                        name="content"
+                        class="form-control"
+                        rows="5"
                         placeholder="What would you like to share?"
                         style="border-radius: 10px; font-size: 0.95rem;"
                     ><?= htmlspecialchars($formData['content'] ?? $post['content']); ?></textarea>
                 </div>
 
-                <!-- Existing Attachments (if any) -->
                 <?php
                 $currentImages = !empty($post['images']) ? $post['images'] : PostModel::parseImages($post['image'] ?? null);
                 ?>
@@ -108,9 +101,9 @@ $authorInitials = count($authorParts) >= 2
                             <?php foreach ($currentImages as $cIdx => $cImg): ?>
                                 <div class="col-6 col-sm-4 col-md-3 existing-image-item">
                                     <div class="card h-100 border shadow-sm position-relative overflow-hidden">
-                                        <img 
-                                            src="<?= BASE_URL ?>/public/uploads/posts/<?= htmlspecialchars(basename($cImg)); ?>" 
-                                            alt="Attachment <?= $cIdx + 1 ?>" 
+                                        <img
+                                            src="<?= BASE_URL ?>/public/uploads/posts/<?= htmlspecialchars(basename($cImg)); ?>"
+                                            alt="Attachment <?= $cIdx + 1 ?>"
                                             style="height: 100px; width: 100%; object-fit: cover;"
                                             onerror="this.onerror=null; this.parentElement.innerHTML='<span class=\'p-2 small text-muted\'>Attachment</span>';"
                                         >
@@ -130,16 +123,15 @@ $authorInitials = count($authorParts) >= 2
                     </div>
                 <?php endif; ?>
 
-                <!-- Upload New Photos -->
                 <div class="mb-4">
                     <label for="postImageInput" class="form-label fw-semibold text-secondary small">
                         <?= !empty($currentImages) ? 'Add More Photos (Optional)' : 'Add Photos (Optional)'; ?>
                     </label>
-                    <input 
-                        type="file" 
-                        id="postImageInput" 
-                        name="post_images[]" 
-                        accept="image/jpeg,image/png,image/gif,image/webp" 
+                    <input
+                        type="file"
+                        id="postImageInput"
+                        name="post_images[]"
+                        accept="image/jpeg,image/png,image/gif,image/webp"
                         class="form-control"
                         multiple
                         onchange="previewNewImages(this)"
@@ -148,7 +140,6 @@ $authorInitials = count($authorParts) >= 2
                         Supported: JPG, JPEG, PNG, GIF, WEBP. Max size: 5MB per image. Select multiple files if desired.
                     </div>
 
-                    <!-- New Images Multi-Preview Box -->
                     <div id="newImagePreviewContainer" class="mt-3 d-none">
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <small class="text-success fw-semibold"><i class="bi bi-eye me-1"></i> New Photos Preview:</small>
@@ -160,7 +151,6 @@ $authorInitials = count($authorParts) >= 2
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
                 <div class="d-flex align-items-center justify-content-between pt-3 border-top">
                     <a href="<?= BASE_URL ?>/" class="btn btn-outline-secondary px-4">
                         <i class="bi bi-arrow-left me-1"></i> Back to Feed
