@@ -1,4 +1,4 @@
-﻿-- Database Schema for SMCC Connect (Social Network Web Application)
+-- Database Schema for SMCC Connect (Social Network Web Application)
 -- Database: smcc_connect_db
 CREATE DATABASE IF NOT EXISTS `smcc_connect_db` DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE `smcc_connect_db`;
@@ -103,20 +103,25 @@ CREATE TABLE `messages` (
 
 -- 8. notifications table
 CREATE TABLE `notifications` (
-    `id`           INT AUTO_INCREMENT PRIMARY KEY,
-    `recipient_id` INT NOT NULL    COMMENT 'User who receives this notification',
-    `actor_id`     INT NOT NULL    COMMENT 'User who performed the action',
-    `type`         VARCHAR(40) NOT NULL COMMENT 'message | comment | like_post | like_comment',
-    `target_type`  VARCHAR(20) NOT NULL COMMENT 'message | post | comment',
-    `target_id`    INT NOT NULL    COMMENT 'ID of the target entity',
-    `preview`      VARCHAR(160) DEFAULT NULL COMMENT 'Short text preview',
-    `is_read`      TINYINT(1) NOT NULL DEFAULT '0',
-    `created_at`   TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `recipient_id` INT NOT NULL COMMENT 'User who receives the notification',
+    `actor_id` INT NOT NULL COMMENT 'User who performed the action',
+    `type` VARCHAR(40) NOT NULL COMMENT 'follow | like | comment',
+    `message` VARCHAR(255) DEFAULT NULL COMMENT 'Human-readable action description',
+    `related_post_id` INT DEFAULT NULL,
+    `related_comment_id` INT DEFAULT NULL,
+    `is_read` TINYINT(1) NOT NULL DEFAULT 0,
+    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     KEY `idx_notif_recipient` (`recipient_id`),
-    KEY `idx_notif_unread`    (`recipient_id`, `is_read`),
-    KEY `idx_notif_created`   (`created_at` DESC),
-    CONSTRAINT `fk_notif_recipient` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
-    CONSTRAINT `fk_notif_actor`     FOREIGN KEY (`actor_id`)     REFERENCES `users` (`id`) ON DELETE CASCADE
+    KEY `idx_notif_unread` (`recipient_id`, `is_read`),
+    KEY `idx_notif_created` (`created_at`),
+    KEY `idx_notif_actor` (`actor_id`),
+    KEY `idx_notif_post` (`related_post_id`),
+    KEY `idx_notif_comment` (`related_comment_id`),
+    CONSTRAINT `fk_notif_recipient` FOREIGN KEY (`recipient_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_notif_actor` FOREIGN KEY (`actor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_notif_post` FOREIGN KEY (`related_post_id`) REFERENCES `posts` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+    CONSTRAINT `fk_notif_comment` FOREIGN KEY (`related_comment_id`) REFERENCES `comments` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- 9. post_images table
@@ -129,6 +134,7 @@ CREATE TABLE `post_images` (
     KEY `idx_post_images_post_id` (`post_id`),
     CONSTRAINT `fk_post_images_post` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Sample Seed Data
 -- Users: passwords hashed with PHP password_hash('password123', PASSWORD_BCRYPT)
 INSERT INTO `users` (`id`, `username`, `password`, `full_name`, `bio`, `profile_image`, `role`, `created_at`) VALUES

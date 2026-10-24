@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
 require_once __DIR__ . '/../models/FollowModel.php';
+require_once __DIR__ . '/../helpers/FileHelper.php';
 
 class ProfileController {
     private $userModel;
@@ -110,20 +111,16 @@ class ProfileController {
             $cleanBio = ($bio === '') ? null : $bio;
 
             // 3. Process Profile Picture Upload (if uploaded or adjusted)
-            $newProfileImage = null;
-            $removePicture = !empty($_POST['remove_picture']);
-            $croppedImageData = trim($_POST['cropped_image_data'] ?? '');
+            $newProfileImage   = null;
+            $newAvatarUploaded = null;
+            $oldAvatarToClean  = null;
+            $removePicture     = !empty($_POST['remove_picture']);
+            $croppedImageData  = trim($_POST['cropped_image_data'] ?? '');
 
             if ($removePicture) {
-                // User opted to remove existing picture
-                if (!empty($user['profile_image'])) {
-                    $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
-                    $oldFilePath = $uploadDir . basename($user['profile_image']);
-                    if (file_exists($oldFilePath) && is_file($oldFilePath)) {
-                        @unlink($oldFilePath);
-                    }
-                }
-                $newProfileImage = ''; // flag to set null in db
+                // User opted to remove existing picture (clean after DB confirmation)
+                $oldAvatarToClean = $user['profile_image'] ?? null;
+                $newProfileImage  = ''; // flag to set null in db
             } elseif (!empty($croppedImageData)) {
                 // Process adjusted / cropped base64 image from canvas
                 if (preg_match('#^data:(image/(?:jpeg|png|webp));base64,(.+)$#i', $croppedImageData, $matches)) {
@@ -153,15 +150,9 @@ class ProfileController {
                             $destination  = $uploadDir . $safeFileName;
 
                             if (file_put_contents($destination, $rawImage) !== false) {
-                                $newProfileImage = $safeFileName;
-
-                                // Clean up previous image file if it exists in uploads/avatars/
-                                if (!empty($user['profile_image'])) {
-                                    $oldFilePath = $uploadDir . basename($user['profile_image']);
-                                    if (file_exists($oldFilePath) && is_file($oldFilePath)) {
-                                        @unlink($oldFilePath);
-                                    }
-                                }
+                                $newProfileImage   = $safeFileName;
+                                $newAvatarUploaded = $safeFileName;
+                                $oldAvatarToClean  = $user['profile_image'] ?? null;
                             } else {
                                 $errors[] = 'Could not save the adjusted image file. Please check folder permissions.';
                             }
@@ -219,15 +210,9 @@ class ProfileController {
                         $destination  = $uploadDir . $safeFileName;
 
                         if (move_uploaded_file($tmpPath, $destination)) {
-                            $newProfileImage = $safeFileName;
-
-                            // Clean up previous image file if it exists in uploads/avatars/
-                            if (!empty($user['profile_image'])) {
-                                $oldFilePath = $uploadDir . basename($user['profile_image']);
-                                if (file_exists($oldFilePath) && is_file($oldFilePath)) {
-                                    @unlink($oldFilePath);
-                                }
-                            }
+                            $newProfileImage   = $safeFileName;
+                            $newAvatarUploaded = $safeFileName;
+                            $oldAvatarToClean  = $user['profile_image'] ?? null;
                         } else {
                             $errors[] = 'Could not save the uploaded image file. Please check folder permissions.';
                         }
@@ -236,19 +221,15 @@ class ProfileController {
             }
 
             // 3.5. Process Cover Photo Upload / Removal / Crop
-            $newCoverPhoto = null;
-            $removeCover = !empty($_POST['remove_cover']);
+            $newCoverPhoto    = null;
+            $newCoverUploaded = null;
+            $oldCoverToClean  = null;
+            $removeCover      = !empty($_POST['remove_cover']);
             $croppedCoverData = trim($_POST['cropped_cover_data'] ?? '');
 
             if ($removeCover) {
-                if (!empty($user['cover_photo'])) {
-                    $coverDir = __DIR__ . '/../../public/uploads/covers/';
-                    $oldCoverPath = $coverDir . basename($user['cover_photo']);
-                    if (file_exists($oldCoverPath) && is_file($oldCoverPath)) {
-                        @unlink($oldCoverPath);
-                    }
-                }
-                $newCoverPhoto = ''; // flag to set null in db
+                $oldCoverToClean = $user['cover_photo'] ?? null;
+                $newCoverPhoto   = ''; // flag to set null in db
             } elseif (!empty($croppedCoverData)) {
                 if (preg_match('#^data:(image/(?:jpeg|png|webp));base64,(.+)$#i', $croppedCoverData, $matches)) {
                     $rawCover = base64_decode($matches[2], true);
@@ -277,14 +258,9 @@ class ProfileController {
                             $coverDestination = $coverDir . $safeCoverName;
 
                             if (file_put_contents($coverDestination, $rawCover) !== false) {
-                                $newCoverPhoto = $safeCoverName;
-
-                                if (!empty($user['cover_photo'])) {
-                                    $oldCoverPath = $coverDir . basename($user['cover_photo']);
-                                    if (file_exists($oldCoverPath) && is_file($oldCoverPath)) {
-                                        @unlink($oldCoverPath);
-                                    }
-                                }
+                                $newCoverPhoto    = $safeCoverName;
+                                $newCoverUploaded = $safeCoverName;
+                                $oldCoverToClean  = $user['cover_photo'] ?? null;
                             } else {
                                 $errors[] = 'Could not save cover photo. Please check folder permissions.';
                             }
@@ -327,14 +303,9 @@ class ProfileController {
                         $coverDestination = $coverDir . $safeCoverName;
 
                         if (move_uploaded_file($tmpCoverPath, $coverDestination)) {
-                            $newCoverPhoto = $safeCoverName;
-
-                            if (!empty($user['cover_photo'])) {
-                                $oldCoverPath = $coverDir . basename($user['cover_photo']);
-                                if (file_exists($oldCoverPath) && is_file($oldCoverPath)) {
-                                    @unlink($oldCoverPath);
-                                }
-                            }
+                            $newCoverPhoto    = $safeCoverName;
+                            $newCoverUploaded = $safeCoverName;
+                            $oldCoverToClean  = $user['cover_photo'] ?? null;
                         } else {
                             $errors[] = 'Could not save the uploaded cover photo file.';
                         }
@@ -359,14 +330,35 @@ class ProfileController {
                     }
 
                     if ($updated !== false) {
+                        // DB update succeeded: safely delete old assets only after confirmation
+                        if (!empty($oldAvatarToClean) && $oldAvatarToClean !== $newProfileImage) {
+                            FileHelper::deleteAvatar($oldAvatarToClean, $userId);
+                        }
+                        if (!empty($oldCoverToClean) && $oldCoverToClean !== $newCoverPhoto) {
+                            FileHelper::deleteCover($oldCoverToClean, $userId);
+                        }
+
                         $_SESSION['profile_image_synced'] = time();
                         $_SESSION['success_message'] = 'Your profile has been updated successfully!';
                         header('Location: ' . BASE_URL . '/index.php?action=profile');
                         exit;
                     } else {
+                        // DB update returned false: remove newly uploaded files so they don't become orphans
+                        if ($newAvatarUploaded) {
+                            FileHelper::deleteAvatar($newAvatarUploaded);
+                        }
+                        if ($newCoverUploaded) {
+                            FileHelper::deleteCover($newCoverUploaded);
+                        }
                         $errors[] = 'Failed to update profile. Please try again.';
                     }
                 } catch (PDOException $e) {
+                    if ($newAvatarUploaded) {
+                        FileHelper::deleteAvatar($newAvatarUploaded);
+                    }
+                    if ($newCoverUploaded) {
+                        FileHelper::deleteCover($newCoverUploaded);
+                    }
                     error_log("Profile update DB error: " . $e->getMessage());
                     if ($e->getCode() == 23000 || strpos($e->getMessage(), 'Duplicate') !== false) {
                         $errors[] = 'Username is already taken. Please choose another.';
@@ -374,8 +366,22 @@ class ProfileController {
                         $errors[] = 'A database error occurred while updating your profile. Please try again.';
                     }
                 } catch (Throwable $e) {
+                    if ($newAvatarUploaded) {
+                        FileHelper::deleteAvatar($newAvatarUploaded);
+                    }
+                    if ($newCoverUploaded) {
+                        FileHelper::deleteCover($newCoverUploaded);
+                    }
                     error_log("Profile update DB error: " . $e->getMessage());
                     $errors[] = 'We could not save your profile changes due to a system issue. Please try again.';
+                }
+            } else {
+                // Validation errors occurred: clean up newly uploaded files
+                if ($newAvatarUploaded) {
+                    FileHelper::deleteAvatar($newAvatarUploaded);
+                }
+                if ($newCoverUploaded) {
+                    FileHelper::deleteCover($newCoverUploaded);
                 }
             }
         }

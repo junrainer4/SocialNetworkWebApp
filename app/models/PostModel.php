@@ -262,17 +262,52 @@ class PostModel {
     }
 
     /**
-     * Delete a post (only allowed if post belongs to user).
+     * Delete a post (transaction-safe; verifies ownership if userId is provided).
      *
      * @param int $postId
-     * @param int $userId
+     * @param int|null $userId
      * @return bool
      */
-    public function deletePost($postId, $userId) {
-        $sql = "DELETE FROM posts WHERE id = :post_id AND user_id = :user_id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':post_id' => $postId, ':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+    public function deletePost($postId, $userId = null) {
+        $postId = (int)$postId;
+        if ($postId <= 0) {
+            return false;
+        }
+
+        try {
+            $inTx = $this->db->inTransaction();
+            if (!$inTx) {
+                $this->db->beginTransaction();
+            }
+
+            if ($userId !== null && (int)$userId > 0) {
+                $sql = "DELETE FROM posts WHERE id = :post_id AND user_id = :user_id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':post_id' => $postId, ':user_id' => (int)$userId]);
+            } else {
+                $sql = "DELETE FROM posts WHERE id = :post_id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':post_id' => $postId]);
+            }
+
+            $deleted = $stmt->rowCount() > 0;
+
+            if (!$inTx) {
+                if ($deleted) {
+                    $this->db->commit();
+                } else {
+                    $this->db->rollBack();
+                }
+            }
+
+            return $deleted;
+        } catch (Throwable $e) {
+            if (!$inTx && $this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            error_log("PostModel::deletePost error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**

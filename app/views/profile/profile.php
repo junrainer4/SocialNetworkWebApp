@@ -59,11 +59,6 @@ if (!empty($user['full_name'])) {
         <div class="card-modern overflow-hidden mb-4">
             <!-- Header Banner / Cover Photo -->
             <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?> height: 200px;" class="position-relative">
-                <div class="position-absolute top-0 end-0 m-3">
-                    <span class="badge" style="background-color: var(--accent-yellow); color: #07193d; font-weight: 600;">
-                        <i class="bi bi-patch-check-fill me-1"></i> Verified Profile
-                    </span>
-                </div>
             </div>
 
             <div class="p-4 p-md-5 pt-0 text-center">

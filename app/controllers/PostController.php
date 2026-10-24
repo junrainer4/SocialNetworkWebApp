@@ -4,6 +4,7 @@
 
 require_once __DIR__ . '/../models/PostModel.php';
 require_once __DIR__ . '/../models/UserModel.php';
+require_once __DIR__ . '/../helpers/FileHelper.php';
 
 class PostController {
     private $postModel;
@@ -211,28 +212,26 @@ class PostController {
     }
 
     /**
-     * Delete an image file from the public/uploads/posts directory.
+     * Safely delete an image file using FileHelper (checks path, references, and protection).
      *
      * @param string|null $imageName
+     * @param int|null $excludePostId
      */
-    private function deleteImageFile($imageName) {
+    private function deleteImageFile($imageName, ?int $excludePostId = null) {
         if (!empty($imageName)) {
-            $filePath = __DIR__ . '/../../public/uploads/posts/' . basename($imageName);
-            if (file_exists($filePath) && is_file($filePath)) {
-                @unlink($filePath);
-            }
+            FileHelper::deletePostImage($imageName, $excludePostId);
         }
     }
 
     /**
-     * Delete multiple image files from the public/uploads/posts directory.
+     * Safely delete multiple image files using FileHelper.
      *
      * @param string|array|null $images
+     * @param int|null $excludePostId
      */
-    private function deleteMultipleImageFiles($images) {
-        $parsed = PostModel::parseImages($images);
-        foreach ($parsed as $img) {
-            $this->deleteImageFile($img);
+    private function deleteMultipleImageFiles($images, ?int $excludePostId = null) {
+        if (!empty($images)) {
+            FileHelper::deletePostImages($images, $excludePostId);
         }
     }
 
@@ -548,8 +547,8 @@ class PostController {
         $updated = $this->postModel->updatePost($postId, $userId, $content, $finalImages);
 
         if ($updated) {
-            // Remove deleted files from disk
-            $this->deleteMultipleImageFiles($filesToDelete);
+            // Remove deleted files from disk only after database update succeeds
+            $this->deleteMultipleImageFiles($filesToDelete, $postId);
 
             $_SESSION['success_message'] = 'Post updated successfully!';
             header('Location: ' . BASE_URL . '/index.php');
@@ -776,8 +775,10 @@ class PostController {
             exit;
         }
 
-        // Strict Server-Side Ownership Check
-        if ((int)$post['user_id'] !== $userId) {
+        // Strict Server-Side Ownership Check (allows author or administrator)
+        $currentUser = $this->userModel->findById($userId);
+        $isAdmin = ($currentUser && isset($currentUser['role']) && $currentUser['role'] === 'admin');
+        if ((int)$post['user_id'] !== $userId && !$isAdmin) {
             if ($isAjax) {
                 header('Content-Type: application/json');
                 echo json_encode(['success' => false, 'error' => 'Unauthorized: You can only delete your own posts.']);
@@ -788,13 +789,18 @@ class PostController {
             exit;
         }
 
-        // Delete all post image files if present
-        if (!empty($post['image'])) {
-            $this->deleteMultipleImageFiles($post['image']);
-        }
+        // Cache image list before DB deletion
+        $postImagesToDelete = $post['images'] ?? PostModel::parseImages($post['image'] ?? null);
 
-        $deleted = $this->postModel->deletePost($postId, $userId);
+        // Delete post from database FIRST (ensures DB consistency before unlinking disk assets)
+        $deleted = $this->postModel->deletePost($postId, $isAdmin ? null : $userId);
+
         if ($deleted) {
+            // ONLY after successful DB deletion, safely unlink exclusive unreferenced image files
+            if (!empty($postImagesToDelete)) {
+                FileHelper::deletePostImages($postImagesToDelete, $postId);
+            }
+
             if ($isAjax) {
                 header('Content-Type: application/json');
                 echo json_encode(['success' => true, 'message' => 'Post deleted successfully.', 'post_id' => $postId]);
@@ -802,6 +808,7 @@ class PostController {
             }
             $_SESSION['success_message'] = 'Post deleted successfully.';
         } else {
+            // DB deletion failed; image files are preserved intact!
             if ($isAjax) {
                 header('Content-Type: application/json');
                 echo json_encode(['success' => false, 'error' => 'Failed to delete post.']);
