@@ -5,11 +5,17 @@
         <!-- Closing Page Content Container -->
         </main>
 
+<<<<<<< HEAD
         <!-- Clean Centered Footer -->
         <footer class="app-footer border-top py-3 px-4 small text-center mt-auto">
             <div class="container-fluid text-center">
                 <span class="text-muted">&copy; <?= date('Y'); ?> <strong>Unify</strong>. All rights reserved.</span>
             </div>
+=======
+        <!-- Modern Footer -->
+        <footer class="bg-white border-top py-3 px-4 text-muted small text-start">
+            &copy; <?= date('Y'); ?> <strong>Nexus</strong>. All rights reserved.
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
         </footer>
 
     <!-- Closing Main Content Area Wrapper -->
@@ -312,5 +318,28 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+
+<script>
+// ===== Notification Badge Updater =====
+window.updateHeaderNotificationBadge = function(count) {
+    var badge = document.getElementById('headerNotifBadge');
+    var btn   = document.getElementById('headerNotifBtn');
+    if (!btn) return;
+    if (count > 0) {
+        var label = count > 99 ? '99+' : String(count);
+        if (badge) {
+            badge.textContent = label;
+        } else {
+            var newBadge = document.createElement('span');
+            newBadge.className = 'notif-badge-count';
+            newBadge.id = 'headerNotifBadge';
+            newBadge.textContent = label;
+            btn.appendChild(newBadge);
+        }
+    } else {
+        if (badge) badge.remove();
+    }
+};
+</script>
 </body>
 </html>

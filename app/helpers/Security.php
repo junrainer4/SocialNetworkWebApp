@@ -1,6 +1,6 @@
 <?php
 // app/helpers/Security.php
-// Centralized Security & Validation Helper functions for SMCC Connect
+// Centralized Security & Validation Helper functions for Nexus
 
 if (session_status() === PHP_SESSION_NONE) {
     session_start();

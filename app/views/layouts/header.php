@@ -62,7 +62,11 @@ if ($isLoggedIn) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="<?= htmlspecialchars($_SESSION['csrf_token'] ?? '', ENT_QUOTES, 'UTF-8') ?>">
+<<<<<<< HEAD
     <title><?= isset($pageTitle) ? htmlspecialchars($pageTitle) . ' - Unify' : 'Unify'; ?></title>
+=======
+    <title><?= isset($pageTitle) ? (strpos($pageTitle, 'Nexus') !== false ? htmlspecialchars($pageTitle) : htmlspecialchars($pageTitle) . ' - Nexus') : 'Nexus - The SMCC Community Hub'; ?></title>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 
     <!-- Bootstrap 5.3 CSS CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
@@ -91,6 +95,7 @@ if ($isLoggedIn) {
         <header class="app-header">
             <div class="header-container d-flex align-items-center justify-content-between w-100">
                 <?php if ($isLoggedIn): ?>
+<<<<<<< HEAD
                     <!-- Header Left: Modern Unify Logo & Brand Name -->
                     <div class="header-left d-flex align-items-center flex-shrink-0">
                         <a href="<?= BASE_URL ?>/" class="brand-link d-flex align-items-center gap-2" id="headerLogoBtn" title="Unify Home">
@@ -119,6 +124,15 @@ if ($isLoggedIn) {
                                 </svg>
                             </div>
                             <span class="brand-title fw-bold fs-4 d-none d-sm-inline">Unify</span>
+=======
+                    <!-- Header Left: Nexus Brand Logo and Name -->
+                    <div class="header-brand-group d-flex align-items-center me-3">
+                        <a href="<?= BASE_URL ?>/" class="brand-link align-items-center gap-2" id="headerLogoBtn" title="Nexus Home">
+                            <div class="brand-icon-box flex-shrink-0">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <span class="fs-5 brand-title fw-bold d-none d-sm-inline">Nexus</span>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
                         </a>
                     </div>
 
@@ -138,6 +152,7 @@ if ($isLoggedIn) {
                                 <?php endif; ?>
                             </form>
 
+<<<<<<< HEAD
                             <!-- Live Search Real-Time Highlight Dropdown -->
                             <div id="liveSearchDropdown" class="live-search-dropdown shadow-lg rounded-3 d-none">
                                 <div id="liveSearchResults" class="live-search-results">
@@ -146,6 +161,30 @@ if ($isLoggedIn) {
                             </div>
                         </div>
                     </div>
+=======
+                    <!-- Right Header Actions -->
+                    <div class="header-actions">
+                        <!-- Notifications Bell -->
+                        <?php if ($isLoggedIn): ?>
+                        <div class="position-relative">
+                            <a href="<?= BASE_URL ?>/index.php?action=notifications" class="header-icon-btn notif-bell-btn" title="Notifications" aria-label="Notifications" id="headerNotifBtn">
+                                <i class="bi bi-bell-fill"></i>
+                                <?php
+                                require_once __DIR__ . '/../../models/NotificationModel.php';
+                                $headerNotifModel = new NotificationModel();
+                                $headerUnreadCount = $headerNotifModel->getUnreadCount((int)$_SESSION['user_id']);
+                                if ($headerUnreadCount > 0): ?>
+                                    <span class="notif-badge-count" id="headerNotifBadge"><?= $headerUnreadCount > 99 ? '99+' : $headerUnreadCount ?></span>
+                                <?php endif; ?>
+                            </a>
+                        </div>
+                        <?php endif; ?>
+
+                        <!-- Dark Mode / Light Mode Toggle -->
+                        <button class="header-icon-btn theme-toggle-btn" type="button" onclick="toggleTheme()" title="Switch to Dark Mode" aria-label="Switch to Dark Mode">
+                            <i class="theme-toggle-icon bi bi-moon-fill"></i>
+                        </button>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 
                     <!-- Header Right: Messages, Notifications, and Profile Dropdown -->
                     <div class="header-right d-flex align-items-center gap-2 flex-shrink-0">
@@ -317,6 +356,17 @@ if ($isLoggedIn) {
                                     <i class="bi bi-chevron-right fb-arrow-right"></i>
                                 </a>
 
+                                <!-- Option: Friends -->
+                                <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=friends">
+                                    <div class="fb-menu-item-left">
+                                        <div class="fb-icon-circle">
+                                            <i class="bi bi-people-fill"></i>
+                                        </div>
+                                        <span class="fb-item-label">Friends</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right fb-arrow-right"></i>
+                                </a>
+
                                 <!-- Option 2: Account Settings -->
                                 <a class="dropdown-item fb-menu-item" href="<?= BASE_URL ?>/index.php?action=settings" title="Account Settings">
                                     <div class="fb-menu-item-left">
@@ -360,6 +410,7 @@ if ($isLoggedIn) {
                 <?php else: ?>
                     <!-- Public / Unauthenticated Header -->
                     <div class="d-flex align-items-center">
+<<<<<<< HEAD
                         <a href="<?= BASE_URL ?>/" class="brand-link d-flex align-items-center gap-2" title="Unify">
                             <div class="brand-logo-icon flex-shrink-0">
                                 <svg width="42" height="42" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" class="unify-logo-svg">
@@ -384,6 +435,13 @@ if ($isLoggedIn) {
                                 </svg>
                             </div>
                             <span class="brand-title fs-4 fw-bold">Unify</span>
+=======
+                        <a href="<?= BASE_URL ?>/" class="brand-link text-dark" title="Nexus">
+                            <div class="brand-icon-box">
+                                <i class="bi bi-people-fill"></i>
+                            </div>
+                            <span class="fs-5 font-navy ms-2">Nexus</span>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
                         </a>
                     </div>
 

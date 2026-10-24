@@ -1,6 +1,6 @@
 <?php
 // app/controllers/InsightsController.php
-// Controller handling the Community Insights module (Search, Filtering, and Reports)
+// Controller handling Community Search (Users and Posts) for Nexus
 
 require_once __DIR__ . '/../models/UserModel.php';
 require_once __DIR__ . '/../models/PostModel.php';
@@ -18,18 +18,21 @@ class InsightsController {
     }
 
     /**
-     * Enforce authentication for Community Insights module.
+     * Enforce authentication for Community Search.
      */
     private function requireAuth() {
         if (!isset($_SESSION['user_id'])) {
-            $_SESSION['error_message'] = 'You must be logged in to access Community Insights.';
+            $_SESSION['error_message'] = 'You must be logged in to access Community Search.';
             header('Location: ' . BASE_URL . '/index.php?action=login');
             exit;
         }
     }
 
     /**
-     * Main action for Community Insights search, filtering, and reporting.
+     * Main action for Community Search (Users & Posts).
+     * Supports fast, relationship-driven search with modern quick filters:
+     * - Posts: 'newest' (Latest), 'most_liked' (Top Liked), 'photos' (With Photos)
+     * - Users: 'all' (All Members), 'following' (People You Follow)
      */
     public function index() {
         $this->requireAuth();
@@ -39,103 +42,50 @@ class InsightsController {
 
         // 1. Sanitize & Retrieve Inputs
         $query = trim($_GET['q'] ?? '');
-        $keyword = trim($_GET['keyword'] ?? '');
-        $type = trim($_GET['type'] ?? 'all'); // 'all', 'users', 'posts'
-        $contentType = trim($_GET['content_type'] ?? 'all'); // 'all', 'text', 'image'
-        $sort = trim($_GET['sort'] ?? 'newest'); // 'newest', 'oldest', 'most_liked', 'most_commented'
-        $reportSort = trim($_GET['report_sort'] ?? 'posts_desc'); // 'posts_desc', 'posts_asc', 'likes_desc', 'comments_desc', 'username_asc'
-        $authorId = isset($_GET['author_id']) && $_GET['author_id'] !== '' ? (int)$_GET['author_id'] : null;
-        $startDate = trim($_GET['start_date'] ?? '');
-        $endDate = trim($_GET['end_date'] ?? '');
+        $type = strtolower(trim($_GET['type'] ?? 'users'));
 
-        // 2. Validate Inputs & Allowlists
-        $validTypes = ['all', 'users', 'posts'];
-        if (!in_array($type, $validTypes, true)) {
-            $type = 'all';
+        // Validate type: only 'users' or 'posts' allowed
+        if (!in_array($type, ['users', 'posts'], true)) {
+            $type = 'users';
         }
 
-        $validContentTypes = ['all', 'text', 'image'];
-        if (!in_array($contentType, $validContentTypes, true)) {
-            $contentType = 'all';
+        // Validate filter:
+        $rawFilter = strtolower(trim($_GET['filter'] ?? ''));
+        if ($type === 'posts') {
+            $validPostFilters = ['newest', 'most_liked', 'photos'];
+            $filter = in_array($rawFilter, $validPostFilters, true) ? $rawFilter : 'newest';
+        } else {
+            $validUserFilters = ['all', 'following'];
+            $filter = in_array($rawFilter, $validUserFilters, true) ? $rawFilter : 'all';
         }
 
-        $validSorts = ['newest', 'oldest', 'most_liked', 'most_commented'];
-        if (!in_array($sort, $validSorts, true)) {
-            $sort = 'newest';
-        }
-
-        $validReportSorts = ['posts_desc', 'posts_asc', 'likes_desc', 'comments_desc', 'username_asc'];
-        if (!in_array($reportSort, $validReportSorts, true)) {
-            $reportSort = 'posts_desc';
-        }
-
-        // Validate YYYY-MM-DD Date Formats
-        if (!empty($startDate) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $startDate)) {
-            $startDate = '';
-        }
-        if (!empty($endDate) && !preg_match('/^\d{4}-\d{2}-\d{2}$/', $endDate)) {
-            $endDate = '';
-        }
-
-        // Date validation: End date cannot be earlier than Start date
-        if (!empty($startDate) && !empty($endDate) && strtotime($endDate) < strtotime($startDate)) {
-            $errorMessage = 'Validation Error: "To Date" cannot be earlier than "From Date". Please select a valid date range.';
-        }
-
-        // Combine search query and keyword if keyword provided
-        $effectiveSearch = $query;
-        if (!empty($keyword)) {
-            $effectiveSearch = !empty($query) ? $query . ' ' . $keyword : $keyword;
-        }
-
-        // 3. Authors List for Filter Dropdown
-        $allAuthors = [];
-        try {
-            $allAuthors = $this->userModel->getAllUsers();
-        } catch (Exception $e) {
-            error_log("Error fetching authors list: " . $e->getMessage());
-        }
-
-        // 4. Execute Search Queries (Users & Posts)
         $users = [];
         $posts = [];
+        $totalCount = 0;
+        $hasSearched = ($query !== '');
 
-        if (empty($errorMessage)) {
+        // 2. Execute Search Queries when query is provided
+        if ($hasSearched) {
             try {
-                if ($type === 'all' || $type === 'users') {
-                    $users = $this->userModel->searchUsers($query);
-                }
-
-                if ($type === 'all' || $type === 'posts') {
-                    $posts = $this->postModel->searchPostsAdvanced([
-                        'query'           => $effectiveSearch,
-                        'author_id'       => $authorId,
-                        'start_date'      => $startDate,
-                        'end_date'        => $endDate,
-                        'content_type'    => $contentType,
-                        'sort'            => $sort,
-                        'current_user_id' => $currentUserId
-                    ]);
+                if ($type === 'users') {
+                    $followingOnly = ($filter === 'following');
+                    $users = $this->userModel->searchUsers($query, $currentUserId, 50, $followingOnly);
+                    $totalCount = $this->userModel->countSearchUsers($query, $currentUserId, $followingOnly);
+                } else {
+                    $mediaOnly = ($filter === 'photos');
+                    $sortOrder = ($filter === 'most_liked') ? 'most_liked' : 'newest';
+                    $posts = $this->postModel->searchPosts($query, $sortOrder, $currentUserId, null, 50, $mediaOnly);
+                    $totalCount = $this->postModel->countSearchPosts($query, $mediaOnly);
                 }
             } catch (Exception $e) {
-                error_log("Search execution error: " . $e->getMessage());
-                $errorMessage = "Search Error: An error occurred while retrieving search results. Please try again.";
+                error_log("Community Search execution error: " . $e->getMessage());
+                $errorMessage = "An error occurred while retrieving search results. Please try again.";
             }
         }
 
-        // Calculate active filter count for UI badge
-        $activeFilterCount = 0;
-        if (!empty($query)) $activeFilterCount++;
-        if (!empty($authorId)) $activeFilterCount++;
-        if (!empty($startDate)) $activeFilterCount++;
-        if (!empty($endDate)) $activeFilterCount++;
-        if ($contentType !== 'all') $activeFilterCount++;
-        if ($sort !== 'newest') $activeFilterCount++;
-        if (!empty($keyword)) $activeFilterCount++;
+        $pageTitle = 'Community Search';
 
-        $pageTitle = 'Community Insights';
-
-        // Render Community Insights View
+        // Render Community Search View
         require_once __DIR__ . '/../views/layouts/header.php';
         require_once __DIR__ . '/../views/insights/index.php';
         require_once __DIR__ . '/../views/layouts/footer.php';

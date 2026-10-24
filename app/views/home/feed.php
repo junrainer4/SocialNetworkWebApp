@@ -38,9 +38,13 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
+<<<<<<< HEAD
                     <h2 class="fw-bold text-dark mb-2">Welcome to Unify</h2>
+=======
+                    <h2 class="fw-bold text-dark mb-2">Welcome to Nexus</h2>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
                     <p class="text-muted fs-6 mb-4 col-md-10 mx-auto">
-                        The campus social networking platform for SMCC. Sign in or create an account to view campus posts, connect with fellow students, comment, and engage with the community.
+                        The SMCC Community Hub. Sign in or create an account to view campus posts, connect with fellow students, comment, and engage with the community.
                     </p>
                     <div class="d-flex justify-content-center gap-3 flex-wrap">
                         <a href="<?= BASE_URL ?>/index.php?action=login" class="btn btn-outline-primary px-4 py-2 rounded-pill fw-medium">
@@ -413,12 +417,236 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 <div class="card-modern p-5 text-center text-muted">
                     <i class="bi bi-chat-square-text fs-1 mb-3 text-secondary"></i>
                     <h5>No posts yet</h5>
+<<<<<<< HEAD
                     <p class="small mb-0">Be the first to share an update on Unify!</p>
+=======
+                    <p class="small mb-0">Be the first to share an update on Nexus!</p>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
                 </div>
             <?php endif; ?>
             <?php endif; // End if (!$currentUserId) ?>
         </div>
 
+<<<<<<< HEAD
+=======
+        <!-- ==============================================
+             RIGHT SIDEBAR: UPCOMING EVENTS
+             ============================================== -->
+        <div class="col-lg-5 col-xl-4">
+
+            <!-- 1. Upcoming Events Card -->
+            <div class="widget-card">
+                <div class="widget-header d-flex justify-content-between align-items-center">
+                    <h6 class="widget-title mb-0 d-flex align-items-center gap-2">
+                        <i class="bi bi-calendar-event text-primary"></i>
+                        <span>Upcoming Events</span>
+                    </h6>
+                    <div class="d-flex align-items-center gap-2">
+                        <?php if (!empty($upcomingEvents)): ?>
+                            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none micro-text fw-semibold text-primary" data-bs-toggle="modal" data-bs-target="#modalAllUpcomingEvents">
+                                <i class="bi bi-eye me-1"></i>View All
+                            </button>
+                        <?php endif; ?>
+                    </div>
+                </div>
+
+                <?php if (!empty($upcomingEvents)): ?>
+                    <div class="events-list">
+                        <?php foreach ($upcomingEvents as $evt): ?>
+                            <?php
+                                $evtTimestamp = !empty($evt['event_date']) ? strtotime($evt['event_date']) : time();
+                                $evtMonth = strtoupper(date('M', $evtTimestamp));
+                                $evtDay = date('d', $evtTimestamp);
+                                $dateFormatted = date('M d', $evtTimestamp);
+                                if (!empty($evt['event_time'])) {
+                                    $dateFormatted .= ' &bull; ' . htmlspecialchars($evt['event_time']);
+                                }
+
+                                $todayDate = date('Y-m-d');
+                                $tomorrowDate = date('Y-m-d', strtotime('+1 day'));
+                                $isToday = ($evt['event_date'] === $todayDate);
+                                $isTomorrow = ($evt['event_date'] === $tomorrowDate);
+                            ?>
+                            <div class="event-item event-item-clickable" role="button" data-bs-toggle="modal" data-bs-target="#modalEventDetails<?= (int)$evt['id']; ?>" title="Click to view full event details">
+                                <div class="event-date-box">
+                                    <span class="event-month"><?= htmlspecialchars($evtMonth); ?></span>
+                                    <span class="event-day"><?= htmlspecialchars($evtDay); ?></span>
+                                </div>
+                                <div class="event-info">
+                                    <div class="d-flex align-items-center justify-content-between gap-1">
+                                        <div class="event-title"><?= htmlspecialchars($evt['title']); ?></div>
+                                        <?php if ($isToday): ?>
+                                            <span class="badge bg-success micro-text">Today</span>
+                                        <?php elseif ($isTomorrow): ?>
+                                            <span class="badge bg-primary micro-text">Tomorrow</span>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div class="event-meta">
+                                        <span class="text-dark fw-medium"><?= $dateFormatted; ?></span><br>
+                                        <span class="text-secondary"><i class="bi bi-geo-alt me-1 text-danger"></i><?= htmlspecialchars($evt['location']); ?></span>
+                                        <div class="mt-1">
+                                            <span class="badge bg-primary-subtle text-primary border-0 micro-text fw-medium py-1 px-2">
+                                                <i class="bi bi-eye me-1"></i>Click for full details
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <i class="bi bi-chevron-right text-muted opacity-50 ms-1"></i>
+                            </div>
+
+                            <!-- EVENT FULL DETAILS MODAL -->
+                            <div class="modal fade" id="modalEventDetails<?= (int)$evt['id']; ?>" tabindex="-1" aria-labelledby="eventModalLabel<?= (int)$evt['id']; ?>" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg">
+                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                                        <div class="modal-header border-0 bg-primary bg-opacity-10 py-3 px-4">
+                                            <div class="d-flex align-items-center gap-3">
+                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
+                                                    <i class="bi bi-calendar-event-fill fs-5"></i>
+                                                </div>
+                                                <div>
+                                                    <h5 class="modal-title fw-bold text-dark mb-0" id="eventModalLabel<?= (int)$evt['id']; ?>">
+                                                        <?= htmlspecialchars($evt['title']); ?>
+                                                    </h5>
+                                                    <span class="micro-text text-muted">Official SMCC Campus Event</span>
+                                                </div>
+                                            </div>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body p-4">
+                                            <!-- Status Banner -->
+                                            <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
+                                                <?php if ($isToday): ?>
+                                                    <span class="badge bg-success rounded-pill px-3 py-1.5"><i class="bi bi-broadcast me-1"></i>Happening Today</span>
+                                                <?php elseif ($isTomorrow): ?>
+                                                    <span class="badge bg-primary rounded-pill px-3 py-1.5"><i class="bi bi-clock-history me-1"></i>Happening Tomorrow</span>
+                                                <?php else: ?>
+                                                    <span class="badge bg-info-subtle text-info-emphasis border rounded-pill px-3 py-1.5"><i class="bi bi-calendar-check me-1"></i>Upcoming Campus Event</span>
+                                                <?php endif; ?>
+                                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-1.5"><i class="bi bi-people me-1"></i>Campus Community</span>
+                                            </div>
+
+                                            <!-- Info Cards Grid -->
+                                            <div class="row g-3 mb-4">
+                                                <div class="col-sm-6 col-md-4">
+                                                    <div class="p-3 rounded-3 bg-light border h-100">
+                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-calendar3 text-primary me-1"></i> Date</div>
+                                                        <div class="fw-bold text-dark"><?= date('l, F j, Y', $evtTimestamp); ?></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-6 col-md-4">
+                                                    <div class="p-3 rounded-3 bg-light border h-100">
+                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-clock text-warning me-1"></i> Time</div>
+                                                        <div class="fw-bold text-dark"><?= !empty($evt['event_time']) ? htmlspecialchars($evt['event_time']) : 'Schedule to be announced'; ?></div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-sm-12 col-md-4">
+                                                    <div class="p-3 rounded-3 bg-light border h-100">
+                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Venue / Location</div>
+                                                        <div class="fw-bold text-dark text-break"><?= htmlspecialchars($evt['location']); ?></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Full Description / Guidelines Section -->
+                                            <div class="p-4 rounded-3 bg-white border shadow-sm">
+                                                <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
+                                                    <i class="bi bi-file-text-fill text-primary"></i>
+                                                    <span>Full Description & Event Details</span>
+                                                </h6>
+                                                <div class="text-secondary" style="line-height: 1.7; font-size: 0.95rem;">
+                                                    <?php if (!empty($evt['description'])): ?>
+                                                        <?= nl2br(htmlspecialchars($evt['description'])); ?>
+                                                    <?php else: ?>
+                                                        <em class="text-muted">No additional instructions or agenda provided for this event yet. Please check campus announcements or inquire at the Student Affairs Office.</em>
+                                                    <?php endif; ?>
+                                                </div>
+                                            </div>
+
+                                            <?php if (!empty($evt['organizer_name'])): ?>
+                                                <div class="mt-3 text-muted micro-text text-end">
+                                                    <i class="bi bi-person-check me-1"></i>Published by <strong><?= htmlspecialchars($evt['organizer_name']); ?></strong>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <div class="modal-footer border-top bg-light py-3 px-4 d-flex justify-content-between align-items-center">
+                                            <div class="micro-text text-muted">
+                                                <i class="bi bi-shield-check text-success me-1"></i>Official Nexus Announcement
+                                            </div>
+                                            <div class="d-flex gap-2">
+                                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="p-4 text-center text-muted small">
+                        <i class="bi bi-calendar-check fs-2 d-block mb-2 text-primary opacity-50"></i>
+                        <span class="fw-semibold d-block text-dark mb-1">No Upcoming Events</span>
+                        No campus events are currently scheduled. Check back soon for student activities, seminars, and sportsfest announcements!
+                    </div>
+                <?php endif; ?>
+            </div>
+
+            <!-- MODAL: ALL UPCOMING CAMPUS EVENTS -->
+            <?php if (!empty($upcomingEvents)): ?>
+                <div class="modal fade" id="modalAllUpcomingEvents" tabindex="-1" aria-labelledby="allEventsModalLabel" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
+                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+                            <div class="modal-header border-bottom bg-light py-3 px-4">
+                                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="allEventsModalLabel">
+                                    <i class="bi bi-calendar3 text-primary"></i>
+                                    <span>SMCC Campus Events Calendar</span>
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body p-4">
+                                <p class="text-muted small mb-3">
+                                    Below is the full schedule of upcoming events and activities happening on campus. Click any event to review complete information.
+                                </p>
+                                <div class="list-group list-group-flush gap-2">
+                                    <?php foreach ($upcomingEvents as $evt): ?>
+                                        <?php
+                                            $evtTimestamp = !empty($evt['event_date']) ? strtotime($evt['event_date']) : time();
+                                            $dateFormatted = date('l, F j, Y', $evtTimestamp);
+                                            if (!empty($evt['event_time'])) {
+                                                $dateFormatted .= ' &bull; ' . htmlspecialchars($evt['event_time']);
+                                            }
+                                        ?>
+                                        <div class="list-group-item list-group-item-action p-3 rounded-3 border mb-1" role="button" data-bs-toggle="modal" data-bs-target="#modalEventDetails<?= (int)$evt['id']; ?>">
+                                            <div class="d-flex align-items-start justify-content-between gap-2">
+                                                <div>
+                                                    <h6 class="fw-bold text-dark mb-1"><?= htmlspecialchars($evt['title']); ?></h6>
+                                                    <div class="small text-muted mb-1">
+                                                        <i class="bi bi-calendar-event me-1 text-primary"></i><?= $dateFormatted; ?>
+                                                        &nbsp;&bull;&nbsp;
+                                                        <i class="bi bi-geo-alt me-1 text-danger"></i><?= htmlspecialchars($evt['location']); ?>
+                                                    </div>
+                                                    <?php if (!empty($evt['description'])): ?>
+                                                        <div class="small text-secondary text-truncate" style="max-width: 550px;">
+                                                            <?= htmlspecialchars($evt['description']); ?>
+                                                        </div>
+                                                    <?php endif; ?>
+                                                </div>
+                                                <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2 py-1 small flex-shrink-0">
+                                                    View Details <i class="bi bi-arrow-right ms-1"></i>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-top bg-light py-2 px-4">
+                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            <?php endif; ?>
+        </div>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
     </div>
 </div>
 

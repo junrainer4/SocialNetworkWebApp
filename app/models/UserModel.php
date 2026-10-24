@@ -250,21 +250,92 @@ class UserModel {
 
     /**
      * Search users by username or full name (case-insensitive partial matching).
+     * Includes posts count, followers count, and follow relationship status.
+     * Optionally filters to only users that the current user is following.
+     * Demonstrates: JOIN/Subqueries, Aggregate Functions COUNT(), Prepared Statements.
      *
      * @param string $query
+     * @param int $currentUserId
      * @param int $limit
+     * @param bool $followingOnly
      * @return array
      */
-    public function searchUsers($query) {
-        $searchTerm = '%' . trim($query) . '%';
+    public function searchUsers($query, $currentUserId = 0, $limit = 50, $followingOnly = false) {
+        $trimmed = trim($query);
+        if ($trimmed === '') {
+            return [];
+        }
+
+        $searchTerm = '%' . $trimmed . '%';
+        $currentUserId = (int)$currentUserId;
+        $limitInt = max(1, min(100, (int)$limit));
+
+        $extraWhere = '';
+        if ($followingOnly) {
+            $extraWhere = " AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = ? AND f.following_id = u.id) ";
+        }
+
         $sql = "SELECT u.id, u.username, u.full_name, u.bio, u.profile_image, u.created_at,
-                       (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) AS total_user_posts
+                       (SELECT COUNT(*) FROM posts p WHERE p.user_id = u.id) AS posts_count,
+                       (SELECT COUNT(*) FROM follows f WHERE f.following_id = u.id) AS followers_count,
+                       (SELECT COUNT(*) FROM follows f WHERE f.follower_id = ? AND f.following_id = u.id) > 0 AS is_following
                 FROM users u
-                WHERE u.username LIKE ? OR u.full_name LIKE ?
-                ORDER BY u.full_name ASC";
+                WHERE (u.username LIKE ? OR u.full_name LIKE ?) {$extraWhere}
+                ORDER BY 
+                    CASE 
+                        WHEN u.username = ? OR u.full_name = ? THEN 1
+                        WHEN u.username LIKE ? OR u.full_name LIKE ? THEN 2
+                        ELSE 3 
+                    END,
+                    u.full_name ASC
+                LIMIT {$limitInt}";
+
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([$searchTerm, $searchTerm]);
-        return $stmt->fetchAll();
+        $starts = $trimmed . '%';
+
+        $params = [$currentUserId, $searchTerm, $searchTerm];
+        if ($followingOnly) {
+            $params[] = $currentUserId;
+        }
+        $params[] = $trimmed;
+        $params[] = $trimmed;
+        $params[] = $starts;
+        $params[] = $starts;
+
+        $stmt->execute($params);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Count matching users for a search query.
+     * Demonstrates: SQL Aggregate Function COUNT().
+     *
+     * @param string $query
+     * @param int $currentUserId
+     * @param bool $followingOnly
+     * @return int
+     */
+    public function countSearchUsers($query, $currentUserId = 0, $followingOnly = false) {
+        $trimmed = trim($query);
+        if ($trimmed === '') {
+            return 0;
+        }
+
+        $searchTerm = '%' . $trimmed . '%';
+        $currentUserId = (int)$currentUserId;
+
+        if ($followingOnly) {
+            $sql = "SELECT COUNT(*) FROM users u 
+                    WHERE (u.username LIKE ? OR u.full_name LIKE ?) 
+                      AND EXISTS (SELECT 1 FROM follows f WHERE f.follower_id = ? AND f.following_id = u.id)";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$searchTerm, $searchTerm, $currentUserId]);
+        } else {
+            $sql = "SELECT COUNT(*) FROM users WHERE username LIKE ? OR full_name LIKE ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute([$searchTerm, $searchTerm]);
+        }
+        return (int)$stmt->fetchColumn();
     }
 
     /**

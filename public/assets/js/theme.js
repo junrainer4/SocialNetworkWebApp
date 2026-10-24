@@ -1,5 +1,5 @@
 /**
- * theme.js - Complete Dark Mode & Light Mode Controller with Persistence for SMCC Connect
+ * theme.js - Complete Dark Mode & Light Mode Controller with Persistence for Nexus
  * Handles:
  *  - Immediate theme application on documentElement to prevent flash
  *  - Theme toggle functionality (window.toggleTheme)
@@ -9,7 +9,8 @@
 (function() {
     'use strict';
 
-    var THEME_STORAGE_KEY = 'smcc_theme_preference';
+    var THEME_STORAGE_KEY = 'nexus_theme_preference';
+    var LEGACY_STORAGE_KEY = 'smcc_theme_preference';
     var THEME_DARK = 'dark';
     var THEME_LIGHT = 'light';
 
@@ -18,7 +19,7 @@
      */
     function getStoredTheme() {
         try {
-            var stored = localStorage.getItem(THEME_STORAGE_KEY);
+            var stored = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem(LEGACY_STORAGE_KEY);
             if (stored === THEME_DARK || stored === THEME_LIGHT) {
                 return stored;
             }

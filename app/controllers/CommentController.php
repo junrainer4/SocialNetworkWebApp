@@ -129,6 +129,20 @@ class CommentController {
         }
 
         if ($newCommentId) {
+            $postAuthorId = (int)$post['user_id'];
+            if ($postAuthorId !== $userId) {
+                require_once __DIR__ . '/../models/NotificationModel.php';
+                $notifModel = new NotificationModel();
+                $notifModel->create(
+                    $postAuthorId,
+                    $userId,
+                    'comment',
+                    'commented on your post.',
+                    $postId,
+                    (int)$newCommentId
+                );
+            }
+
             $user = $this->userModel->findById($userId);
             $allComments = $this->commentModel->getCommentsByPost($postId);
             $commentsCount = count($allComments);

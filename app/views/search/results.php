@@ -1,6 +1,6 @@
 <?php
 // app/views/search/results.php
-// Centered Modern Search, Filtering & Reports View for SMCC Connect (Step 11 & Step 12)
+// Centered Modern Search, Filtering & Reports View for Nexus (Step 11 & Step 12)
 
 $currentUserId = $_SESSION['user_id'] ?? null;
 $currentUserInitials = 'U';
@@ -39,7 +39,7 @@ $authorId = $_GET['author_id'] ?? null;
     <!-- Search Header -->
     <div class="search-header-clean mb-4 text-center">
         <h3 class="fw-bold text-dark mb-1">Search</h3>
-        <p class="text-muted small mb-0">Find students, faculty, posts, and topics across SMCC Connect</p>
+        <p class="text-muted small mb-0">Find students, faculty, posts, and topics across Nexus</p>
     </div>
 
     <!-- Main Search Bar -->

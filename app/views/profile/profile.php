@@ -69,6 +69,7 @@ if (!empty($user['full_name'])) {
             </div>
         </div>
 
+<<<<<<< HEAD
         <!-- Profile Bar (Avatar + Details + Actions) -->
         <div class="px-4 py-3 border-bottom">
             <div class="d-flex align-items-md-end justify-content-between flex-column flex-md-row gap-3">
@@ -91,6 +92,13 @@ if (!empty($user['full_name'])) {
                                 <?= htmlspecialchars($userInitials); ?>
                             </div>
                         <?php endif; ?>
+=======
+        <!-- Profile Card -->
+        <div class="card-modern overflow-hidden mb-4">
+            <!-- Header Banner / Cover Photo -->
+            <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?> height: 200px;" class="position-relative">
+            </div>
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
 
                         <?php if (!empty($isOwnProfile)): ?>
                             <button type="button" class="avatar-camera-btn shadow d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modalEditAvatar" title="Update Profile Picture" aria-label="Update Profile Picture" style="bottom: 6px; right: 6px; width: 36px; height: 36px;">

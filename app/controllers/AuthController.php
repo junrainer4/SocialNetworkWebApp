@@ -18,8 +18,13 @@ class AuthController {
             exit;
         }
 
+<<<<<<< HEAD
         header('Location: ' . BASE_URL . '/index.php?action=login');
         exit;
+=======
+        $pageTitle = 'Nexus - The SMCC Community Hub';
+        require __DIR__ . '/../views/auth/welcome.php';
+>>>>>>> b6e9240576e48f39db6dea044ddd922cc77d8534
     }
 
     public function register() {

@@ -262,17 +262,52 @@ class PostModel {
     }
 
     /**
-     * Delete a post (only allowed if post belongs to user).
+     * Delete a post (transaction-safe; verifies ownership if userId is provided).
      *
      * @param int $postId
-     * @param int $userId
+     * @param int|null $userId
      * @return bool
      */
-    public function deletePost($postId, $userId) {
-        $sql = "DELETE FROM posts WHERE id = :post_id AND user_id = :user_id";
-        $stmt = $this->db->prepare($sql);
-        $stmt->execute([':post_id' => $postId, ':user_id' => $userId]);
-        return $stmt->rowCount() > 0;
+    public function deletePost($postId, $userId = null) {
+        $postId = (int)$postId;
+        if ($postId <= 0) {
+            return false;
+        }
+
+        try {
+            $inTx = $this->db->inTransaction();
+            if (!$inTx) {
+                $this->db->beginTransaction();
+            }
+
+            if ($userId !== null && (int)$userId > 0) {
+                $sql = "DELETE FROM posts WHERE id = :post_id AND user_id = :user_id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':post_id' => $postId, ':user_id' => (int)$userId]);
+            } else {
+                $sql = "DELETE FROM posts WHERE id = :post_id";
+                $stmt = $this->db->prepare($sql);
+                $stmt->execute([':post_id' => $postId]);
+            }
+
+            $deleted = $stmt->rowCount() > 0;
+
+            if (!$inTx) {
+                if ($deleted) {
+                    $this->db->commit();
+                } else {
+                    $this->db->rollBack();
+                }
+            }
+
+            return $deleted;
+        } catch (Throwable $e) {
+            if (!$inTx && $this->db->inTransaction()) {
+                $this->db->rollBack();
+            }
+            error_log("PostModel::deletePost error: " . $e->getMessage());
+            return false;
+        }
     }
 
     /**
@@ -389,7 +424,12 @@ class PostModel {
      * @param int|null $authorId Optional user ID to filter posts by author
      * @return array
      */
-    public function searchPosts($query = '', $filter = 'newest', $currentUserId = null, $authorId = null) {
+    public function searchPosts($query = '', $filter = 'newest', $currentUserId = null, $authorId = null, $limit = 50, $mediaOnly = false) {
+        $trimmedQuery = trim($query);
+        if ($trimmedQuery === '' && empty($authorId)) {
+            return [];
+        }
+
         $whereConditions = [];
         $params = [];
 
@@ -399,14 +439,18 @@ class PostModel {
             $params[':current_user_id'] = 0;
         }
 
-        if (trim($query) !== '') {
+        if ($trimmedQuery !== '') {
             $whereConditions[] = "p.content LIKE :search_term";
-            $params[':search_term'] = '%' . trim($query) . '%';
+            $params[':search_term'] = '%' . $trimmedQuery . '%';
         }
 
         if (!empty($authorId)) {
             $whereConditions[] = "p.user_id = :author_id";
             $params[':author_id'] = (int)$authorId;
+        }
+
+        if ($mediaOnly) {
+            $whereConditions[] = "(p.image IS NOT NULL AND p.image != '')";
         }
 
         $whereClause = !empty($whereConditions) ? 'WHERE ' . implode(' AND ', $whereConditions) : '';
@@ -428,12 +472,15 @@ class PostModel {
                 break;
         }
 
+        $limitVal = max(1, min(100, (int)$limit));
+
         // SQL Query demonstrating:
         // 1. JOIN (JOIN users u ON p.user_id = u.id, LEFT JOIN likes l, LEFT JOIN comments c)
         // 2. Aggregate functions (COUNT(DISTINCT l.id), COUNT(DISTINCT c.id))
         // 3. Subquery for user like status (SELECT COUNT(*) FROM likes ...)
         // 4. GROUP BY (GROUP BY p.id)
         // 5. ORDER BY ($orderBy)
+        // 6. LIMIT ($limitVal)
         $sql = "SELECT p.*, 
                        u.username, 
                        u.full_name, 
@@ -447,7 +494,8 @@ class PostModel {
                 LEFT JOIN comments c ON p.id = c.post_id
                 {$whereClause}
                 GROUP BY p.id, p.user_id, p.content, p.image, p.created_at, u.username, u.full_name, u.profile_image
-                ORDER BY {$orderBy}";
+                ORDER BY {$orderBy}
+                LIMIT {$limitVal}";
 
         $stmt = $this->db->prepare($sql);
         $stmt->execute($params);
@@ -460,6 +508,31 @@ class PostModel {
         }
 
         return $posts;
+    }
+
+    /**
+     * Count matching posts for keyword search.
+     * Demonstrates: SQL Aggregate Function COUNT().
+     *
+     * @param string $query
+     * @param bool $mediaOnly
+     * @return int
+     */
+    public function countSearchPosts($query = '', $mediaOnly = false) {
+        $trimmed = trim($query);
+        if ($trimmed === '') {
+            return 0;
+        }
+        if ($mediaOnly) {
+            $sql = "SELECT COUNT(*) FROM posts p WHERE p.content LIKE ? AND (p.image IS NOT NULL AND p.image != '')";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['%' . $trimmed . '%']);
+        } else {
+            $sql = "SELECT COUNT(*) FROM posts p WHERE p.content LIKE ?";
+            $stmt = $this->db->prepare($sql);
+            $stmt->execute(['%' . $trimmed . '%']);
+        }
+        return (int)$stmt->fetchColumn();
     }
 
     /**
