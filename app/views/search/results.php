@@ -8,8 +8,8 @@ if ($currentUserId) {
     $name = $_SESSION['full_name'] ?? $_SESSION['username'] ?? 'User';
     $parts = explode(' ', trim($name));
     $currentUserInitials = count($parts) >= 2
-        ? strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[count($parts)-1], 0, 1))
-        : strtoupper(mb_substr($name, 0, 2));
+        ? strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts)-1], 0, 1))
+        : strtoupper(substr($name, 0, 2));
 }
 
 $userCount = count($users ?? []);
@@ -21,19 +21,17 @@ $authorId = $_GET['author_id'] ?? null;
 
     <!-- Flash Notifications -->
     <?php if (!empty($_SESSION['success_message'])): ?>
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <div class="alert alert-success fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             <?= htmlspecialchars($_SESSION['success_message']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
 
     <?php if (!empty($_SESSION['error_message'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             <?= htmlspecialchars($_SESSION['error_message']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php unset($_SESSION['error_message']); ?>
     <?php endif; ?>
@@ -193,8 +191,8 @@ $authorId = $_GET['author_id'] ?? null;
                         <?php
                         $uParts = explode(' ', trim($user['full_name']));
                         $uInitials = count($uParts) >= 2
-                            ? strtoupper(mb_substr($uParts[0], 0, 1) . mb_substr($uParts[count($uParts)-1], 0, 1))
-                            : strtoupper(mb_substr($user['full_name'], 0, 2));
+                            ? strtoupper(substr($uParts[0], 0, 1) . substr($uParts[count($uParts)-1], 0, 1))
+                            : strtoupper(substr($user['full_name'], 0, 2));
                         ?>
                         <div class="search-user-card">
                             <div class="d-flex align-items-center justify-content-between gap-3">
@@ -275,8 +273,8 @@ $authorId = $_GET['author_id'] ?? null;
                     <?php
                     $authorParts = explode(' ', trim($post['full_name']));
                     $authorInitials = count($authorParts) >= 2
-                        ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-                        : strtoupper(mb_substr($post['full_name'], 0, 2));
+                        ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+                        : strtoupper(substr($post['full_name'], 0, 2));
 
                     $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
                     $diffHours = round((time() - strtotime($post['created_at'])) / 3600);
@@ -427,8 +425,8 @@ $authorId = $_GET['author_id'] ?? null;
                                     <?php
                                     $cParts = explode(' ', trim($comment['full_name'] ?? 'User'));
                                     $cInitials = count($cParts) >= 2
-                                        ? strtoupper(mb_substr($cParts[0], 0, 1) . mb_substr($cParts[count($cParts)-1], 0, 1))
-                                        : strtoupper(mb_substr($comment['full_name'] ?? 'U', 0, 2));
+                                        ? strtoupper(substr($cParts[0], 0, 1) . substr($cParts[count($cParts)-1], 0, 1))
+                                        : strtoupper(substr($comment['full_name'] ?? 'U', 0, 2));
 
                                     $cTimeBadge = format_time_ago($comment['created_at']);
                                     ?>

@@ -61,20 +61,40 @@
 
         buttons.forEach(function(btn) {
             var icon = btn.querySelector('.theme-toggle-icon');
+            var moonSvg = btn.querySelector('.theme-icon-moon');
+            var sunSvg = btn.querySelector('.theme-icon-sun');
+
             if (current === THEME_DARK) {
-                if (icon) {
-                    icon.className = 'theme-toggle-icon bi bi-sun-fill';
-                }
+                if (icon) icon.className = 'theme-toggle-icon bi bi-sun-fill';
+                if (moonSvg) moonSvg.classList.add('d-none');
+                if (sunSvg) sunSvg.classList.remove('d-none');
                 btn.setAttribute('title', 'Switch to Light Mode');
                 btn.setAttribute('aria-label', 'Switch to Light Mode');
             } else {
-                if (icon) {
-                    icon.className = 'theme-toggle-icon bi bi-moon-fill';
-                }
+                if (icon) icon.className = 'theme-toggle-icon bi bi-moon-fill';
+                if (moonSvg) moonSvg.classList.remove('d-none');
+                if (sunSvg) sunSvg.classList.add('d-none');
                 btn.setAttribute('title', 'Switch to Dark Mode');
                 btn.setAttribute('aria-label', 'Switch to Dark Mode');
             }
         });
+
+        // Synchronize switch in profile dropdown
+        var switches = document.querySelectorAll('.theme-toggle-switch, #themeSwitchCheckbox');
+        switches.forEach(function(sw) {
+            sw.checked = (current === THEME_DARK);
+        });
+
+        // Synchronize moon/sun in profile dropdown item
+        var menuMoon = document.querySelectorAll('.fb-menu-theme-item .theme-icon-moon');
+        var menuSun = document.querySelectorAll('.fb-menu-theme-item .theme-icon-sun');
+        if (current === THEME_DARK) {
+            menuMoon.forEach(function(el) { el.classList.add('d-none'); });
+            menuSun.forEach(function(el) { el.classList.remove('d-none'); });
+        } else {
+            menuMoon.forEach(function(el) { el.classList.remove('d-none'); });
+            menuSun.forEach(function(el) { el.classList.add('d-none'); });
+        }
     }
 
     /**

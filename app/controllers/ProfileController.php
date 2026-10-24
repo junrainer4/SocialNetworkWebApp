@@ -102,7 +102,7 @@ class ProfileController {
             $formData['bio'] = $bio;
 
             // 1. Validate Bio
-            if (mb_strlen($bio) > 500) {
+            if (strlen($bio) > 500) {
                 $errors[] = 'Bio must not exceed 500 characters.';
             }
 
@@ -433,8 +433,8 @@ class ProfileController {
         foreach ($users as $u) {
             $uParts = explode(' ', trim($u['full_name']));
             $uInitials = count($uParts) >= 2
-                ? strtoupper(mb_substr($uParts[0], 0, 1) . mb_substr($uParts[count($uParts)-1], 0, 1))
-                : strtoupper(mb_substr($u['full_name'], 0, 2));
+                ? strtoupper(substr($uParts[0], 0, 1) . substr($uParts[count($uParts)-1], 0, 1))
+                : strtoupper(substr($u['full_name'], 0, 2));
 
             $isFollowingThisUser = ($currentUserId !== (int)$u['id']) 
                 ? $this->followModel->isFollowing($currentUserId, (int)$u['id']) 

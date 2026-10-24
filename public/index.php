@@ -28,7 +28,7 @@ switch ($action) {
     case 'welcome':
         require_once __DIR__ . '/../app/controllers/AuthController.php';
         $authController = new AuthController();
-        $authController->welcome();
+        $authController->login();
         break;
 
     case 'register':
@@ -80,6 +80,12 @@ switch ($action) {
         require_once __DIR__ . '/../app/controllers/SettingsController.php';
         $settingsController = new SettingsController();
         $settingsController->changePassword();
+        break;
+
+    case 'settings_avatar':
+        require_once __DIR__ . '/../app/controllers/SettingsController.php';
+        $settingsController = new SettingsController();
+        $settingsController->updateAvatar();
         break;
 
     case 'get_follow_list':
@@ -165,6 +171,12 @@ switch ($action) {
         $insightsController->index();
         break;
 
+    case 'live_search':
+        require_once __DIR__ . '/../app/controllers/SearchController.php';
+        $searchController = new SearchController();
+        $searchController->liveSearch();
+        break;
+
     case 'reports':
         header('Location: ' . BASE_URL . '/index.php?action=insights');
         exit;
@@ -219,7 +231,7 @@ switch ($action) {
         if (!isset($_SESSION['user_id'])) {
             require_once __DIR__ . '/../app/controllers/AuthController.php';
             $authController = new AuthController();
-            $authController->welcome();
+            $authController->login();
             break;
         }
         $pageTitle = 'Home';
@@ -243,6 +255,6 @@ switch ($action) {
 
     default:
         // Return friendly 404 Not Found for unrecognized action routes
-        ErrorHandler::renderErrorPage(404, 'Page Not Found', 'The page or action you requested ("' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '") does not exist on SMCC Connect.');
+        ErrorHandler::renderErrorPage(404, 'Page Not Found', 'The page or action you requested ("' . htmlspecialchars($action, ENT_QUOTES, 'UTF-8') . '") does not exist on Unify.');
         break;
 }

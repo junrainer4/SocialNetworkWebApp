@@ -34,133 +34,105 @@ $userInitials = 'U';
 if (!empty($user['full_name'])) {
     $parts = explode(' ', trim($user['full_name']));
     if (count($parts) >= 2) {
-        $userInitials = strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[count($parts)-1], 0, 1));
+        $userInitials = strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts)-1], 0, 1));
     } else {
-        $userInitials = strtoupper(mb_substr($user['full_name'], 0, 2));
+        $userInitials = strtoupper(substr($user['full_name'], 0, 2));
     }
 }
 ?>
 
-<div class="feed-layout-container mx-auto">
-    <div class="row justify-content-center">
-        <div class="col-lg-7 col-xl-8">
+<div class="profile-layout-container mx-auto" style="max-width: 1040px; width: 100%;">
 
-        <!-- Flash Success Message -->
-        <?php if (!empty($_SESSION['success_message'])): ?>
-            <div class="alert alert-success alert-dismissible fade show mb-4 border-0 shadow-sm" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                <?= htmlspecialchars($_SESSION['success_message']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    <!-- Flash Success Message -->
+    <?php if (!empty($_SESSION['success_message'])): ?>
+        <div class="alert alert-success fade show mb-4 border-0 shadow-sm" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <?= htmlspecialchars($_SESSION['success_message']); ?>
+        </div>
+        <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
+
+    <!-- PROFILE HERO HEADER CARD -->
+    <div class="card-modern overflow-hidden mb-4 border-0 shadow-sm">
+        <!-- Cover Photo Banner -->
+        <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 50%, #0062ff 100%);" ?> height: 260px;" class="position-relative">
+            <div class="position-absolute top-0 end-0 m-3 d-flex align-items-center gap-2">
+                <span class="badge" style="background-color: var(--accent-yellow, #f1bd27); color: #07193d; font-weight: 700; padding: 0.45rem 0.85rem; border-radius: 50px;">
+                    <i class="bi bi-patch-check-fill me-1"></i> Verified Profile
+                </span>
+                <?php if (!empty($isOwnProfile)): ?>
+                    <a href="<?= BASE_URL ?>/index.php?action=edit_profile" class="btn btn-sm btn-cover-action shadow fw-semibold d-inline-flex align-items-center gap-1" title="Edit Cover Photo">
+                        <i class="bi bi-camera-fill me-1"></i>
+                        <span>Edit Cover</span>
+                    </a>
+                <?php endif; ?>
             </div>
-            <?php unset($_SESSION['success_message']); ?>
-        <?php endif; ?>
+        </div>
 
-        <!-- Profile Card -->
-        <div class="card-modern overflow-hidden mb-4">
-            <!-- Header Banner / Cover Photo -->
-            <div style="<?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?> height: 200px;" class="position-relative">
-                <div class="position-absolute top-0 end-0 m-3">
-                    <span class="badge" style="background-color: var(--accent-yellow); color: #07193d; font-weight: 600;">
-                        <i class="bi bi-patch-check-fill me-1"></i> Verified Profile
-                    </span>
-                </div>
-            </div>
+        <!-- Profile Bar (Avatar + Details + Actions) -->
+        <div class="px-4 py-3 border-bottom">
+            <div class="d-flex align-items-md-end justify-content-between flex-column flex-md-row gap-3">
+                <!-- Left: Big Avatar + Names -->
+                <div class="d-flex align-items-center align-items-md-end gap-3 flex-wrap">
+                    <div class="position-relative flex-shrink-0" style="margin-top: -75px;">
+                        <?php if ($avatarUrl): ?>
+                            <img 
+                                src="<?= $avatarUrl ?>" 
+                                alt="<?= htmlspecialchars($user['full_name']); ?>" 
+                                class="rounded-circle border border-4 border-white shadow bg-white"
+                                style="width: 136px; height: 136px; object-fit: cover;"
+                                onerror="this.onerror=null; this.outerHTML='<div class=\'rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-1 fw-bold\' style=\'width: 136px; height: 136px; background-color: #07193d;\'><?= htmlspecialchars($userInitials) ?></div>';"
+                            >
+                        <?php else: ?>
+                            <div 
+                                class="rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-1 fw-bold"
+                                style="width: 136px; height: 136px; background-color: #07193d;"
+                            >
+                                <?= htmlspecialchars($userInitials); ?>
+                            </div>
+                        <?php endif; ?>
 
-            <div class="p-4 p-md-5 pt-0 text-center">
-                <!-- Avatar -->
-                <div class="d-inline-block position-relative mb-3" style="margin-top: -65px;">
-                    <?php if ($avatarUrl): ?>
-                        <img 
-                            src="<?= $avatarUrl ?>" 
-                            alt="<?= htmlspecialchars($user['full_name']); ?>" 
-                            class="rounded-circle border border-4 border-white shadow bg-white"
-                            style="width: 120px; height: 120px; object-fit: cover;"
-                            onerror="this.onerror=null; this.outerHTML='<div class=\'rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-2 fw-bold\' style=\'width: 120px; height: 120px; background-color: #07193d;\'><?= htmlspecialchars($userInitials) ?></div>';"
-                        >
-                    <?php else: ?>
-                        <div 
-                            class="rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-2 fw-bold"
-                            style="width: 120px; height: 120px; background-color: #07193d;"
-                        >
-                            <?= htmlspecialchars($userInitials); ?>
-                        </div>
-                    <?php endif; ?>
-                </div>
-
-                <!-- User Names -->
-                <h2 class="fw-bold mb-1 text-dark"><?= htmlspecialchars($user['full_name']); ?></h2>
-                <p class="text-muted fw-medium mb-3">
-                    @<?= htmlspecialchars($user['username']); ?>
-                    <?php if (!empty($isFollowedBy)): ?>
-                        <span class="badge bg-secondary-subtle text-secondary border px-2 py-1 ms-1" style="font-size: 0.72rem;">Follows you</span>
-                    <?php endif; ?>
-                </p>
-
-                <!-- Follower / Following Stats Badges -->
-                <div class="d-flex justify-content-center align-items-center gap-4 mb-4">
-                    <button type="button" class="btn p-0 border-0 bg-transparent text-center follow-stat-btn" onclick="openFollowListModal('followers', <?= (int)$user['id'] ?>)" title="Click to view Followers" style="cursor: pointer; text-decoration: none;">
-                        <div class="fs-5 fw-bold text-dark follow-stat-num" id="profileFollowersCount"><?= (int)($followersCount ?? 0) ?></div>
-                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Followers</small>
-                    </button>
-                    <div class="border-end" style="height: 24px;"></div>
-                    <button type="button" class="btn p-0 border-0 bg-transparent text-center follow-stat-btn" onclick="openFollowListModal('following', <?= (int)$user['id'] ?>)" title="Click to view Following" style="cursor: pointer; text-decoration: none;">
-                        <div class="fs-5 fw-bold text-dark follow-stat-num" id="profileFollowingCount"><?= (int)($followingCount ?? 0) ?></div>
-                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Following</small>
-                    </button>
-                    <div class="border-end" style="height: 24px;"></div>
-                    <div class="text-center">
-                        <div class="fs-5 fw-bold text-dark"><?= !empty($posts) ? count($posts) : 0; ?></div>
-                        <small class="text-muted text-uppercase fw-semibold" style="font-size: 0.75rem;">Posts</small>
+                        <?php if (!empty($isOwnProfile)): ?>
+                            <button type="button" class="avatar-camera-btn shadow d-flex align-items-center justify-content-center" data-bs-toggle="modal" data-bs-target="#modalEditAvatar" title="Update Profile Picture" aria-label="Update Profile Picture" style="bottom: 6px; right: 6px; width: 36px; height: 36px;">
+                                <i class="bi bi-camera-fill" style="font-size: 1rem;"></i>
+                            </button>
+                        <?php endif; ?>
                     </div>
-                </div>
 
-                <!-- Bio -->
-                <div class="col-md-9 mx-auto mb-4">
-                    <?php if (!empty($user['bio'])): ?>
-                        <div class="p-3 bg-light rounded-3 text-start border border-light-subtle">
-                            <i class="bi bi-quote text-warning me-1 fs-5 align-middle"></i>
-                            <span class="text-secondary"><?= nl2br(htmlspecialchars($user['bio'])); ?></span>
+                    <div class="pb-1">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <h2 class="fw-bold mb-0 text-dark" style="letter-spacing: -0.5px;"><?= htmlspecialchars($user['full_name']); ?></h2>
+                            <?php if (!empty($isFollowedBy)): ?>
+                                <span class="badge bg-secondary-subtle text-secondary border px-2 py-1" style="font-size: 0.72rem;">Follows you</span>
+                            <?php endif; ?>
                         </div>
-                    <?php else: ?>
-                        <p class="text-muted fst-italic mb-0 small">
-                            No bio provided yet. Tell others about yourself by updating your profile!
-                        </p>
-                    <?php endif; ?>
-                </div>
-
-                <hr class="my-4" style="opacity: 0.1;">
-
-                <!-- Profile Meta Information -->
-                <div class="row g-3 justify-content-center text-start mb-4">
-                    <div class="col-sm-6 col-md-5">
-                        <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-3">
-                            <div class="rounded-circle p-2 fs-4 d-flex align-items-center justify-content-center" style="background-color: var(--accent-yellow-light); color: var(--accent-yellow-hover); width: 42px; height: 42px;">
-                                <i class="bi bi-person"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Username</small>
-                                <span class="fw-bold text-dark">@<?= htmlspecialchars($user['username']); ?></span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-sm-6 col-md-5">
-                        <div class="p-3 bg-light rounded-3 border d-flex align-items-center gap-3">
-                            <div class="rounded-circle p-2 fs-4 d-flex align-items-center justify-content-center" style="background-color: #e0f2fe; color: #0284c7; width: 42px; height: 42px;">
-                                <i class="bi bi-calendar-event"></i>
-                            </div>
-                            <div>
-                                <small class="text-muted d-block">Member Since</small>
-                                <span class="fw-bold text-dark"><?= $formattedDate; ?></span>
-                            </div>
+                        <div class="text-muted fw-semibold mb-2">@<?= htmlspecialchars($user['username']); ?></div>
+                        
+                        <!-- Follower / Following Quick Counter Line -->
+                        <div class="d-flex align-items-center gap-2 small text-muted">
+                            <button type="button" class="btn btn-link p-0 text-decoration-none text-muted fw-semibold follow-stat-btn" onclick="openFollowListModal('followers', <?= (int)$user['id'] ?>)">
+                                <strong class="text-dark fs-6" id="profileFollowersCount"><?= (int)($followersCount ?? 0) ?></strong> Followers
+                            </button>
+                            <span>&bull;</span>
+                            <button type="button" class="btn btn-link p-0 text-decoration-none text-muted fw-semibold follow-stat-btn" onclick="openFollowListModal('following', <?= (int)$user['id'] ?>)">
+                                <strong class="text-dark fs-6" id="profileFollowingCount"><?= (int)($followingCount ?? 0) ?></strong> Following
+                            </button>
+                            <span>&bull;</span>
+                            <span><strong class="text-dark fs-6"><?= !empty($posts) ? count($posts) : 0; ?></strong> Posts</span>
                         </div>
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="d-flex flex-wrap justify-content-center gap-2">
+                <!-- Right: Action Buttons -->
+                <div class="d-flex align-items-center gap-2 pb-2 flex-wrap">
                     <?php if (!empty($isOwnProfile)): ?>
-                        <a href="<?= BASE_URL ?>/index.php?action=edit_profile" class="btn btn-accent px-4">
-                            <i class="bi bi-pencil-square me-1"></i> Edit Profile
+                        <a href="<?= BASE_URL ?>/index.php?action=edit_profile" class="btn btn-primary rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2 shadow-sm">
+                            <i class="bi bi-pencil-square"></i>
+                            <span>Edit Profile</span>
+                        </a>
+                        <a href="<?= BASE_URL ?>/index.php?action=settings" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-semibold d-inline-flex align-items-center gap-2">
+                            <i class="bi bi-gear"></i>
+                            <span>Settings</span>
                         </a>
                     <?php else: ?>
                         <!-- Follow / Unfollow AJAX Button -->
@@ -173,17 +145,79 @@ if (!empty($user['full_name'])) {
                             </button>
                         </form>
                     <?php endif; ?>
-                    <a href="<?= BASE_URL ?>/" class="btn btn-outline-secondary px-4 rounded-pill">
-                        <i class="bi bi-arrow-left me-1"></i> Back to Feed
+                    <a href="<?= BASE_URL ?>/" class="btn btn-outline-secondary rounded-pill px-3 py-2 fw-medium d-inline-flex align-items-center gap-1">
+                        <i class="bi bi-arrow-left"></i>
+                        <span>Feed</span>
                     </a>
                 </div>
             </div>
         </div>
 
+        <!-- Profile Sub-navigation Tabs -->
+        <div class="px-4 d-flex align-items-center gap-3">
+            <span class="py-3 px-2 text-primary fw-bold border-bottom border-3 border-primary" style="font-size: 0.95rem;">Timeline Posts (<?= !empty($posts) ? count($posts) : 0; ?>)</span>
+            <a href="#aboutDetailsCard" class="py-3 px-2 text-muted fw-semibold text-decoration-none" style="font-size: 0.95rem;">About & Details</a>
+        </div>
+    </div>
+
+    <!-- 2-COLUMN ORGANIZED PROFILE CONTENT -->
+    <div class="row g-4">
         <!-- ==============================================
-             USER'S POSTS SECTION
+             LEFT COLUMN: INTRO, BIO & PROFILE DETAILS
              ============================================== -->
-        <div class="user-posts-section mb-5">
+        <div class="col-lg-5 col-xl-4" id="aboutDetailsCard">
+            <!-- Intro & Bio Card -->
+            <div class="card-modern p-4 mb-4 border-0 shadow-sm">
+                <h5 class="fw-bold mb-3 text-dark d-flex align-items-center gap-2">
+                    <i class="bi bi-info-circle text-primary"></i>
+                    <span>Intro</span>
+                </h5>
+
+                <!-- Bio -->
+                <?php if (!empty($user['bio'])): ?>
+                    <p class="text-dark small mb-3 lh-base fst-italic">“<?= nl2br(htmlspecialchars($user['bio'])); ?>”</p>
+                <?php else: ?>
+                    <p class="text-muted small mb-3 fst-italic">No bio added yet. Tell fellow campus members about yourself!</p>
+                <?php endif; ?>
+
+                <?php if (!empty($isOwnProfile)): ?>
+                    <a href="<?= BASE_URL ?>/index.php?action=edit_profile" class="btn btn-sm btn-outline-primary w-100 rounded-pill fw-semibold mb-3">
+                        Edit Bio
+                    </a>
+                <?php endif; ?>
+
+                <div class="border-top pt-3">
+                    <div class="d-flex align-items-center gap-3 mb-3 text-muted small">
+                        <i class="bi bi-person text-primary fs-5 flex-shrink-0"></i>
+                        <div>Username: <strong class="text-dark">@<?= htmlspecialchars($user['username']); ?></strong></div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-3 text-muted small">
+                        <i class="bi bi-calendar3 text-primary fs-5 flex-shrink-0"></i>
+                        <div>Joined: <strong class="text-dark"><?= $formattedDate; ?></strong></div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 mb-3 text-muted small">
+                        <i class="bi bi-people text-primary fs-5 flex-shrink-0"></i>
+                        <div>Followers: <strong class="text-dark"><?= (int)($followersCount ?? 0); ?></strong></div>
+                    </div>
+                    <div class="d-flex align-items-center gap-3 text-muted small">
+                        <i class="bi bi-file-earmark-text text-primary fs-5 flex-shrink-0"></i>
+                        <div>Total Posts: <strong class="text-dark"><?= !empty($posts) ? count($posts) : 0; ?></strong></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Card -->
+            <div class="card-modern p-4 mb-4 border-0 shadow-sm">
+                <h6 class="fw-bold mb-2 text-dark">Unify Network</h6>
+                <p class="text-muted small mb-0">Connected member of the Unify campus social platform.</p>
+            </div>
+        </div>
+
+        <!-- ==============================================
+             RIGHT COLUMN: USER'S TIMELINE POSTS
+             ============================================== -->
+        <div class="col-lg-7 col-xl-8">
+            <div class="user-posts-section mb-5">
             <div class="d-flex align-items-center justify-content-between mb-3 px-1">
                 <h4 class="fw-bold mb-0 text-dark d-flex align-items-center gap-2">
                     <i class="bi bi-file-earmark-post text-primary"></i>
@@ -200,8 +234,8 @@ if (!empty($user['full_name'])) {
                     // Compute author initials
                     $authorParts = explode(' ', trim($post['full_name']));
                     $authorInitials = count($authorParts) >= 2
-                        ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-                        : strtoupper(mb_substr($post['full_name'], 0, 2));
+                        ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+                        : strtoupper(substr($post['full_name'], 0, 2));
 
                     // Time formatting
                     $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
@@ -340,8 +374,8 @@ if (!empty($user['full_name'])) {
                                     <?php
                                     $cParts = explode(' ', trim($comment['full_name'] ?? 'User'));
                                     $cInitials = count($cParts) >= 2
-                                        ? strtoupper(mb_substr($cParts[0], 0, 1) . mb_substr($cParts[count($cParts)-1], 0, 1))
-                                        : strtoupper(mb_substr($comment['full_name'] ?? 'U', 0, 2));
+                                        ? strtoupper(substr($cParts[0], 0, 1) . substr($cParts[count($cParts)-1], 0, 1))
+                                        : strtoupper(substr($comment['full_name'] ?? 'U', 0, 2));
 
                                     $cTimeBadge = format_time_ago($comment['created_at']);
                                     $cFullTime = date('M j, Y \a\t g:i a', strtotime($comment['created_at']));
@@ -631,6 +665,70 @@ function openFollowListModal(type, targetUserId) {
     });
 }
 </script>
+
+<?php if (!empty($isOwnProfile)): ?>
+<!-- Modal for Quick Profile Picture Update -->
+<div class="modal fade" id="modalEditAvatar" tabindex="-1" aria-labelledby="editAvatarModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
+            <div class="modal-header border-bottom py-3 px-4">
+                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="editAvatarModalLabel">
+                    <i class="bi bi-camera-fill text-primary fs-5"></i>
+                    <span>Update Profile Picture</span>
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="<?= BASE_URL ?>/index.php?action=edit_profile" method="POST" enctype="multipart/form-data">
+                <?= csrf_field(); ?>
+                <div class="modal-body p-4 text-center">
+                    <div class="mb-4">
+                        <?php if ($avatarUrl): ?>
+                            <img src="<?= $avatarUrl ?>" alt="Current Avatar" id="modalAvatarPreview" class="rounded-circle border border-4 border-white shadow" style="width: 120px; height: 120px; object-fit: cover;">
+                        <?php else: ?>
+                            <div id="modalAvatarPlaceholder" class="rounded-circle border border-4 border-white shadow text-white d-inline-flex align-items-center justify-content-center fs-2 fw-bold" style="width: 120px; height: 120px; background-color: var(--fb-blue, #1877f2);">
+                                <?= htmlspecialchars($userInitials); ?>
+                            </div>
+                        <?php endif; ?>
+                    </div>
+                    <div class="mb-3 text-start">
+                        <label for="modalProfileImageInput" class="form-label small fw-semibold text-secondary">Select New Profile Picture</label>
+                        <input type="file" name="profile_image" id="modalProfileImageInput" class="form-control" accept="image/jpeg,image/png,image/webp,image/gif" required>
+                        <div class="form-text small text-muted">Supports JPG, PNG, WEBP, or GIF (max 5MB).</div>
+                    </div>
+                </div>
+                <div class="modal-footer border-top py-3 px-4 d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">Save Profile Picture</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const avatarInput = document.getElementById('modalProfileImageInput');
+    const avatarPreview = document.getElementById('modalAvatarPreview');
+    if (avatarInput) {
+        avatarInput.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    if (avatarPreview) {
+                        avatarPreview.src = e.target.result;
+                    } else {
+                        const placeholder = document.getElementById('modalAvatarPlaceholder');
+                        if (placeholder) {
+                            placeholder.outerHTML = '<img src="' + e.target.result + '" id="modalAvatarPreview" class="rounded-circle border border-4 border-white shadow" style="width: 120px; height: 120px; object-fit: cover;">';
+                        }
+                    }
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
+});
+</script>
+<?php endif; ?>
 
 <?php
 require_once __DIR__ . '/../layouts/footer.php';

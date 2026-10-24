@@ -5,32 +5,30 @@
 $currentUserId = $_SESSION['user_id'] ?? null;
 ?>
 
-<div class="feed-layout-container mx-auto">
+<div class="feed-layout-container mx-auto" style="max-width: 880px; width: 100%;">
 
     <!-- Flash Notifications -->
     <?php if (!empty($_SESSION['success_message'])): ?>
-        <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <div class="alert alert-success fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-check-circle-fill me-2"></i>
             <?= htmlspecialchars($_SESSION['success_message']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php unset($_SESSION['success_message']); ?>
     <?php endif; ?>
 
     <?php if (!empty($_SESSION['error_message'])): ?>
-        <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+        <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
             <?= htmlspecialchars($_SESSION['error_message']); ?>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
         <?php unset($_SESSION['error_message']); ?>
     <?php endif; ?>
 
-    <div class="row g-4">
+    <div class="row g-4 justify-content-center">
         <!-- ==============================================
              CENTER COLUMN: POST COMPOSER & SOCIAL FEED
              ============================================== -->
-        <div class="col-lg-7 col-xl-8">
+        <div class="col-12">
 
             <?php if (!$currentUserId): ?>
                 <!-- Guest Landing Home Page (No social posts exposed to guests) -->
@@ -40,7 +38,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             <i class="bi bi-people-fill"></i>
                         </div>
                     </div>
-                    <h2 class="fw-bold text-dark mb-2">Welcome to SMCC Connect</h2>
+                    <h2 class="fw-bold text-dark mb-2">Welcome to Unify</h2>
                     <p class="text-muted fs-6 mb-4 col-md-10 mx-auto">
                         The campus social networking platform for SMCC. Sign in or create an account to view campus posts, connect with fellow students, comment, and engage with the community.
                     </p>
@@ -103,7 +101,7 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 id="composerTextarea"
                                 class="composer-input" 
                                 rows="2" 
-                                placeholder="What's happening on campus?"
+                                placeholder="What's on your mind, <?= htmlspecialchars(explode(' ', trim($_SESSION['full_name'] ?? $_SESSION['username'] ?? 'User'))[0]); ?>?"
                             ></textarea>
                         </div>
 
@@ -122,13 +120,13 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 
                         <div class="composer-actions-row">
                             <div class="d-flex align-items-center gap-2">
-                                <label for="postImageInput" class="composer-tool-btn mb-0 d-inline-flex align-items-center gap-1" title="Upload Photos (multiple allowed)" style="cursor: pointer;">
-                                    <i class="bi bi-images text-secondary"></i>
-                                    <span class="small text-muted d-none d-sm-inline">Photos</span>
+                                <label for="postImageInput" class="composer-tool-btn mb-0 d-inline-flex align-items-center gap-2" title="Upload Photos (multiple allowed)" style="cursor: pointer;">
+                                    <i class="bi bi-images text-success fs-5"></i>
+                                    <span class="small fw-semibold text-secondary">Photo/video</span>
                                 </label>
                                 <input type="file" id="postImageInput" name="post_images[]" accept="image/jpeg,image/png,image/gif,image/webp" class="d-none" multiple onchange="previewImages(this)">
                             </div>
-                            <button type="submit" class="btn btn-accent btn-sm px-4 fw-semibold">
+                            <button type="submit" class="btn btn-primary btn-sm px-4 fw-semibold" style="background-color: var(--fb-blue, #1877f2); border-color: var(--fb-blue, #1877f2);">
                                 Post
                             </button>
                         </div>
@@ -157,8 +155,8 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                     // Compute author initials
                     $authorParts = explode(' ', trim($post['full_name']));
                     $authorInitials = count($authorParts) >= 2
-                        ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-                        : strtoupper(mb_substr($post['full_name'], 0, 2));
+                        ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+                        : strtoupper(substr($post['full_name'], 0, 2));
 
                     // Time formatting
                     $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
@@ -272,23 +270,41 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                             </div>
                         <?php endif; ?>
 
-                        <!-- Post Engagement Actions (Like / Comment) -->
-                        <div class="post-footer-actions d-flex align-items-center">
-                            <div class="d-flex align-items-center gap-3">
-                                <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline">
-                                    <?= csrf_field(); ?>
-                                    <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
-                                    <button type="submit" class="post-action-btn <?= !empty($post['is_liked']) ? 'liked' : '' ?>" title="Like">
-                                        <i class="bi <?= !empty($post['is_liked']) ? 'bi-heart-fill' : 'bi-heart' ?>"></i>
-                                        <span class="post-likes-count" data-post-id="<?= (int)$post['id']; ?>" title="View reactions"><?= (int)$post['likes_count']; ?></span>
-                                    </button>
-                                </form>
-
-                                <button type="button" class="post-action-btn" onclick="toggleComments(<?= $post['id'] ?>)" title="Comments">
-                                    <i class="bi bi-chat"></i>
-                                    <span><?= (int)$post['comments_count']; ?></span>
-                                </button>
+                        <!-- Post Engagement Stats & Reactions (Facebook Style) -->
+                        <div class="post-stats-row d-flex align-items-center justify-content-between px-1 py-1 small text-secondary">
+                            <div class="d-flex align-items-center gap-1">
+                                <span class="fb-reaction-pill" data-post-id="<?= (int)$post['id']; ?>" title="Reactions">
+                                    <span class="fb-reaction-badge"><i class="bi bi-hand-thumbs-up-fill"></i></span>
+                                    <span class="post-likes-count" data-post-id="<?= (int)$post['id']; ?>"><?= (int)$post['likes_count']; ?></span>
+                                </span>
                             </div>
+                            <div>
+                                <span class="fb-comments-count" style="cursor: pointer;" onclick="toggleComments(<?= $post['id'] ?>)">
+                                    <?= (int)$post['comments_count']; ?> <?= ((int)$post['comments_count'] === 1) ? 'comment' : 'comments'; ?>
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Post Engagement Action Buttons (Facebook 3-Button Row) -->
+                        <div class="post-footer-actions d-flex align-items-center justify-content-between gap-1 py-1 border-top border-bottom">
+                            <form action="<?= BASE_URL ?>/index.php?action=like_post" method="POST" class="d-inline flex-grow-1 m-0">
+                                <?= csrf_field(); ?>
+                                <input type="hidden" name="post_id" value="<?= $post['id'] ?>">
+                                <button type="submit" class="post-action-btn w-100 <?= !empty($post['is_liked']) ? 'liked' : '' ?>" title="Like">
+                                    <i class="bi <?= !empty($post['is_liked']) ? 'bi-hand-thumbs-up-fill' : 'bi-hand-thumbs-up' ?> fs-5"></i>
+                                    <span>Like</span>
+                                </button>
+                            </form>
+
+                            <button type="button" class="post-action-btn flex-grow-1" onclick="toggleComments(<?= $post['id'] ?>)" title="Comment">
+                                <i class="bi bi-chat-left fs-5"></i>
+                                <span>Comment</span>
+                            </button>
+
+                            <button type="button" class="post-action-btn flex-grow-1" onclick="navigator.clipboard.writeText(window.location.origin + window.location.pathname + '#post-<?= $post['id'] ?>'); alert('Post link copied to clipboard!');" title="Share">
+                                <i class="bi bi-share fs-5"></i>
+                                <span>Share</span>
+                            </button>
                         </div>
 
                         <!-- Comments Section -->
@@ -298,8 +314,8 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                     <?php
                                     $cParts = explode(' ', trim($comment['full_name'] ?? 'User'));
                                     $cInitials = count($cParts) >= 2
-                                        ? strtoupper(mb_substr($cParts[0], 0, 1) . mb_substr($cParts[count($cParts)-1], 0, 1))
-                                        : strtoupper(mb_substr($comment['full_name'] ?? 'U', 0, 2));
+                                        ? strtoupper(substr($cParts[0], 0, 1) . substr($cParts[count($cParts)-1], 0, 1))
+                                        : strtoupper(substr($comment['full_name'] ?? 'U', 0, 2));
 
                                     $cTimeBadge = format_time_ago($comment['created_at']);
                                     $cFullTime = date('M j, Y \a\t g:i a', strtotime($comment['created_at']));
@@ -397,229 +413,12 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                 <div class="card-modern p-5 text-center text-muted">
                     <i class="bi bi-chat-square-text fs-1 mb-3 text-secondary"></i>
                     <h5>No posts yet</h5>
-                    <p class="small mb-0">Be the first to share an update on SMCC Connect!</p>
+                    <p class="small mb-0">Be the first to share an update on Unify!</p>
                 </div>
             <?php endif; ?>
             <?php endif; // End if (!$currentUserId) ?>
         </div>
 
-        <!-- ==============================================
-             RIGHT SIDEBAR: UPCOMING EVENTS
-             ============================================== -->
-        <div class="col-lg-5 col-xl-4">
-
-            <!-- 1. Upcoming Events Card -->
-            <div class="widget-card">
-                <div class="widget-header d-flex justify-content-between align-items-center">
-                    <h6 class="widget-title mb-0 d-flex align-items-center gap-2">
-                        <i class="bi bi-calendar-event text-primary"></i>
-                        <span>Upcoming Events</span>
-                    </h6>
-                    <div class="d-flex align-items-center gap-2">
-                        <?php if (!empty($upcomingEvents)): ?>
-                            <button type="button" class="btn btn-link btn-sm p-0 text-decoration-none micro-text fw-semibold text-primary" data-bs-toggle="modal" data-bs-target="#modalAllUpcomingEvents">
-                                <i class="bi bi-eye me-1"></i>View All
-                            </button>
-                        <?php endif; ?>
-                    </div>
-                </div>
-
-                <?php if (!empty($upcomingEvents)): ?>
-                    <div class="events-list">
-                        <?php foreach ($upcomingEvents as $evt): ?>
-                            <?php
-                                $evtTimestamp = !empty($evt['event_date']) ? strtotime($evt['event_date']) : time();
-                                $evtMonth = strtoupper(date('M', $evtTimestamp));
-                                $evtDay = date('d', $evtTimestamp);
-                                $dateFormatted = date('M d', $evtTimestamp);
-                                if (!empty($evt['event_time'])) {
-                                    $dateFormatted .= ' &bull; ' . htmlspecialchars($evt['event_time']);
-                                }
-
-                                $todayDate = date('Y-m-d');
-                                $tomorrowDate = date('Y-m-d', strtotime('+1 day'));
-                                $isToday = ($evt['event_date'] === $todayDate);
-                                $isTomorrow = ($evt['event_date'] === $tomorrowDate);
-                            ?>
-                            <div class="event-item event-item-clickable" role="button" data-bs-toggle="modal" data-bs-target="#modalEventDetails<?= (int)$evt['id']; ?>" title="Click to view full event details">
-                                <div class="event-date-box">
-                                    <span class="event-month"><?= htmlspecialchars($evtMonth); ?></span>
-                                    <span class="event-day"><?= htmlspecialchars($evtDay); ?></span>
-                                </div>
-                                <div class="event-info">
-                                    <div class="d-flex align-items-center justify-content-between gap-1">
-                                        <div class="event-title"><?= htmlspecialchars($evt['title']); ?></div>
-                                        <?php if ($isToday): ?>
-                                            <span class="badge bg-success micro-text">Today</span>
-                                        <?php elseif ($isTomorrow): ?>
-                                            <span class="badge bg-primary micro-text">Tomorrow</span>
-                                        <?php endif; ?>
-                                    </div>
-                                    <div class="event-meta">
-                                        <span class="text-dark fw-medium"><?= $dateFormatted; ?></span><br>
-                                        <span class="text-secondary"><i class="bi bi-geo-alt me-1 text-danger"></i><?= htmlspecialchars($evt['location']); ?></span>
-                                        <div class="mt-1">
-                                            <span class="badge bg-primary-subtle text-primary border-0 micro-text fw-medium py-1 px-2">
-                                                <i class="bi bi-eye me-1"></i>Click for full details
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <i class="bi bi-chevron-right text-muted opacity-50 ms-1"></i>
-                            </div>
-
-                            <!-- EVENT FULL DETAILS MODAL -->
-                            <div class="modal fade" id="modalEventDetails<?= (int)$evt['id']; ?>" tabindex="-1" aria-labelledby="eventModalLabel<?= (int)$evt['id']; ?>" aria-hidden="true">
-                                <div class="modal-dialog modal-dialog-centered modal-lg">
-                                    <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                                        <div class="modal-header border-0 bg-primary bg-opacity-10 py-3 px-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-sm" style="width: 42px; height: 42px;">
-                                                    <i class="bi bi-calendar-event-fill fs-5"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="modal-title fw-bold text-dark mb-0" id="eventModalLabel<?= (int)$evt['id']; ?>">
-                                                        <?= htmlspecialchars($evt['title']); ?>
-                                                    </h5>
-                                                    <span class="micro-text text-muted">Official SMCC Campus Event</span>
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                        </div>
-                                        <div class="modal-body p-4">
-                                            <!-- Status Banner -->
-                                            <div class="mb-3 d-flex flex-wrap align-items-center gap-2">
-                                                <?php if ($isToday): ?>
-                                                    <span class="badge bg-success rounded-pill px-3 py-1.5"><i class="bi bi-broadcast me-1"></i>Happening Today</span>
-                                                <?php elseif ($isTomorrow): ?>
-                                                    <span class="badge bg-primary rounded-pill px-3 py-1.5"><i class="bi bi-clock-history me-1"></i>Happening Tomorrow</span>
-                                                <?php else: ?>
-                                                    <span class="badge bg-info-subtle text-info-emphasis border rounded-pill px-3 py-1.5"><i class="bi bi-calendar-check me-1"></i>Upcoming Campus Event</span>
-                                                <?php endif; ?>
-                                                <span class="badge bg-light text-secondary border rounded-pill px-3 py-1.5"><i class="bi bi-people me-1"></i>Campus Community</span>
-                                            </div>
-
-                                            <!-- Info Cards Grid -->
-                                            <div class="row g-3 mb-4">
-                                                <div class="col-sm-6 col-md-4">
-                                                    <div class="p-3 rounded-3 bg-light border h-100">
-                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-calendar3 text-primary me-1"></i> Date</div>
-                                                        <div class="fw-bold text-dark"><?= date('l, F j, Y', $evtTimestamp); ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-6 col-md-4">
-                                                    <div class="p-3 rounded-3 bg-light border h-100">
-                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-clock text-warning me-1"></i> Time</div>
-                                                        <div class="fw-bold text-dark"><?= !empty($evt['event_time']) ? htmlspecialchars($evt['event_time']) : 'Schedule to be announced'; ?></div>
-                                                    </div>
-                                                </div>
-                                                <div class="col-sm-12 col-md-4">
-                                                    <div class="p-3 rounded-3 bg-light border h-100">
-                                                        <div class="text-muted small fw-semibold mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i> Venue / Location</div>
-                                                        <div class="fw-bold text-dark text-break"><?= htmlspecialchars($evt['location']); ?></div>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <!-- Full Description / Guidelines Section -->
-                                            <div class="p-4 rounded-3 bg-white border shadow-sm">
-                                                <h6 class="fw-bold text-dark mb-2 d-flex align-items-center gap-2">
-                                                    <i class="bi bi-file-text-fill text-primary"></i>
-                                                    <span>Full Description & Event Details</span>
-                                                </h6>
-                                                <div class="text-secondary" style="line-height: 1.7; font-size: 0.95rem;">
-                                                    <?php if (!empty($evt['description'])): ?>
-                                                        <?= nl2br(htmlspecialchars($evt['description'])); ?>
-                                                    <?php else: ?>
-                                                        <em class="text-muted">No additional instructions or agenda provided for this event yet. Please check campus announcements or inquire at the Student Affairs Office.</em>
-                                                    <?php endif; ?>
-                                                </div>
-                                            </div>
-
-                                            <?php if (!empty($evt['organizer_name'])): ?>
-                                                <div class="mt-3 text-muted micro-text text-end">
-                                                    <i class="bi bi-person-check me-1"></i>Published by <strong><?= htmlspecialchars($evt['organizer_name']); ?></strong>
-                                                </div>
-                                            <?php endif; ?>
-                                        </div>
-                                        <div class="modal-footer border-top bg-light py-3 px-4 d-flex justify-content-between align-items-center">
-                                            <div class="micro-text text-muted">
-                                                <i class="bi bi-shield-check text-success me-1"></i>Official SMCC Connect Announcement
-                                            </div>
-                                            <div class="d-flex gap-2">
-                                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-4" data-bs-dismiss="modal">Close</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="p-4 text-center text-muted small">
-                        <i class="bi bi-calendar-check fs-2 d-block mb-2 text-primary opacity-50"></i>
-                        <span class="fw-semibold d-block text-dark mb-1">No Upcoming Events</span>
-                        No campus events are currently scheduled. Check back soon for student activities, seminars, and sportsfest announcements!
-                    </div>
-                <?php endif; ?>
-            </div>
-
-            <!-- MODAL: ALL UPCOMING CAMPUS EVENTS -->
-            <?php if (!empty($upcomingEvents)): ?>
-                <div class="modal fade" id="modalAllUpcomingEvents" tabindex="-1" aria-labelledby="allEventsModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-dialog-centered modal-lg modal-dialog-scrollable">
-                        <div class="modal-content border-0 shadow-lg rounded-4 overflow-hidden">
-                            <div class="modal-header border-bottom bg-light py-3 px-4">
-                                <h5 class="modal-title fw-bold text-dark d-flex align-items-center gap-2" id="allEventsModalLabel">
-                                    <i class="bi bi-calendar3 text-primary"></i>
-                                    <span>SMCC Campus Events Calendar</span>
-                                </h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body p-4">
-                                <p class="text-muted small mb-3">
-                                    Below is the full schedule of upcoming events and activities happening on campus. Click any event to review complete information.
-                                </p>
-                                <div class="list-group list-group-flush gap-2">
-                                    <?php foreach ($upcomingEvents as $evt): ?>
-                                        <?php
-                                            $evtTimestamp = !empty($evt['event_date']) ? strtotime($evt['event_date']) : time();
-                                            $dateFormatted = date('l, F j, Y', $evtTimestamp);
-                                            if (!empty($evt['event_time'])) {
-                                                $dateFormatted .= ' &bull; ' . htmlspecialchars($evt['event_time']);
-                                            }
-                                        ?>
-                                        <div class="list-group-item list-group-item-action p-3 rounded-3 border mb-1" role="button" data-bs-toggle="modal" data-bs-target="#modalEventDetails<?= (int)$evt['id']; ?>">
-                                            <div class="d-flex align-items-start justify-content-between gap-2">
-                                                <div>
-                                                    <h6 class="fw-bold text-dark mb-1"><?= htmlspecialchars($evt['title']); ?></h6>
-                                                    <div class="small text-muted mb-1">
-                                                        <i class="bi bi-calendar-event me-1 text-primary"></i><?= $dateFormatted; ?>
-                                                        &nbsp;&bull;&nbsp;
-                                                        <i class="bi bi-geo-alt me-1 text-danger"></i><?= htmlspecialchars($evt['location']); ?>
-                                                    </div>
-                                                    <?php if (!empty($evt['description'])): ?>
-                                                        <div class="small text-secondary text-truncate" style="max-width: 550px;">
-                                                            <?= htmlspecialchars($evt['description']); ?>
-                                                        </div>
-                                                    <?php endif; ?>
-                                                </div>
-                                                <span class="badge bg-primary-subtle text-primary border-0 rounded-pill px-2 py-1 small flex-shrink-0">
-                                                    View Details <i class="bi bi-arrow-right ms-1"></i>
-                                                </span>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                            <div class="modal-footer border-top bg-light py-2 px-4">
-                                <button type="button" class="btn btn-secondary btn-sm rounded-pill px-3" data-bs-dismiss="modal">Close</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            <?php endif; ?>
-        </div>
     </div>
 </div>
 

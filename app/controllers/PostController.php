@@ -259,7 +259,7 @@ class PostController {
         $post = $this->postModel->getPostWithDetails($postId, $currentUserId);
 
         if (!$post) {
-            require_once __DIR__ . '/../core/ErrorHandler.php';
+            require_once __DIR__ . '/../helpers/ErrorHandler.php';
             ErrorHandler::renderErrorPage(404, 'Post Not Found', 'The requested post does not exist or may have been removed.');
             exit;
         }
@@ -366,8 +366,8 @@ class PostController {
 
                 $authorParts = explode(' ', trim($authorFullName));
                 $authorInitials = count($authorParts) >= 2
-                    ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-                    : strtoupper(mb_substr($authorFullName, 0, 2));
+                    ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+                    : strtoupper(substr($authorFullName, 0, 2));
 
                 if ($isAjax) {
                     header('Content-Type: application/json');
@@ -678,8 +678,8 @@ class PostController {
         foreach ($likers as $u) {
             $uParts = explode(' ', trim($u['full_name']));
             $uInitials = count($uParts) >= 2
-                ? strtoupper(mb_substr($uParts[0], 0, 1) . mb_substr($uParts[count($uParts)-1], 0, 1))
-                : strtoupper(mb_substr($u['full_name'], 0, 2));
+                ? strtoupper(substr($uParts[0], 0, 1) . substr($uParts[count($uParts)-1], 0, 1))
+                : strtoupper(substr($u['full_name'], 0, 2));
 
             $formatted[] = [
                 'id' => (int)$u['id'],

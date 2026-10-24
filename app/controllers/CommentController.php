@@ -108,7 +108,7 @@ class CommentController {
             exit;
         }
 
-        if (mb_strlen($content) > 1000) {
+        if (strlen($content) > 1000) {
             $errMsg = 'Comment cannot exceed 1,000 characters.';
             if ($isAjax) {
                 header('Content-Type: application/json');
@@ -139,8 +139,8 @@ class CommentController {
 
             $cParts = explode(' ', trim($cFullName));
             $cInitials = count($cParts) >= 2
-                ? strtoupper(mb_substr($cParts[0], 0, 1) . mb_substr($cParts[count($cParts)-1], 0, 1))
-                : strtoupper(mb_substr($cFullName, 0, 2));
+                ? strtoupper(substr($cParts[0], 0, 1) . substr($cParts[count($cParts)-1], 0, 1))
+                : strtoupper(substr($cFullName, 0, 2));
 
             if ($isAjax) {
                 header('Content-Type: application/json');
@@ -261,7 +261,7 @@ class CommentController {
 
         if ($content === '') {
             $errors[] = 'Comment cannot be empty.';
-        } elseif (mb_strlen($content) > 1000) {
+        } elseif (strlen($content) > 1000) {
             $errors[] = 'Comment cannot exceed 1,000 characters.';
         }
 

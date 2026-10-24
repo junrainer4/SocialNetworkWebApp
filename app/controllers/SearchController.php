@@ -115,4 +115,78 @@ class SearchController {
         require_once __DIR__ . '/../views/search/results.php';
         require_once __DIR__ . '/../views/layouts/footer.php';
     }
+
+    /**
+     * Live search API endpoint for header dropdown real-time suggestions.
+     * Returns JSON list of matching users and posts.
+     */
+    public function liveSearch() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        header('Content-Type: application/json; charset=utf-8');
+
+        if (!isset($_SESSION['user_id'])) {
+            echo json_encode(['success' => false, 'users' => [], 'posts' => []]);
+            exit;
+        }
+
+        $query = trim($_GET['q'] ?? '');
+        if ($query === '' || strlen($query) < 1) {
+            echo json_encode(['success' => true, 'query' => '', 'users' => [], 'posts' => []]);
+            exit;
+        }
+
+        $currentUserId = (int)$_SESSION['user_id'];
+
+        // Search users
+        $rawUsers = $this->userModel->searchUsers($query);
+        $users = [];
+        $topUsers = array_slice($rawUsers, 0, 5);
+        foreach ($topUsers as $u) {
+            $avatarUrl = null;
+            if (!empty($u['profile_image'])) {
+                $avatarUrl = BASE_URL . '/public/uploads/avatars/' . htmlspecialchars(basename($u['profile_image']));
+            }
+            $parts = explode(' ', trim($u['full_name']));
+            $initials = (count($parts) >= 2)
+                ? strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts)-1], 0, 1))
+                : strtoupper(substr($u['full_name'], 0, 2));
+
+            $users[] = [
+                'id'        => (int)$u['id'],
+                'username'  => $u['username'],
+                'full_name' => $u['full_name'],
+                'avatar'    => $avatarUrl,
+                'initials'  => $initials
+            ];
+        }
+
+        // Search posts
+        $rawPosts = $this->postModel->searchPosts($query, 'newest', $currentUserId);
+        $posts = [];
+        $topPosts = array_slice($rawPosts, 0, 5);
+        foreach ($topPosts as $p) {
+            $cleanContent = strip_tags($p['content']);
+            $snippet = substr($cleanContent, 0, 85);
+            if (strlen($cleanContent) > 85) {
+                $snippet .= '...';
+            }
+            $posts[] = [
+                'id'              => (int)$p['id'],
+                'snippet'         => $snippet,
+                'author_name'     => $p['full_name'] ?? 'User',
+                'author_username' => $p['username'] ?? '',
+                'created_at'      => !empty($p['created_at']) ? date('M j', strtotime($p['created_at'])) : ''
+            ];
+        }
+
+        echo json_encode([
+            'success' => true,
+            'query'   => $query,
+            'users'   => $users,
+            'posts'   => $posts
+        ]);
+        exit;
+    }
 }

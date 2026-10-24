@@ -85,11 +85,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (btn.classList.contains('post-action-btn')) {
                 if (isLiked) {
                     btn.classList.add('liked');
-                    if (heartIcon) heartIcon.className = 'bi bi-heart-fill';
+                    if (heartIcon) heartIcon.className = 'bi bi-hand-thumbs-up-fill fs-5';
                 } else {
                     btn.classList.remove('liked');
-                    if (heartIcon) heartIcon.className = 'bi bi-heart';
+                    if (heartIcon) heartIcon.className = 'bi bi-hand-thumbs-up fs-5';
                 }
+                const labelSpan = btn.querySelector('span');
+                if (labelSpan) labelSpan.textContent = 'Like';
             } 
             // Handle insights / search style button (.btn-danger / .btn-outline-danger)
             else {
@@ -102,28 +104,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     btn.classList.add('btn-outline-danger');
                     if (heartIcon) heartIcon.className = 'bi bi-heart me-1';
                 }
+                let countSpan = btn.querySelector('.post-likes-count') || btn.querySelector('span');
+                if (countSpan) countSpan.textContent = likesCount;
             }
+        });
 
-            // Remove any raw text nodes from the button to permanently eliminate duplicate numbers
-            const textNodes = [];
-            btn.childNodes.forEach(node => {
-                if (node.nodeType === Node.TEXT_NODE) {
-                    textNodes.push(node);
-                }
-            });
-            textNodes.forEach(node => node.remove());
-
-            // Ensure countSpan exists with .post-likes-count and set clean exact count
-            if (!countSpan) {
-                countSpan = document.createElement('span');
-                countSpan.className = 'post-likes-count';
-                btn.appendChild(countSpan);
-            } else {
-                countSpan.classList.add('post-likes-count');
-            }
-            countSpan.setAttribute('data-post-id', postId);
-            countSpan.setAttribute('title', 'View reactions');
-            countSpan.textContent = likesCount;
+        // Globally synchronize all reaction count badges for this post
+        document.querySelectorAll(`.post-likes-count[data-post-id="${postId}"]`).forEach(el => {
+            el.textContent = likesCount;
         });
     }
 
@@ -878,4 +866,546 @@ document.addEventListener('DOMContentLoaded', function() {
             .replace(/"/g, '&quot;')
             .replace(/'/g, '&#039;');
     }
+
+    // =========================================================================
+    // 12. LIVE SEARCH DROPDOWN WITH REAL-TIME KEYWORD HIGHLIGHTING
+    // =========================================================================
+    const searchInput = document.getElementById('headerSearchInput');
+    const searchDropdown = document.getElementById('liveSearchDropdown');
+    const searchResultsBox = document.getElementById('liveSearchResults');
+    let searchDebounceTimer = null;
+
+    function highlightMatch(text, query) {
+        if (!text) return '';
+        if (!query) return escapeHtml(text);
+        const escapedText = escapeHtml(text);
+        const escapedQuery = escapeHtml(query).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        const regex = new RegExp('(' + escapedQuery + ')', 'gi');
+        return escapedText.replace(regex, '<mark class="search-highlight">$1</mark>');
+    }
+
+    if (searchInput && searchDropdown && searchResultsBox) {
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchDebounceTimer);
+            const query = this.value.trim();
+
+            if (query.length === 0) {
+                searchDropdown.classList.add('d-none');
+                searchResultsBox.innerHTML = '';
+                return;
+            }
+
+            searchDebounceTimer = setTimeout(function() {
+                fetch(`${baseUrl}/index.php?action=live_search&q=${encodeURIComponent(query)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (!data || !data.success) {
+                            searchDropdown.classList.add('d-none');
+                            return;
+                        }
+
+                        const users = data.users || [];
+                        const posts = data.posts || [];
+
+                        if (users.length === 0 && posts.length === 0) {
+                            searchResultsBox.innerHTML = `
+                                <div class="p-3 text-center text-muted small">
+                                    No matches found for "<strong>${escapeHtml(query)}</strong>"
+                                </div>
+                            `;
+                            searchDropdown.classList.remove('d-none');
+                            return;
+                        }
+
+                        let html = '';
+
+                        // 1. Users Section
+                        if (users.length > 0) {
+                            html += `
+                                <div class="search-section-header px-3 py-2 text-uppercase micro-text fw-bold text-muted border-bottom">
+                                    People
+                                </div>
+                                <div class="search-section-list">
+                            `;
+                            users.forEach(u => {
+                                const highlightedName = highlightMatch(u.full_name, query);
+                                const highlightedUsername = highlightMatch('@' + u.username, query);
+                                const avatarHtml = u.avatar 
+                                    ? `<img src="${u.avatar}" alt="" class="rounded-circle object-fit-cover flex-shrink-0" style="width: 36px; height: 36px;">`
+                                    : `<div class="rounded-circle text-white fw-bold d-flex align-items-center justify-content-center flex-shrink-0" style="width: 36px; height: 36px; background: var(--fb-blue, #1877f2); font-size: 0.8rem;">${escapeHtml(u.initials)}</div>`;
+
+                                html += `
+                                    <a href="${baseUrl}/index.php?action=profile&id=${u.id}" class="search-result-item d-flex align-items-center gap-2 px-3 py-2 text-decoration-none">
+                                        ${avatarHtml}
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="fw-semibold text-dark small text-truncate mb-0">${highlightedName}</div>
+                                            <div class="text-muted micro-text text-truncate">${highlightedUsername}</div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            html += `</div>`;
+                        }
+
+                        // 2. Posts Section
+                        if (posts.length > 0) {
+                            html += `
+                                <div class="search-section-header px-3 py-2 text-uppercase micro-text fw-bold text-muted border-bottom mt-1">
+                                    Posts
+                                </div>
+                                <div class="search-section-list">
+                            `;
+                            posts.forEach(p => {
+                                const highlightedSnippet = highlightMatch(p.snippet, query);
+                                const highlightedAuthor = highlightMatch(p.author_name, query);
+
+                                html += `
+                                    <a href="${baseUrl}/index.php?action=view_post&id=${p.id}" class="search-result-item d-flex align-items-start gap-2 px-3 py-2 text-decoration-none">
+                                        <div class="search-post-icon mt-1 flex-shrink-0 text-muted">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                                <polyline points="14 2 14 8 20 8"></polyline>
+                                            </svg>
+                                        </div>
+                                        <div class="flex-grow-1 min-w-0">
+                                            <div class="text-dark small text-truncate mb-0">${highlightedSnippet}</div>
+                                            <div class="text-muted micro-text">${highlightedAuthor} &bull; ${escapeHtml(p.created_at)}</div>
+                                        </div>
+                                    </a>
+                                `;
+                            });
+                            html += `</div>`;
+                        }
+
+                        // 3. Footer link to full search page
+                        html += `
+                            <div class="search-footer-action p-2 border-top text-center">
+                                <a href="${baseUrl}/index.php?action=search&q=${encodeURIComponent(query)}" class="small text-primary text-decoration-none fw-semibold d-inline-flex align-items-center gap-1">
+                                    <span>See all results for "${escapeHtml(query)}"</span>
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </a>
+                            </div>
+                        `;
+
+                        searchResultsBox.innerHTML = html;
+                        searchDropdown.classList.remove('d-none');
+                    })
+                    .catch(err => {
+                        console.warn('Live search error:', err);
+                    });
+            }, 200);
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!searchInput.contains(e.target) && !searchDropdown.contains(e.target)) {
+                searchDropdown.classList.add('d-none');
+            }
+        });
+
+        // Re-open on focus if query has content
+        searchInput.addEventListener('focus', function() {
+            if (this.value.trim().length > 0 && searchResultsBox.innerHTML.trim().length > 0) {
+                searchDropdown.classList.remove('d-none');
+            }
+        });
+
+        // Close on Escape
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                searchDropdown.classList.add('d-none');
+            }
+        });
+    }
+
+    // =========================================================================
+    // 8. FACEBOOK-STYLE MESSAGES, NOTIFICATIONS & FLOATING CHAT DOCK
+    // =========================================================================
+
+    // --- A. LocalStorage State Management for Read Status ---
+    const getStoredSet = (key) => {
+        try {
+            const data = localStorage.getItem(key);
+            return data ? new Set(JSON.parse(data)) : new Set();
+        } catch (e) {
+            return new Set();
+        }
+    };
+
+    const saveStoredSet = (key, set) => {
+        try {
+            localStorage.setItem(key, JSON.stringify(Array.from(set)));
+        } catch (e) {
+            console.warn('LocalStorage error:', e);
+        }
+    };
+
+    const readMsgs = getStoredSet('unify_read_msgs');
+    const readNotifs = getStoredSet('unify_read_notifs');
+
+    // --- B. Notifications Management ---
+    const notifBadge = document.getElementById('headerNotifBadge');
+    const notifCountText = document.getElementById('notifNewBadgeCount');
+    const notifItems = document.querySelectorAll('.user-notif-item');
+    const markAllNotifBtn = document.getElementById('btnMarkAllNotifRead');
+
+    const updateNotifUI = () => {
+        let unreadCount = 0;
+        notifItems.forEach(item => {
+            const notifId = item.getAttribute('data-notif-id');
+            const unreadDot = item.querySelector('.unread-dot');
+            if (readNotifs.has(notifId)) {
+                item.classList.remove('unread');
+                if (unreadDot) unreadDot.style.display = 'none';
+            } else {
+                unreadCount++;
+            }
+        });
+
+        if (notifBadge) {
+            if (unreadCount > 0) {
+                notifBadge.textContent = unreadCount;
+                notifBadge.style.display = 'inline-block';
+            } else {
+                notifBadge.style.display = 'none';
+            }
+        }
+
+        if (notifCountText) {
+            if (unreadCount > 0) {
+                notifCountText.textContent = `${unreadCount} New`;
+                notifCountText.style.display = 'inline-block';
+            } else {
+                notifCountText.style.display = 'none';
+            }
+        }
+    };
+
+    // Initialize notification states
+    updateNotifUI();
+
+    // Notification item click handler
+    notifItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const notifId = this.getAttribute('data-notif-id');
+            const target = this.getAttribute('data-target');
+
+            // Mark read
+            if (notifId && !readNotifs.has(notifId)) {
+                readNotifs.add(notifId);
+                saveStoredSet('unify_read_notifs', readNotifs);
+                updateNotifUI();
+            }
+
+            // Close dropdown
+            const notifDropdownBtn = document.getElementById('headerNotifBtn');
+            if (notifDropdownBtn && window.bootstrap && bootstrap.Dropdown) {
+                const bsDrop = bootstrap.Dropdown.getInstance(notifDropdownBtn);
+                if (bsDrop) bsDrop.hide();
+            }
+
+            // Handle navigation or feed scroll
+            if (target === 'profile') {
+                window.location.href = `${baseUrl}/index.php?action=profile`;
+            } else if (target === 'feed') {
+                if (window.location.pathname.includes('index.php') && window.location.search.includes('action=profile')) {
+                    window.location.href = `${baseUrl}/`;
+                } else {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                }
+            }
+        });
+    });
+
+    // Mark all notifications read
+    if (markAllNotifBtn) {
+        markAllNotifBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            notifItems.forEach(item => {
+                const id = item.getAttribute('data-notif-id');
+                if (id) readNotifs.add(id);
+            });
+            saveStoredSet('unify_read_notifs', readNotifs);
+            updateNotifUI();
+        });
+    }
+
+    // --- C. Messages & Facebook Floating Chat Dock ---
+    const msgBadge = document.getElementById('headerMessagesBadge');
+    const msgCountText = document.getElementById('msgNewBadgeCount');
+    const msgItems = document.querySelectorAll('.msg-item');
+    const markAllMsgBtn = document.getElementById('btnMarkAllMessagesRead');
+    const chatSearchInput = document.getElementById('chatSearchInput');
+
+    // Floating Chat Elements
+    const chatDock = document.getElementById('fbFloatingChat');
+    const chatContactName = document.getElementById('fbChatContactName');
+    const chatStatusText = document.getElementById('fbChatStatusText');
+    const chatAvatar = document.getElementById('fbChatAvatar');
+    const chatMiniAvatar = document.getElementById('fbChatMiniAvatar');
+    const chatInitialMsg = document.getElementById('fbChatInitialMsg');
+    const chatMessagesBody = document.getElementById('fbChatMessagesBody');
+    const chatMinimizeBtn = document.getElementById('fbChatMinimizeBtn');
+    const chatMaximizeBtn = document.getElementById('fbChatMaximizeBtn');
+    const chatCloseBtn = document.getElementById('fbChatCloseBtn');
+    const chatForm = document.getElementById('fbChatForm');
+    const chatInput = document.getElementById('fbChatInput');
+
+    let currentChatContact = {
+        name: 'Alice Wonderland',
+        initials: 'AW',
+        color: '#1877f2'
+    };
+
+    const updateMsgUI = () => {
+        let unreadCount = 0;
+        msgItems.forEach(item => {
+            const msgId = item.getAttribute('data-msg-id');
+            const unreadDot = item.querySelector('.unread-dot');
+            if (readMsgs.has(msgId)) {
+                item.classList.remove('unread');
+                if (unreadDot) unreadDot.style.display = 'none';
+            } else {
+                unreadCount++;
+            }
+        });
+
+        if (msgBadge) {
+            if (unreadCount > 0) {
+                msgBadge.textContent = unreadCount;
+                msgBadge.style.display = 'inline-block';
+            } else {
+                msgBadge.style.display = 'none';
+            }
+        }
+
+        if (msgCountText) {
+            if (unreadCount > 0) {
+                msgCountText.textContent = `${unreadCount} New`;
+                msgCountText.style.display = 'inline-block';
+            } else {
+                msgCountText.style.display = 'none';
+            }
+        }
+    };
+
+    // Initialize messages states
+    updateMsgUI();
+
+    // Mark all chats read
+    if (markAllMsgBtn) {
+        markAllMsgBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            msgItems.forEach(item => {
+                const id = item.getAttribute('data-msg-id');
+                if (id) readMsgs.add(id);
+            });
+            saveStoredSet('unify_read_msgs', readMsgs);
+            updateMsgUI();
+        });
+    }
+
+    // Live search filter inside messenger dropdown
+    if (chatSearchInput) {
+        chatSearchInput.addEventListener('input', function() {
+            const q = this.value.toLowerCase().trim();
+            msgItems.forEach(item => {
+                const name = (item.getAttribute('data-contact-name') || '').toLowerCase();
+                const preview = (item.querySelector('.msg-preview')?.textContent || '').toLowerCase();
+                if (!q || name.includes(q) || preview.includes(q)) {
+                    item.style.display = '';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Function to scroll chat body to bottom
+    const scrollChatToBottom = () => {
+        if (chatMessagesBody) {
+            chatMessagesBody.scrollTop = chatMessagesBody.scrollHeight;
+        }
+    };
+
+    // Chat item click: Open floating Facebook chat box!
+    msgItems.forEach(item => {
+        item.addEventListener('click', function() {
+            const msgId = this.getAttribute('data-msg-id');
+            const contactName = this.getAttribute('data-contact-name') || 'Contact';
+            const contactInitials = this.getAttribute('data-contact-initials') || 'U';
+            const contactColor = this.getAttribute('data-contact-color') || '#1877f2';
+            const msgPreview = this.querySelector('.msg-preview')?.textContent || 'Hello!';
+
+            currentChatContact = {
+                name: contactName,
+                initials: contactInitials,
+                color: contactColor
+            };
+
+            // Mark as read
+            if (msgId && !readMsgs.has(msgId)) {
+                readMsgs.add(msgId);
+                saveStoredSet('unify_read_msgs', readMsgs);
+                updateMsgUI();
+            }
+
+            // Close header dropdown
+            const msgDropdownBtn = document.getElementById('headerMessagesBtn');
+            if (msgDropdownBtn && window.bootstrap && bootstrap.Dropdown) {
+                const bsDrop = bootstrap.Dropdown.getInstance(msgDropdownBtn);
+                if (bsDrop) bsDrop.hide();
+            }
+
+            // Setup and reveal Floating Chat dock
+            if (chatDock) {
+                if (chatContactName) chatContactName.textContent = contactName;
+                if (chatStatusText) chatStatusText.textContent = 'Active now';
+                if (chatAvatar) {
+                    chatAvatar.textContent = contactInitials;
+                    chatAvatar.style.background = contactColor;
+                }
+                if (chatMiniAvatar) {
+                    chatMiniAvatar.textContent = contactInitials;
+                    chatMiniAvatar.style.background = contactColor;
+                }
+                if (chatInitialMsg) {
+                    chatInitialMsg.textContent = msgPreview;
+                }
+
+                // Show dock & un-minimize
+                chatDock.classList.remove('d-none');
+                chatDock.classList.remove('minimized');
+
+                scrollChatToBottom();
+
+                // Focus input after slight delay
+                if (chatInput) {
+                    setTimeout(() => chatInput.focus(), 150);
+                }
+            }
+        });
+    });
+
+    // Minimize & Close controls for Floating Chat Dock
+    if (chatMinimizeBtn && chatDock) {
+        chatMinimizeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            chatDock.classList.toggle('minimized');
+        });
+    }
+
+    if (chatMaximizeBtn && chatDock) {
+        chatMaximizeBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            chatDock.classList.remove('minimized');
+            chatDock.classList.toggle('expanded');
+            const isExp = chatDock.classList.contains('expanded');
+            const maxIcon = chatMaximizeBtn.querySelector('.maximize-icon');
+            const resIcon = chatMaximizeBtn.querySelector('.restore-icon');
+            if (maxIcon && resIcon) {
+                if (isExp) {
+                    maxIcon.classList.add('d-none');
+                    resIcon.classList.remove('d-none');
+                    chatMaximizeBtn.setAttribute('title', 'Restore Chat Size');
+                } else {
+                    maxIcon.classList.remove('d-none');
+                    resIcon.classList.add('d-none');
+                    chatMaximizeBtn.setAttribute('title', 'Expand / Maximize Chat');
+                }
+            }
+            scrollChatToBottom();
+        });
+    }
+
+    if (chatCloseBtn && chatDock) {
+        chatCloseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            chatDock.classList.add('d-none');
+        });
+    }
+
+    // Header click on minimized dock un-minimizes it
+    const chatHeader = chatDock ? chatDock.querySelector('.fb-chat-header') : null;
+    if (chatHeader && chatDock) {
+        chatHeader.addEventListener('click', function(e) {
+            if (e.target.closest('#fbChatMinimizeBtn') || e.target.closest('#fbChatMaximizeBtn') || e.target.closest('#fbChatCloseBtn')) {
+                return;
+            }
+            if (chatDock.classList.contains('minimized')) {
+                chatDock.classList.remove('minimized');
+                scrollChatToBottom();
+            }
+        });
+    }
+
+    // Chat Form Submit: Send Message & Simulated Realistic Reply
+    if (chatForm && chatInput && chatMessagesBody) {
+        const simulatedReplies = [
+            "Got it! Thanks for checking in.",
+            "Sounds good! Let me take a look at that right away.",
+            "Awesome! Loving the new Unify layout and speed.",
+            "Thanks for the update! Catch you later today.",
+            "Great! Talk soon."
+        ];
+
+        chatForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const text = chatInput.value.trim();
+            if (!text) return;
+
+            // 1. Render User Outgoing Message
+            const outRow = document.createElement('div');
+            outRow.className = 'd-flex align-items-end justify-content-end mb-2 chat-msg-row outgoing';
+            outRow.innerHTML = `
+                <div class="chat-bubble chat-bubble-out shadow-sm">
+                    ${escapeHtml(text)}
+                </div>
+            `;
+            chatMessagesBody.appendChild(outRow);
+            chatInput.value = '';
+            scrollChatToBottom();
+
+            // 2. Simulated Typing Indicator after 500ms
+            setTimeout(() => {
+                const typingRow = document.createElement('div');
+                typingRow.className = 'd-flex align-items-end gap-2 mb-2 chat-msg-row incoming typing-row';
+                typingRow.id = 'chatActiveTyping';
+                typingRow.innerHTML = `
+                    <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 fb-chat-avatar-mini" style="width: 26px; height: 26px; background: ${currentChatContact.color}; font-size: 0.7rem;">${escapeHtml(currentChatContact.initials)}</div>
+                    <div class="chat-bubble chat-bubble-in shadow-sm py-2 px-3">
+                        <div class="typing-dots d-inline-flex align-items-center gap-1">
+                            <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                        </div>
+                    </div>
+                `;
+                chatMessagesBody.appendChild(typingRow);
+                scrollChatToBottom();
+
+                // 3. Simulated Incoming Response after 1400ms
+                setTimeout(() => {
+                    const typingEl = document.getElementById('chatActiveTyping');
+                    if (typingEl) typingEl.remove();
+
+                    const replyText = simulatedReplies[Math.floor(Math.random() * simulatedReplies.length)];
+                    const inRow = document.createElement('div');
+                    inRow.className = 'd-flex align-items-end gap-2 mb-2 chat-msg-row incoming';
+                    inRow.innerHTML = `
+                        <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 fb-chat-avatar-mini" style="width: 26px; height: 26px; background: ${currentChatContact.color}; font-size: 0.7rem;">${escapeHtml(currentChatContact.initials)}</div>
+                        <div class="chat-bubble chat-bubble-in shadow-sm">
+                            ${escapeHtml(replyText)}
+                        </div>
+                    `;
+                    chatMessagesBody.appendChild(inRow);
+                    scrollChatToBottom();
+                }, 1400);
+            }, 600);
+        });
+    }
 });
+

@@ -7,14 +7,14 @@ require_once __DIR__ . '/../layouts/header.php';
 // Author initials for the commenter
 $authorParts = explode(' ', trim($comment['full_name'] ?? 'User'));
 $authorInitials = count($authorParts) >= 2
-    ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-    : strtoupper(mb_substr($comment['full_name'] ?? 'U', 0, 2));
+    ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+    : strtoupper(substr($comment['full_name'] ?? 'U', 0, 2));
 
 // Post author initials
 $postAuthorParts = explode(' ', trim($comment['post_author_name'] ?? 'User'));
 $postAuthorInitials = count($postAuthorParts) >= 2
-    ? strtoupper(mb_substr($postAuthorParts[0], 0, 1) . mb_substr($postAuthorParts[count($postAuthorParts)-1], 0, 1))
-    : strtoupper(mb_substr($comment['post_author_name'] ?? 'U', 0, 2));
+    ? strtoupper(substr($postAuthorParts[0], 0, 1) . substr($postAuthorParts[count($postAuthorParts)-1], 0, 1))
+    : strtoupper(substr($comment['post_author_name'] ?? 'U', 0, 2));
 ?>
 
 <div class="row justify-content-center">
@@ -22,7 +22,7 @@ $postAuthorInitials = count($postAuthorParts) >= 2
 
         <!-- Flash Error Notifications -->
         <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <strong>Please check the errors below:</strong>
                 <ul class="mb-0 mt-2 ps-3">
@@ -30,7 +30,6 @@ $postAuthorInitials = count($postAuthorParts) >= 2
                         <li><?= htmlspecialchars($err); ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 
@@ -58,7 +57,10 @@ $postAuthorInitials = count($postAuthorParts) >= 2
                     <span class="text-muted small">&bull; Posted by <strong><?= htmlspecialchars($comment['post_author_name'] ?? ''); ?></strong> (@<?= htmlspecialchars($comment['post_author_username'] ?? ''); ?>)</span>
                 </div>
                 <div class="text-muted small fst-italic ps-2 border-start border-3 border-warning">
-                    <?= nl2br(htmlspecialchars(mb_strimwidth($comment['post_content'] ?? '', 0, 160, '...'))); ?>
+                    <?php 
+                    $pContent = $comment['post_content'] ?? '';
+                    echo nl2br(htmlspecialchars(strlen($pContent) > 160 ? substr($pContent, 0, 160) . '...' : $pContent)); 
+                    ?>
                 </div>
             </div>
 

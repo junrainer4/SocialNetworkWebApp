@@ -41,6 +41,12 @@ class SettingsController {
             exit;
         }
 
+        $activeTab = $_GET['tab'] ?? 'account';
+        $validTabs = ['account', 'password', 'avatar'];
+        if (!in_array($activeTab, $validTabs, true)) {
+            $activeTab = 'account';
+        }
+
         $pageTitle = 'Account Settings';
         require __DIR__ . '/../views/settings/index.php';
     }
@@ -54,20 +60,20 @@ class SettingsController {
         $userId = (int)$_SESSION['user_id'];
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=account');
             exit;
         }
 
         if (!validate_csrf_token()) {
             $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=account');
             exit;
         }
 
         $currentUser = $this->userModel->getProfileById($userId);
         if (!$currentUser) {
             $_SESSION['error_message'] = 'User profile not found.';
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=account');
             exit;
         }
 
@@ -80,14 +86,14 @@ class SettingsController {
         // 1. Validate Full Name
         if ($fullName === '') {
             $errors[] = 'Full Name is required.';
-        } elseif (mb_strlen($fullName) < 2 || mb_strlen($fullName) > 100) {
+        } elseif (strlen($fullName) < 2 || strlen($fullName) > 100) {
             $errors[] = 'Full Name must be between 2 and 100 characters.';
         }
 
         // 2. Validate Username
         if ($username === '') {
             $errors[] = 'Username is required.';
-        } elseif (mb_strlen($username) < 3 || mb_strlen($username) > 50) {
+        } elseif (strlen($username) < 3 || strlen($username) > 50) {
             $errors[] = 'Username must be between 3 and 50 characters.';
         } elseif (!preg_match('/^[a-zA-Z0-9_]+$/', $username)) {
             $errors[] = 'Username may only contain letters, numbers, and underscores.';
@@ -120,7 +126,7 @@ class SettingsController {
 
                 $_SESSION['success_message'] = 'Account information has been updated successfully.';
                 if (!headers_sent()) {
-                    header('Location: ' . BASE_URL . '/index.php?action=settings');
+                    header('Location: ' . BASE_URL . '/index.php?action=settings&tab=account');
                 }
                 exit;
             } elseif (empty($errors)) {
@@ -131,7 +137,7 @@ class SettingsController {
         // If validation failed or DB error occurred, no changes saved
         $_SESSION['error_message'] = implode(' ', $errors);
         if (!headers_sent()) {
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=account');
         }
         exit;
     }
@@ -159,13 +165,13 @@ class SettingsController {
         $userId = (int)$_SESSION['user_id'];
 
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=password');
             exit;
         }
 
         if (!validate_csrf_token()) {
             $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
-            header('Location: ' . BASE_URL . '/index.php?action=settings');
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=password');
             exit;
         }
 
@@ -198,7 +204,7 @@ class SettingsController {
             $newHash = password_hash($newPassword, PASSWORD_DEFAULT);
             if ($this->userModel->updatePassword($userId, $newHash)) {
                 $_SESSION['success_message'] = 'Your password has been updated successfully.';
-                header('Location: ' . BASE_URL . '/index.php?action=settings');
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=password');
                 exit;
             } else {
                 $errors[] = 'Failed to update password. Please try again.';
@@ -206,7 +212,116 @@ class SettingsController {
         }
 
         $_SESSION['error_message'] = implode(' ', $errors);
-        header('Location: ' . BASE_URL . '/index.php?action=settings');
+        header('Location: ' . BASE_URL . '/index.php?action=settings&tab=password');
+        exit;
+    }
+
+    /**
+     * Update Profile Picture from Settings tab.
+     */
+    public function updateAvatar() {
+        $this->requireAuth();
+        $userId = (int)$_SESSION['user_id'];
+
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+            exit;
+        }
+
+        if (!validate_csrf_token()) {
+            $_SESSION['error_message'] = 'Security Error: Invalid or expired CSRF token.';
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+            exit;
+        }
+
+        $user = $this->userModel->getProfileById($userId);
+        if (!$user) {
+            $_SESSION['error_message'] = 'User profile not found.';
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+            exit;
+        }
+
+        $uploadDir = __DIR__ . '/../../public/uploads/avatars/';
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0755, true);
+        }
+
+        $removePicture = !empty($_POST['remove_picture']);
+
+        if ($removePicture) {
+            if (!empty($user['profile_image'])) {
+                $oldFilePath = $uploadDir . basename($user['profile_image']);
+                if (file_exists($oldFilePath) && is_file($oldFilePath)) {
+                    @unlink($oldFilePath);
+                }
+            }
+            $this->userModel->updateProfileImage($userId, null);
+            $_SESSION['profile_image'] = null;
+            $_SESSION['profile_image_synced'] = time();
+            $_SESSION['success_message'] = 'Profile picture removed successfully.';
+            header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+            exit;
+        }
+
+        if (isset($_FILES['profile_image']) && $_FILES['profile_image']['error'] !== UPLOAD_ERR_NO_FILE) {
+            $fileError = $_FILES['profile_image']['error'];
+            if ($fileError !== UPLOAD_ERR_OK) {
+                $_SESSION['error_message'] = 'Failed to upload image. (Error code: ' . $fileError . ')';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            }
+
+            $tmpPath  = $_FILES['profile_image']['tmp_name'];
+            $fileName = $_FILES['profile_image']['name'];
+            $fileSize = $_FILES['profile_image']['size'];
+
+            if ($fileSize > 5 * 1024 * 1024) {
+                $_SESSION['error_message'] = 'Profile picture must not exceed 5MB.';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            }
+
+            $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+            $allowedExts = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+            if (!in_array($ext, $allowedExts, true)) {
+                $_SESSION['error_message'] = 'Invalid image extension. Only JPG, PNG, GIF, and WEBP formats are allowed.';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            }
+
+            $imageInfo = @getimagesize($tmpPath);
+            if ($imageInfo === false) {
+                $_SESSION['error_message'] = 'Uploaded file is not a valid image.';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            }
+
+            $safeFileName = 'avatar_' . $userId . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+            $destination  = $uploadDir . $safeFileName;
+
+            if (move_uploaded_file($tmpPath, $destination)) {
+                if (!empty($user['profile_image'])) {
+                    $oldFilePath = $uploadDir . basename($user['profile_image']);
+                    if (file_exists($oldFilePath) && is_file($oldFilePath)) {
+                        @unlink($oldFilePath);
+                    }
+                }
+
+                $this->userModel->updateProfileImage($userId, $safeFileName);
+                $_SESSION['profile_image'] = $safeFileName;
+                $_SESSION['profile_image_synced'] = time();
+                $_SESSION['success_message'] = 'Profile picture updated successfully!';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            } else {
+                $_SESSION['error_message'] = 'Could not save the uploaded image file.';
+                header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
+                exit;
+            }
+        }
+
+        $_SESSION['error_message'] = 'Please choose an image file to upload.';
+        header('Location: ' . BASE_URL . '/index.php?action=settings&tab=avatar');
         exit;
     }
 }

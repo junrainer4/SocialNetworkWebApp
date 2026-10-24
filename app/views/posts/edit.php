@@ -6,8 +6,8 @@ require_once __DIR__ . '/../layouts/header.php';
 
 $authorParts = explode(' ', trim($post['full_name']));
 $authorInitials = count($authorParts) >= 2
-    ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-    : strtoupper(mb_substr($post['full_name'], 0, 2));
+    ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+    : strtoupper(substr($post['full_name'], 0, 2));
 ?>
 
 <div class="row justify-content-center">
@@ -15,7 +15,7 @@ $authorInitials = count($authorParts) >= 2
 
         <!-- Flash Error Notifications -->
         <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <strong>Please check the errors below:</strong>
                 <ul class="mb-0 mt-2 ps-3">
@@ -23,7 +23,6 @@ $authorInitials = count($authorParts) >= 2
                         <li><?= htmlspecialchars($err); ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 

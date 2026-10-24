@@ -6,23 +6,40 @@ require_once __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="auth-card-wrapper w-100" style="max-width: 480px;">
+    <!-- Flash Success Message (Placed above the card container) -->
+    <?php if (!empty($_SESSION['success_message'])): ?>
+        <div class="alert alert-success fade show border-0 shadow-sm mb-3" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i>
+            <?= htmlspecialchars($_SESSION['success_message']); ?>
+        </div>
+        <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
+
+    <!-- Flash Error Message (Placed above the card container) -->
+    <?php if (!empty($_SESSION['error_message'])): ?>
+        <div class="alert alert-danger fade show border-0 shadow-sm mb-3" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <?= htmlspecialchars($_SESSION['error_message']); ?>
+        </div>
+        <?php unset($_SESSION['error_message']); ?>
+    <?php endif; ?>
+
     <div class="card-modern shadow-lg border-0 p-4 p-md-5 my-auto">
         <div class="text-center mb-4">
             <div class="brand-icon-box mx-auto mb-3" style="width: 52px; height: 52px; font-size: 1.6rem; background-color: var(--sidebar-bg); color: var(--accent-yellow);">
                 <i class="bi bi-person-plus-fill"></i>
             </div>
             <h3 class="fw-bold text-navy mb-1">Create an Account</h3>
-            <p class="text-muted small">Join SMCC Connect and connect with the campus community.</p>
+            <p class="text-muted small">Join Unify and connect with the community.</p>
         </div>
 
         <?php if (!empty($errors)): ?>
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4" role="alert">
+            <div class="alert alert-danger fade show border-0 shadow-sm mb-4" role="alert">
                 <ul class="mb-0 ps-3">
                     <?php foreach ($errors as $error): ?>
                         <li><?= htmlspecialchars($error); ?></li>
                     <?php endforeach; ?>
                 </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 
@@ -147,17 +164,10 @@ require_once __DIR__ . '/../layouts/header.php';
 
             <!-- Form Navigation Links -->
             <div class="text-center pt-3 border-top">
-                <div class="mb-2">
-                    <span class="text-muted small">Already have an account?</span>
-                    <a href="<?= BASE_URL ?>/index.php?action=login" class="text-navy small fw-bold text-decoration-none ms-1">
-                        Log In
-                    </a>
-                </div>
-                <div>
-                    <a href="<?= BASE_URL ?>/index.php?action=welcome" class="text-muted small text-decoration-none d-inline-flex align-items-center gap-1">
-                        <i class="bi bi-arrow-left"></i> Back to Welcome
-                    </a>
-                </div>
+                <span class="text-muted small">Already have an account?</span>
+                <a href="<?= BASE_URL ?>/index.php?action=login" class="text-navy small fw-bold text-decoration-none ms-1">
+                    Log In
+                </a>
             </div>
         </form>
     </div>

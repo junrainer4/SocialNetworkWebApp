@@ -30,9 +30,9 @@ $userInitials = 'U';
 if (!empty($user['full_name'])) {
     $parts = explode(' ', trim($user['full_name']));
     if (count($parts) >= 2) {
-        $userInitials = strtoupper(mb_substr($parts[0], 0, 1) . mb_substr($parts[count($parts)-1], 0, 1));
+        $userInitials = strtoupper(substr($parts[0], 0, 1) . substr($parts[count($parts)-1], 0, 1));
     } else {
-        $userInitials = strtoupper(mb_substr($user['full_name'], 0, 2));
+        $userInitials = strtoupper(substr($user['full_name'], 0, 2));
     }
 }
 ?>
@@ -55,7 +55,7 @@ if (!empty($user['full_name'])) {
 
             <!-- Error Messages -->
             <?php if (!empty($errors)): ?>
-                <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+                <div class="alert alert-danger fade show border-0 shadow-sm" role="alert">
                     <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <strong>Please review the errors below:</strong>
                     <ul class="mb-0 mt-2 ps-3">
@@ -63,7 +63,6 @@ if (!empty($user['full_name'])) {
                             <li><?= htmlspecialchars($error); ?></li>
                         <?php endforeach; ?>
                     </ul>
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             <?php endif; ?>
 
@@ -102,10 +101,7 @@ if (!empty($user['full_name'])) {
 
                         <!-- Avatar Actions & Controls -->
                         <div class="flex-grow-1 w-100">
-                            <div class="d-flex align-items-center justify-content-between mb-1">
-                                <label class="form-label fw-semibold mb-0 small text-secondary">Profile Picture</label>
-                                <span class="badge bg-secondary-subtle text-secondary small">1:1 Square/Circle</span>
-                            </div>
+                            <label class="form-label fw-semibold mb-1 small text-secondary">Profile Picture</label>
 
                             <p class="small text-muted mb-2">
                                 Upload a photo and adjust (zoom, reposition, or rotate) to fit perfectly.
@@ -158,15 +154,12 @@ if (!empty($user['full_name'])) {
 
                 <!-- Cover Photo Preview & Upload Area -->
                 <div class="mb-4 p-3 bg-light rounded-3 border border-light-subtle">
-                    <div class="d-flex align-items-center justify-content-between mb-2">
-                        <label class="form-label fw-semibold mb-0 small text-secondary">Profile Banner / Cover Photo</label>
-                        <span class="badge bg-secondary-subtle text-secondary small">Banner (16:9 / 3:1)</span>
-                    </div>
+                    <label class="form-label fw-semibold mb-2 small text-secondary">Profile Banner / Cover Photo</label>
                     
                     <div class="rounded-3 overflow-hidden position-relative mb-3 border" style="height: 140px; <?= $coverUrl ? "background: url('" . $coverUrl . "') center center / cover no-repeat;" : "background: linear-gradient(135deg, #07193d 0%, #1e3a8a 100%);" ?>" id="coverPreviewContainer">
                         <div class="position-absolute bottom-0 end-0 m-2">
-                            <label for="cover_photo" class="btn btn-sm btn-light shadow-sm fw-semibold mb-0 cursor-pointer">
-                                <i class="bi bi-camera me-1"></i> Change Cover Photo
+                            <label for="cover_photo" class="btn btn-sm btn-cover-action shadow fw-semibold mb-0 cursor-pointer">
+                                <i class="bi bi-camera-fill me-1"></i> Change Cover Photo
                             </label>
                             <input 
                                 type="file" 
@@ -180,7 +173,7 @@ if (!empty($user['full_name'])) {
 
                     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2">
                         <div class="form-text small text-muted">
-                            Recommended size: 1200x400. Max file size: 5MB (JPG, PNG, WEBP).
+                            Supported formats: JPG, PNG, WEBP, GIF. Max file size: 5MB.
                         </div>
                         <?php if (!empty($user['cover_photo'])): ?>
                             <div class="form-check">
@@ -255,7 +248,6 @@ if (!empty($user['full_name'])) {
                                 <div class="avatar-crop-preview"></div>
                             </div>
                         </div>
-                        <span class="badge bg-light text-secondary border small mb-3">Circular Avatar</span>
 
                         <div class="small text-muted text-start bg-light p-3 rounded-3 border">
                             <div class="mb-1"><i class="bi bi-arrows-move me-1 text-primary"></i> <strong>Drag</strong> to move photo</div>

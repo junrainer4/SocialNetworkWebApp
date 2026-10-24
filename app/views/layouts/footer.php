@@ -5,9 +5,11 @@
         <!-- Closing Page Content Container -->
         </main>
 
-        <!-- Modern Footer -->
-        <footer class="bg-white border-top py-3 px-4 text-muted small text-start">
-            &copy; <?= date('Y'); ?> <strong>SMCC Connect</strong>. All rights reserved.
+        <!-- Clean Centered Footer -->
+        <footer class="app-footer border-top py-3 px-4 small text-center mt-auto">
+            <div class="container-fluid text-center">
+                <span class="text-muted">&copy; <?= date('Y'); ?> <strong>Unify</strong>. All rights reserved.</span>
+            </div>
         </footer>
 
     <!-- Closing Main Content Area Wrapper -->
@@ -26,11 +28,21 @@
 <!-- AJAX Interactions Script (Likes, Comments, Post Creation) -->
 <script src="<?= BASE_URL ?>/public/assets/js/interactions.js?v=<?= filemtime(__DIR__ . '/../../../public/assets/js/interactions.js') ?>"></script>
 
-<!-- Keyboard Event Handlers: Quick Search Shortcut (Cmd+K / Ctrl+K) -->
+<!-- Keyboard Event Handlers: Quick Search Shortcut (Cmd+K / Ctrl+K and '/') -->
 <script>
 document.addEventListener('keydown', function(e) {
+    // Quick search with Cmd+K or Ctrl+K
     if ((e.ctrlKey || e.metaKey) && (e.key === 'k' || e.key === 'K')) {
-        const searchInput = document.querySelector('.header-search input[name="q"]');
+        const searchInput = document.getElementById('headerSearchInput') || document.querySelector('.header-search input[name="q"]');
+        if (searchInput) {
+            e.preventDefault();
+            searchInput.focus();
+            searchInput.select();
+        }
+    }
+    // Quick search with '/' key when not already focused inside an input or textarea
+    if (e.key === '/' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+        const searchInput = document.getElementById('headerSearchInput') || document.querySelector('.header-search input[name="q"]');
         if (searchInput) {
             e.preventDefault();
             searchInput.focus();
@@ -38,7 +50,79 @@ document.addEventListener('keydown', function(e) {
         }
     }
 });
+
+// Universal Auto-Dismiss Flash Alerts after 3 seconds
+document.addEventListener('DOMContentLoaded', function () {
+    const alerts = document.querySelectorAll('.alert:not(.alert-permanent)');
+    if (alerts.length > 0) {
+        setTimeout(function () {
+            alerts.forEach(function (alert) {
+                alert.style.transition = 'opacity 0.6s ease, transform 0.6s ease, max-height 0.6s ease, margin 0.6s ease, padding 0.6s ease';
+                alert.style.opacity = '0';
+                alert.style.transform = 'translateY(-10px)';
+                setTimeout(function () {
+                    if (window.bootstrap && bootstrap.Alert) {
+                        try {
+                            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+                            if (bsAlert) bsAlert.close();
+                        } catch (e) {
+                            alert.remove();
+                        }
+                    } else {
+                        alert.remove();
+                    }
+                }, 600);
+            });
+        }, 3000);
+    }
+});
 </script>
+
+<!-- FLOATING FACEBOOK CHAT DOCK -->
+<div id="fbFloatingChat" class="fb-chat-dock d-none shadow-lg">
+    <div class="fb-chat-header d-flex align-items-center justify-content-between px-3 py-3 border-bottom">
+        <div class="d-flex align-items-center gap-2 min-w-0">
+            <div class="position-relative flex-shrink-0">
+                <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold fb-chat-avatar" id="fbChatAvatar" style="width: 44px; height: 44px; background: #1877f2; font-size: 0.95rem;">AW</div>
+                <span class="online-status-dot mini" style="width: 11px; height: 11px; border-width: 2px;"></span>
+            </div>
+            <div class="min-w-0">
+                <div class="fw-bold text-truncate fb-chat-name" id="fbChatContactName" style="font-size: 1.05rem;">Alice Wonderland</div>
+                <div class="micro-text text-success" id="fbChatStatusText" style="font-size: 0.8rem;">Active now</div>
+            </div>
+        </div>
+        <div class="d-flex align-items-center gap-1">
+            <button type="button" class="btn btn-sm btn-link text-muted p-1 fb-chat-ctrl" id="fbChatMinimizeBtn" title="Minimize Chat" aria-label="Minimize Chat">
+                <i class="bi bi-dash-lg"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-link text-muted p-1 fb-chat-ctrl" id="fbChatMaximizeBtn" title="Expand / Maximize Chat" aria-label="Expand / Maximize Chat">
+                <i class="bi bi-arrows-angle-expand maximize-icon"></i>
+                <i class="bi bi-arrows-angle-contract restore-icon d-none"></i>
+            </button>
+            <button type="button" class="btn btn-sm btn-link text-muted p-1 fb-chat-ctrl" id="fbChatCloseBtn" title="Close Chat" aria-label="Close Chat">
+                <i class="bi bi-x-lg"></i>
+            </button>
+        </div>
+    </div>
+    <div class="fb-chat-body p-3 p-md-4" id="fbChatMessagesBody">
+        <div class="text-center micro-text text-muted mb-3" id="fbChatTimestamp" style="font-size: 0.82rem;">Today</div>
+        <!-- Initial Incoming Message -->
+        <div class="d-flex align-items-end gap-2 mb-3 chat-msg-row incoming" id="fbChatInitialRow">
+            <div class="rounded-circle text-white d-flex align-items-center justify-content-center fw-bold flex-shrink-0 fb-chat-avatar-mini" id="fbChatMiniAvatar" style="width: 32px; height: 32px; background: #1877f2; font-size: 0.8rem;">AW</div>
+            <div class="chat-bubble chat-bubble-in shadow-sm" id="fbChatInitialMsg">
+                Hey, loved your latest post! Are you free later?
+            </div>
+        </div>
+    </div>
+    <div class="fb-chat-footer p-3 border-top">
+        <form id="fbChatForm" class="d-flex align-items-center gap-2">
+            <input type="text" class="form-control rounded-pill px-3 py-2" id="fbChatInput" placeholder="Type a message..." autocomplete="off">
+            <button type="submit" class="btn btn-primary rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 42px; height: 42px;" title="Send">
+                <i class="bi bi-send-fill text-white"></i>
+            </button>
+        </form>
+    </div>
+</div>
 
 <!-- Image Crop/Adjust Modal -->
 <div class="modal fade" id="imageCropModal" tabindex="-1" aria-labelledby="imageCropModalLabel" aria-hidden="true" data-bs-backdrop="static">

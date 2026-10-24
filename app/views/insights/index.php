@@ -10,18 +10,16 @@ $currentUserId = $_SESSION['user_id'] ?? null;
 
         <!-- Flash Notifications / Error Alerts -->
         <?php if (!empty($errorMessage)): ?>
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <div class="alert alert-danger fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
                 <i class="bi bi-exclamation-triangle-fill me-2"></i>
                 <?= htmlspecialchars($errorMessage); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
         <?php endif; ?>
 
         <?php if (!empty($_SESSION['success_message'])): ?>
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
+            <div class="alert alert-success fade show border-0 shadow-sm mb-4 rounded-3" role="alert">
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <?= htmlspecialchars($_SESSION['success_message']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
             <?php unset($_SESSION['success_message']); ?>
         <?php endif; ?>
@@ -174,8 +172,8 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 <?php
                                 $uParts = explode(' ', trim($u['full_name']));
                                 $uInitials = count($uParts) >= 2
-                                    ? strtoupper(mb_substr($uParts[0], 0, 1) . mb_substr($uParts[count($uParts)-1], 0, 1))
-                                    : strtoupper(mb_substr($u['full_name'], 0, 2));
+                                    ? strtoupper(substr($uParts[0], 0, 1) . substr($uParts[count($uParts)-1], 0, 1))
+                                    : strtoupper(substr($u['full_name'], 0, 2));
                                 ?>
                                 <div class="col-12 col-md-6">
                                     <div class="p-3 rounded-3 border bg-body h-100 d-flex align-items-center justify-content-between">
@@ -227,8 +225,8 @@ $currentUserId = $_SESSION['user_id'] ?? null;
                                 <?php
                                 $authorParts = explode(' ', trim($post['full_name']));
                                 $authorInitials = count($authorParts) >= 2
-                                    ? strtoupper(mb_substr($authorParts[0], 0, 1) . mb_substr($authorParts[count($authorParts)-1], 0, 1))
-                                    : strtoupper(mb_substr($post['full_name'], 0, 2));
+                                    ? strtoupper(substr($authorParts[0], 0, 1) . substr($authorParts[count($authorParts)-1], 0, 1))
+                                    : strtoupper(substr($post['full_name'], 0, 2));
 
                                 $postTime = date('M j, Y \a\t g:i a', strtotime($post['created_at']));
                                 ?>

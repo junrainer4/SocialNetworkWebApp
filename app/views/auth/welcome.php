@@ -6,6 +6,24 @@ require_once __DIR__ . '/../layouts/header.php';
 ?>
 
 <div class="auth-card-wrapper w-100" style="max-width: 460px;">
+    <!-- Flash Success Message (Above Container) -->
+    <?php if (!empty($_SESSION['success_message'])): ?>
+        <div class="alert alert-success fade show border-0 shadow-sm mb-3 text-start" role="alert">
+            <i class="bi bi-check-circle-fill me-1"></i>
+            <?= htmlspecialchars($_SESSION['success_message']); ?>
+        </div>
+        <?php unset($_SESSION['success_message']); ?>
+    <?php endif; ?>
+
+    <!-- Flash Error Message (Above Container) -->
+    <?php if (!empty($_SESSION['error_message'])): ?>
+        <div class="alert alert-danger fade show border-0 shadow-sm mb-3 text-start" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+            <?= htmlspecialchars($_SESSION['error_message']); ?>
+        </div>
+        <?php unset($_SESSION['error_message']); ?>
+    <?php endif; ?>
+
     <div class="card-modern shadow-lg border-0 p-4 p-md-5 my-auto text-center">
         <!-- Logo & Brand Icon -->
         <div class="mb-3">
@@ -20,26 +38,6 @@ require_once __DIR__ . '/../layouts/header.php';
                 Connect with your campus community, share updates, and stay informed.
             </p>
         </div>
-
-        <!-- Flash Success Message -->
-        <?php if (!empty($_SESSION['success_message'])): ?>
-            <div class="alert alert-success alert-dismissible fade show border-0 shadow-sm my-3 text-start" role="alert">
-                <i class="bi bi-check-circle-fill me-1"></i>
-                <?= htmlspecialchars($_SESSION['success_message']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['success_message']); ?>
-        <?php endif; ?>
-
-        <!-- Flash Error Message -->
-        <?php if (!empty($_SESSION['error_message'])): ?>
-            <div class="alert alert-danger alert-dismissible fade show border-0 shadow-sm my-3 text-start" role="alert">
-                <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                <?= htmlspecialchars($_SESSION['error_message']); ?>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <?php unset($_SESSION['error_message']); ?>
-        <?php endif; ?>
 
         <!-- Two Clear Authentication Choices -->
         <div class="d-grid gap-3 my-4">
